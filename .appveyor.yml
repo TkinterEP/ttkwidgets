@@ -12,7 +12,7 @@ install:
   - "%PYTHON%\\python.exe -m pip install codecov coverage nose"
 build: off
 test_script:
-  - "%PYTHON%\\python.exe setup.py install"
+  - "%PYTHON%\\python.exe -m pip install ."
   - "%PYTHON%\\python.exe -m nose --with-coverage"
 after_test:
   - "%PYTHON%\\Scripts\\codecov.exe"
