@@ -9,7 +9,7 @@ setup(
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     author="RedFantom and others",
     url="https://www.github.com/RedFantom/ttkwidgets",
-    download_url="https://www.github.com/RedFantom/ttkwidgets",
+    download_url="https://www.github.com/RedFantom/ttkwidgets/releases",
     license="AGPL",
     classifiers=["Programming Language :: Python :: 2.7",
                  "Programming Language :: Python :: 3",
