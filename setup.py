@@ -14,5 +14,6 @@ setup(
     classifiers=["Programming Language :: Python :: 2.7",
                  "Programming Language :: Python :: 3",
                  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"],
-    include_package_data=True
+    include_package_data=True,
+    install_requires=["pillow"]
 )
