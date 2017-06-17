@@ -1,0 +1,16 @@
+language: python
+required: sudo
+python:
+    - "2.7"
+    - "3.5"
+virtualenv:
+    system_site_packages: true
+install:
+  - sudo apt-get install python-tk
+  - python -m pip install nose coverage codecov
+script:
+  - python setup.py install
+  - python -m nose
+after_success:
+  - coverage run nosetests
+  - codecov
