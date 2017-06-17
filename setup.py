@@ -13,6 +13,6 @@ setup(
     license="AGPL",
     classifiers=["Programming Language :: Python :: 2.7",
                  "Programming Language :: Python :: 3",
-                 "License :: OSI Approved :: GNU Affero General Public License v2 or later (AGPLv2+)"],
+                 "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"],
     include_package_data=True
 )
