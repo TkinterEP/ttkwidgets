@@ -26,7 +26,7 @@ class ScrolledListbox(ttk.Frame):
         ttk.Frame.__init__(self, master)
         self.listbox = tk.Listbox(self, **kwargs)
         self.scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
-        self.listbox.config(yscrollcommand=self.scrollbar.set)
+        self.config_listbox(yscrollcommand=self.scrollbar.set)
         if compound is not tk.LEFT and compound is not tk.RIGHT:
             raise ValueError("Invalid compound value passed: {0}".format(compound))
         self.__compound = compound
