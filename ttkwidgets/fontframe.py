@@ -344,13 +344,16 @@ class FontChooser(tk.Toplevel):
         self.style = ttk.Style()
         self.style.configure("FontChooser.TLabel", font=("default", 11), relief=tk.SUNKEN, anchor=tk.CENTER)
         self._font_family_header = ttk.Label(self, text="Font family", style="FontChooser.TLabel")
-        self._font_family_list = FontFamilyListbox(self, callback=self._on_family)
+        self._font_family_list = FontFamilyListbox(self, callback=self._on_family, height=8)
+        self._font_label_variable = tk.StringVar()
+        self._font_label = ttk.Label(self, textvariable=self._font_label_variable, background="white")
         self._font_properties_header = ttk.Label(self, text="Font properties", style="FontChooser.TLabel")
         self._font_properties_frame = FontPropertiesFrame(self, callback=self._on_properties, label=False)
         self._font_size_header = ttk.Label(self, text="Font size", style="FontChooser.TLabel")
         self._size_dropdown = FontSizeDropdown(self, callback=self._on_size, width=4)
-        self._example_entry = ttk.Entry(self, font=("default", 11))
-        self._example_entry.insert(0, "Example")
+        self._example_label = tk.Label(self, text="Example", anchor=tk.CENTER, background="white", height=2,
+                                       relief=tk.SUNKEN)
+
         self._family = None
         self._size = 11
         self._bold = False
@@ -367,13 +370,14 @@ class FontChooser(tk.Toplevel):
         Puts all the child widgets in the correct position
         :return: None
         """
-        self._font_family_header.grid(row=1, column=1, sticky="nswe", padx=5, pady=5)
+        self._font_family_header.grid(row=0, column=1, sticky="nswe", padx=5, pady=5)
+        self._font_label.grid(row=1, column=1, sticky="nswe", padx=5, pady=(0, 5))
         self._font_family_list.grid(row=2, rowspan=3, column=1, sticky="nswe", padx=5, pady=(0, 5))
-        self._font_properties_header.grid(row=1, column=2, sticky="nswe", padx=5, pady=5)
-        self._font_properties_frame.grid(row=2, column=2, sticky="we", padx=5, pady=5)
+        self._font_properties_header.grid(row=0, column=2, sticky="nswe", padx=5, pady=5)
+        self._font_properties_frame.grid(row=1, rowspan=2, column=2, sticky="we", padx=5, pady=5)
         self._font_size_header.grid(row=3, column=2, sticky="we", padx=5, pady=5)
         self._size_dropdown.grid(row=4, column=2, sticky="we", padx=5, pady=5)
-        self._example_entry.grid(row=5, column=1, columnspan=2, sticky="nswe", padx=5, pady=5)
+        self._example_label.grid(row=5, column=1, columnspan=2, sticky="nswe", padx=5, pady=5)
         self._ok_button.grid(row=6, column=2, sticky="nswe", padx=5, pady=5)
         self._cancel_button.grid(row=6, column=1, sticky="nswe", padx=5, pady=5)
 
@@ -383,6 +387,7 @@ class FontChooser(tk.Toplevel):
         :param family: family name
         :return: None
         """
+        self._font_label_variable.set(family)
         self._family = family
         self._on_change()
 
@@ -410,10 +415,7 @@ class FontChooser(tk.Toplevel):
         :return: None
         """
         font = self.__generate_font_tuple()
-        label = ttk.Label(text="A", font=font)
-        width = 200 // label.winfo_reqwidth()
-        self._example_entry.config(font=font, width=width)
-        self._grid_widgets()
+        self._example_label.configure(font=font)
 
     def __generate_font_tuple(self):
         """
