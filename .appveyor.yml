@@ -5,7 +5,7 @@ environment:
     - PYTHON: "C:\\PYTHON35"
     - PYTHON: "C:\\PYTHON36"
 install:
-  - "%PYTHON%\\python.exe -m pip install codecov coverage nose"
+  - "%PYTHON%\\python.exe -m pip install codecov coverage nose mock"
 build: off
 test_script:
   - "%PYTHON%\\python.exe -m pip install ."
