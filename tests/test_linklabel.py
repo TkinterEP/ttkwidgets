@@ -1,22 +1,14 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
 from ttkwidgets import LinkLabel
-import unittest
+from tests import BaseWidgetTest
 try:
     import Tkinter as tk
 except ImportError:
     import tkinter as tk
 
 
-class TestLinkLabel(unittest.TestCase):
-    def setUp(self):
-        self.window = tk.Tk()
-        self.window.update()
-
-    def tearDown(self):
-        self.window.update()
-        self.window.destroy()
-
+class TestLinkLabel(BaseWidgetTest):
     def test_linklabel_init(self):
         label = LinkLabel(self.window, link="google.com", text="Visit Google")
         label.pack()
