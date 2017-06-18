@@ -30,8 +30,8 @@ class TestDebugWindow(BaseWidgetTest):
         debug = DebugWindow(self.window)
         print("Something!")
         self.window.update()
-        module = "tkinter.filedialog.saveasfilename" if is_python_3() else "tkFileDialog.saveasfilename"
-        with mock.patch(module, "somefile.txt"):
+        module = "tkinter.filedialog.asksaveasfilename" if is_python_3() else "tkFileDialog.asksaveasfilename"
+        with mock.patch(module, return_value="somefile.txt"):
             debug.save()
         self.assertTrue(os.path.exists("somefile.txt"))
         with open("somefile.txt", "r") as f:
