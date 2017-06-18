@@ -1,5 +1,8 @@
-# Original location: http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py
-# Licensed under the GPL-compatible Python license
+"""
+Author: The Python Team
+License: The Python License
+Source: Original location: http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py
+"""
 try:
     import Tkinter as tk
     import ttk

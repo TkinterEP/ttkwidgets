@@ -1,5 +1,8 @@
-# Copyright (c) RedFantom 2017
-# For license see LICENSE
+"""
+Author: RedFantom
+License: GNU GPLv3
+Source: This repository
+"""
 try:
     import Tkinter as tk
     import ttk

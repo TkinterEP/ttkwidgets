@@ -1,6 +1,8 @@
-# Copyright (c) RedFantom 2017
-# Fully written by RedFantom
-# For license see LICENSE
+"""
+Author: RedFantom
+License: GNU GPLv3
+Source: This repository
+"""
 # The following sites were used for reference in the creation of this file:
 # http://code.activestate.com/recipes/578894-mousewheel-binding-to-scrolling-area-tkinter-multi/
 # http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
