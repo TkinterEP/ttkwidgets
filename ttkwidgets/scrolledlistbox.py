@@ -30,6 +30,7 @@ class ScrolledListbox(ttk.Frame):
         if compound is not tk.LEFT and compound is not tk.RIGHT:
             raise ValueError("Invalid compound value passed: {0}".format(compound))
         self.__compound = compound
+        self._grid_widgets()
 
     def _grid_widgets(self):
         """
