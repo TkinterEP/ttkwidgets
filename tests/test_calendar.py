@@ -12,6 +12,11 @@ except ImportError:
 class TestCalendar(unittest.TestCase):
     def setUp(self):
         self.window = tk.Tk()
+        self.window.update()
+
+    def tearDown(self):
+        self.window.update()
+        self.window.destroy()
 
     def test_calendar_init(self):
         widget = Calendar(self.window)
@@ -27,6 +32,3 @@ class TestCalendar(unittest.TestCase):
     def test_calendar_kw(self):
         widget = Calendar(self.window, firstweekday=calendar.SUNDAY, year=2016, month=12)
         widget.pack()
-
-    def tearDown(self):
-        self.window.destroy()
