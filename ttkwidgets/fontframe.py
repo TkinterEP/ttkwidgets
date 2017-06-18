@@ -293,6 +293,24 @@ class FontSelectFrame(ttk.Frame):
         if callable(self.__callback):
             self.__callback((self._family, self._size, self._bold, self._italic, self._underline, self._overstrike))
 
+    def __generate_font_tuple(self):
+        """
+        Generate a font tuple for tkinter widgets based on the user's entries
+        :return: font tuple (family_name, size, *options)
+        """
+        if not self._family:
+            return None
+        font = [self._family, self._size]
+        if self._bold:
+            font.append("bold")
+        if self._italic:
+            font.append("italic")
+        if self._underline:
+            font.append("underline")
+        if self._overstrike:
+            font.append("overstrike")
+        return tuple(font)
+
     @property
     def font(self):
         """
@@ -301,9 +319,13 @@ class FontSelectFrame(ttk.Frame):
         """
         if not self._family:
             return None
-        return font.Font(family=self._family, size=self._size, weight=font.BOLD if self._bold else font.NORMAL,
-                         slant=font.ITALIC if self._italic else font.ROMAN, underline=1 if self._underline else 0,
-                         overstrike=1 if self._overstrike else 0)
+        font_obj = font.Font(family=self._family, size=self._size,
+                             weight=font.BOLD if self._bold else font.NORMAL,
+                             slant=font.ITALIC if self._italic else font.ROMAN,
+                             underline=1 if self._underline else 0,
+                             overstrike=1 if self._overstrike else 0)
+        font_tuple = self.__generate_font_tuple()
+        return font_tuple, font_obj
 
 
 class FontChooser(tk.Toplevel):
@@ -451,4 +473,3 @@ def askfont():
     chooser = FontChooser()
     chooser.wait_window()
     return chooser.font
-
