@@ -34,18 +34,18 @@ class LinkLabel(ttk.Label):
         self._clicked_color = clicked_color
         self.__link = link
         self.__clicked = False
-        self.bind("<Button-1>", lambda l=link: self.open_link())
+        self.bind("<Button-1>", self.open_link)
         self.bind("<Enter>", self._on_enter)
         self.bind("<Leave>", self._on_leave)
 
-    def _on_enter(self):
+    def _on_enter(self, *args):
         """
         Sets the text color to the hover color
         :return: None
         """
         self.config(foreground=self._hover_color)
 
-    def _on_leave(self):
+    def _on_leave(self, *args):
         """
         Sets the text color to either the normal color when not clicked or the clicked color when clicked
         :return: None
@@ -61,11 +61,13 @@ class LinkLabel(ttk.Label):
         :return:
         """
         self.__clicked = False
-        self.config(foreground=self._normal_color)
+        self._on_leave()
 
-    def open_link(self):
+    def open_link(self, *args):
         """
         Open the link in the web browser
         :return: None
         """
         webbrowser.open(self.__link)
+        self.__clicked = True
+        self._on_leave()
