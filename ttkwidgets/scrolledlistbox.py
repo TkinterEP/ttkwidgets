@@ -15,7 +15,7 @@ class ScrolledListbox(ttk.Frame):
     """
     Simple Listbox with an added scrollbar
     """
-    def __init__(self, master=None, compound=tk.LEFT, **kwargs):
+    def __init__(self, master=None, compound=tk.RIGHT, **kwargs):
         """
         :param master: master widget
         :param compound: side for the Scrollbar to be on (tk.LEFT or tk.RIGHT)
@@ -36,7 +36,7 @@ class ScrolledListbox(ttk.Frame):
         Puts the two whole widgets in the correct position depending on compound
         :return: None
         """
-        scrollbar_column = 0 if self.__compound is tk.RIGHT else 2
+        scrollbar_column = 0 if self.__compound is tk.LEFT else 2
         self.listbox.grid(row=0, column=1, sticky="nswe")
         self.scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
 

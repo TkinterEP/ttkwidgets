@@ -21,7 +21,7 @@ class ScrolledFrame(ttk.Frame):
     Widgets can be placed in instance.interior attribute Frame with any geometry manager
     """
 
-    def __init__(self, master=None, compound=tk.LEFT, canvasheight=400, canvaswidth=400, canvasborder=0, **kwargs):
+    def __init__(self, master=None, compound=tk.RIGHT, canvasheight=400, canvaswidth=400, canvasborder=0, **kwargs):
         """
         :param master: master widget
         :param compound: side the scrollbar should be on
@@ -48,7 +48,7 @@ class ScrolledFrame(ttk.Frame):
         Places all the child widgets in the appropriate positions
         :return: None
         """
-        scrollbar_column = 0 if self.__compound is tk.RIGHT else 2
+        scrollbar_column = 0 if self.__compound is tk.LEFT else 2
         self._canvas.grid(row=0, column=1, sticky="nswe")
         self.interior.grid(row=0, column=1, sticky="nswe")
         self._scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
