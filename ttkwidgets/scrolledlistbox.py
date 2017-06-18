@@ -32,6 +32,10 @@ class ScrolledListbox(ttk.Frame):
         self.__compound = compound
 
     def _grid_widgets(self):
+        """
+        Puts the two whole widgets in the correct position depending on compound
+        :return: None
+        """
         scrollbar_column = 0 if self.__compound is tk.RIGHT else 2
         self.listbox.grid(row=0, column=1, sticky="nswe")
         self.scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
