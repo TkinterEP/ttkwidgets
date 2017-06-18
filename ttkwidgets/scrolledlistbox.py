@@ -41,3 +41,9 @@ class ScrolledListbox(ttk.Frame):
         self.listbox.grid(row=0, column=1, sticky="nswe")
         self.scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
 
+    def config_listbox(self, *args, **kwargs):
+        """
+        Pass on arguments to listbox.configure
+        """
+        self.listbox.configure(*args, **kwargs)
+
