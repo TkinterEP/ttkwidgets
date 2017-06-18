@@ -42,7 +42,7 @@ class DebugWindow(tk.Toplevel):
         if file_name is "" or file_name is None:
             return
         with open(file_name, "w") as f:
-            f.write(self.text.get(0, tk.END))
+            f.write(self.text.get("1.0", tk.END))
 
     def _grid_widgets(self):
         self.text.grid(row=0, column=0)
