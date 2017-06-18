@@ -15,6 +15,12 @@ class TestFontChooser(BaseWidgetTest):
         chooser = FontChooser(self.window)
         self.window.update()
 
+    def test_fontchooser_noselection(self):
+        chooser = FontChooser(self.window)
+        self.window.update()
+        results = chooser.font
+        self.assertEqual(results, (None, None))
+
     def test_fontchooser_selection(self):
         chooser = FontChooser(self.window)
         self.window.update()
@@ -54,5 +60,26 @@ class TestFontChooser(BaseWidgetTest):
         self.window.update()
         results = chooser.font
         self.assertEqual(results[0][1], 14)
+
+
+class TestFontSelectFrame(BaseWidgetTest):
+    def test_fontselectframe_init(self):
+        frame = FontSelectFrame(self.window)
+        frame.pack()
+        self.window.update()
+
+    def test_fontselectframe_family(self):
+        frame = FontSelectFrame(self.window)
+        frame.pack()
+        self.window.update()
+        frame._family_dropdown.set(font.families()[1])
+        self.window.update()
+        frame._on_family(frame._family_dropdown.get())
+        results = frame.font
+        self.assertIsInstance(results, tuple)
+        self.assertEqual(len(results), 2)
+        self.assertIsInstance(results[0], tuple)
+        self.assertEqual(len(results[0]), 2)
+        self.assertIsInstance(results[1], font.Font)
 
 
