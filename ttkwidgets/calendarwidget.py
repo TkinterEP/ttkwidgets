@@ -1,7 +1,7 @@
 """
 Author: The Python Team
 License: The Python License
-Source: Original location: http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py
+Source: http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py
 """
 try:
     import Tkinter as tk
