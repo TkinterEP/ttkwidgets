@@ -6,3 +6,5 @@ from ttkwidgets.toggledframe import ToggledFrame
 from ttkwidgets.linklabel import LinkLabel
 from ttkwidgets.scrolledlistbox import ScrolledListbox
 from ttkwidgets.autocompletewidgets import AutocompleteCombobox, AutocompleteEntry
+from ttkwidgets.fontframe import FontSizeDropdown, FontPropertiesFrame, FontFamilyDropdown, FontFamilyListbox, \
+    FontSelectFrame, FontChooser, askfont
