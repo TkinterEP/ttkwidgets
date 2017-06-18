@@ -1,13 +1,9 @@
 environment:
   matrix:
     - PYTHON: "C:\\PYTHON27"
-    - PYTHON: "C:\\PYTHON27-x64"
     - PYTHON: "C:\\PYTHON34"
-    - PYTHON: "C:\\PYTHON34-x64"
     - PYTHON: "C:\\PYTHON35"
-    - PYTHON: "C:\\PYTHON35-x64"
     - PYTHON: "C:\\PYTHON36"
-    - PYTHON: "C:\\PYTHON36-x64"
 install:
   - "%PYTHON%\\python.exe -m pip install codecov coverage nose"
 build: off
