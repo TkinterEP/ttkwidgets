@@ -31,6 +31,7 @@ class AutocompleteEntry(ttk.Entry):
         """
         ttk.Entry.__init__(self, master, **kwargs)
         self._completion_list = completevalues
+        self.set_completion_list(completevalues)
         self._hits = []
         self._hit_index = 0
         self.position = 0
@@ -123,11 +124,9 @@ class AutocompleteCombobox(ttk.Combobox):
         :param kwargs: keyword arguments passed to Combobox initializer
         """
         ttk.Combobox.__init__(self, master, values=completevalues, **kwargs)
-        if completevalues and not isinstance(completevalues, list):
-            raise ValueError("completevalues keyword argument must be None or list")
-        if completevalues is not None:
-            self.set_completion_list(list(completevalues))
-        self._completion_list = []
+        self._completion_list = completevalues
+        if isinstance(completevalues, list):
+            self.set_completion_list(completevalues)
         self._hits = []
         self._hit_index = 0
         self.position = 0
