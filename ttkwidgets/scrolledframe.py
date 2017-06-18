@@ -14,7 +14,7 @@ except ImportError:
     from tkinter import ttk
 
 
-class VerticalScrollFrame(ttk.Frame):
+class ScrolledFrame(ttk.Frame):
     """
     A frame that sports a vertically oriented scrollbar for scrolling
 
@@ -34,6 +34,7 @@ class VerticalScrollFrame(ttk.Frame):
         self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
         self._canvas = tk.Canvas(self, borderwidth=canvasborder, highlightthickness=0,
                                  yscrollcommand=self._scrollbar.set, width=canvaswidth, height=canvasheight)
+        self.__compound = compound
         self._scrollbar.config(command=self._canvas.yview)
         self._canvas.yview_moveto(0)
         self.interior = ttk.Frame(self._canvas)
@@ -47,9 +48,10 @@ class VerticalScrollFrame(ttk.Frame):
         Places all the child widgets in the appropriate positions
         :return: None
         """
-        self._canvas.grid(row=0, column=0, sticky="nswe")
-        self.interior.grid(row=0, column=0, sticky="nswe")
-        self._scrollbar.grid(row=0, column=1, sticky="ns")
+        scrollbar_column = 0 if self.__compound is tk.RIGHT else 2
+        self._canvas.grid(row=0, column=1, sticky="nswe")
+        self.interior.grid(row=0, column=1, sticky="nswe")
+        self._scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
 
     def __configure_interior(self, *args):
         """

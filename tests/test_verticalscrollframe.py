@@ -1,6 +1,6 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
-from ttkwidgets import VerticalScrollFrame
+from ttkwidgets import ScrolledFrame
 import unittest
 try:
     import Tkinter as tk
@@ -16,6 +16,6 @@ class TestVerticalScrollFrame(unittest.TestCase):
         self.window.destroy()
 
     def test_vertical_scroll_frame_init(self):
-        frame = VerticalScrollFrame(self.window)
+        frame = ScrolledFrame(self.window)
         frame.pack()
         self.window.update()
