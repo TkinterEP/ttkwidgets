@@ -24,3 +24,13 @@ class TestLinkLabel(BaseWidgetTest):
         self.window.update()
         label.open_link()
         self.window.update()
+        label.keys()
+        self.window.update()
+        label.configure(link="www.wikipedia.fr")
+        self.window.update()
+        label.cget("hover_color")
+        self.window.update()
+        label["normal_color"]
+        self.window.update()
+        label["clicked_color"] = "purple"
+        self.window.update()
