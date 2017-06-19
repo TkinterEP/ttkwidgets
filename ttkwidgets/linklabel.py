@@ -3,7 +3,7 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
-# Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
+# Based on an idea by Nelson Brochado (https://www.github.com/nbroltkinter-kit)
 try:
     import Tkinter as tk
     import ttk
@@ -45,7 +45,7 @@ class LinkLabel(ttk.Label):
         return self.cget(key)
 
     def __setitem__(self, key, value):
-        self.configure(key=value)
+        self.configure(**{key: value})
 
     def _on_enter(self, *args):
         """
