@@ -8,6 +8,7 @@ This file contains a list of all the authors of widgets in this repository.
   * `ScrolledListbox`
   * `FontChooser`, based on an idea by [Nelson Brochado](https://www.github.com/nbro)
   * `FontSelectFrame`
+  * `ScaleEntry`
 - The Python Team
   * `Calendar`, found [here](http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py)
 - Mitja Martini
