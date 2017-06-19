@@ -28,6 +28,9 @@ class LinkLabel(ttk.Label):
         :param clicked_color: text color when link is clicked
         :param kwargs: options to be passed on to Label initializer
         """
+        if not "cursor" in kwargs:
+            # set default cursor to 'hand1'
+            kwargs["cursor"] = "hand1"
         ttk.Label.__init__(self, master, foreground=normal_color, **kwargs)
         self._normal_color = normal_color
         self._hover_color = hover_color
@@ -37,6 +40,12 @@ class LinkLabel(ttk.Label):
         self.bind("<Button-1>", self.open_link)
         self.bind("<Enter>", self._on_enter)
         self.bind("<Leave>", self._on_leave)
+
+    def __getitem__(self, key):
+        return self.cget(key)
+
+    def __setitem__(self, key, value):
+        self.configure(key=value)
 
     def _on_enter(self, *args):
         """
@@ -68,6 +77,45 @@ class LinkLabel(ttk.Label):
         Open the link in the web browser
         :return: None
         """
-        webbrowser.open(self.__link)
-        self.__clicked = True
+        if not "disabled" in self.state():
+            webbrowser.open(self.__link)
+            self.__clicked = True
+            self._on_leave()
+
+    def cget(self, key):
+        """ Return the resource value for a KEY given as string. """
+        if key == "link":
+            return self.__link
+        elif key == "hover_color":
+            return self._hover_color
+        elif key == "normal_color":
+            return self._normal_color
+        elif key == "clicked_color":
+            return self._clicked_color
+        else:
+            return ttk.Label.cget(self, key)
+
+    def configure(self, **kwargs):
+        """
+        Configure resources of a widget.
+
+        The values for resources are specified as keyword
+        arguments. To get an overview about
+        the allowed keyword arguments call the method keys.
+        """
+        if "link" in kwargs:
+            self.__link = kwargs.pop("link")
+        if "hover_color" in kwargs:
+            self._hover_color = kwargs.pop("hover_color")
+        if "normal_color" in kwargs:
+            self._normal_color = kwargs.pop("normal_color")
+        if "clicked_color" in kwargs:
+            self._clicked_color = kwargs.pop("clicked_color")
+        ttk.Label.configure(self, **kwargs)
         self._on_leave()
+
+    def keys(self):
+        """ Return a list of all resource names of this widget. """
+        keys = ttk.Label.keys(self)
+        keys.extend(["link", "normal_color", "hover_color", "clicked_color"])
+        return keys
