@@ -95,10 +95,9 @@ class ScaleEntry(ttk.Frame):
         Subclass of tk.IntVar that allows limits in the value of the variable stored
         """
         def __init__(self, low, high):
-            tk.IntVar.__init__(self)
-            self.__low = low
-            self.__high = high
-            self.set(low)
+            self._low = low
+            self._high = high
+            tk.IntVar.__init__(self, value=low)
 
         def set(self, value):
             """
@@ -111,7 +110,7 @@ class ScaleEntry(ttk.Frame):
                     value = int(value)
                 except ValueError:
                     raise ValueError("value argument passed is not int and cannot be converted to int")
-            limited_value = max(min(self.__high, value), self.__low)
+            limited_value = max(min(self._high, value), self._low)
             tk.IntVar.set(self, limited_value)
             # Return False if the value had to be limited
             return limited_value is value
