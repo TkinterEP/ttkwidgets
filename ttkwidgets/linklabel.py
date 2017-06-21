@@ -18,8 +18,7 @@ class LinkLabel(ttk.Label):
     A ttk Label that can be clicked to open a link with a default blue color, a purple color when clicked and a bright
     blue color when hovering over the Label
     """
-    def __init__(self, master=None, link="", normal_color="#0563c1", hover_color="#057bc1", clicked_color="#954f72",
-                 **kwargs):
+    def __init__(self, master=None, **kwargs):
         """
         :param master: master widget
         :param link: link to be opened
@@ -28,14 +27,12 @@ class LinkLabel(ttk.Label):
         :param clicked_color: text color when link is clicked
         :param kwargs: options to be passed on to Label initializer
         """
-        if not "cursor" in kwargs:
-            # set default cursor to 'hand1'
-            kwargs["cursor"] = "hand1"
-        ttk.Label.__init__(self, master, foreground=normal_color, **kwargs)
-        self._normal_color = normal_color
-        self._hover_color = hover_color
-        self._clicked_color = clicked_color
-        self.__link = link
+        self._cursor = kwargs.pop("cursor", "hand1")
+        self._link = kwargs.pop("link", "")
+        self._normal_color = kwargs.pop("normal_color", "#0563c1")
+        self._hover_color = kwargs.pop("hover_color", "#057bc1")
+        self._clicked_color = kwargs.pop("clicked_color", "#954f72")
+        ttk.Label.__init__(self, master, foreground=self._normal_color, **kwargs)
         self.__clicked = False
         self.bind("<Button-1>", self.open_link)
         self.bind("<Enter>", self._on_enter)
@@ -52,7 +49,7 @@ class LinkLabel(ttk.Label):
         Sets the text color to the hover color
         :return: None
         """
-        self.config(foreground=self._hover_color)
+        self.config(foreground=self._hover_color, cursor=self._cursor)
 
     def _on_leave(self, *args):
         """
@@ -63,6 +60,7 @@ class LinkLabel(ttk.Label):
             self.config(foreground=self._clicked_color)
         else:
             self.config(foreground=self._normal_color)
+        self.config(cursor="default")
 
     def reset(self):
         """
@@ -77,20 +75,20 @@ class LinkLabel(ttk.Label):
         Open the link in the web browser
         :return: None
         """
-        if not "disabled" in self.state():
-            webbrowser.open(self.__link)
+        if "disabled" not in self.state():
+            webbrowser.open(self._link)
             self.__clicked = True
             self._on_leave()
 
     def cget(self, key):
         """ Return the resource value for a KEY given as string. """
-        if key == "link":
-            return self.__link
-        elif key == "hover_color":
+        if key is "link":
+            return self._link
+        elif key is "hover_color":
             return self._hover_color
-        elif key == "normal_color":
+        elif key is "normal_color":
             return self._normal_color
-        elif key == "clicked_color":
+        elif key is "clicked_color":
             return self._clicked_color
         else:
             return ttk.Label.cget(self, key)
@@ -103,14 +101,10 @@ class LinkLabel(ttk.Label):
         arguments. To get an overview about
         the allowed keyword arguments call the method keys.
         """
-        if "link" in kwargs:
-            self.__link = kwargs.pop("link")
-        if "hover_color" in kwargs:
-            self._hover_color = kwargs.pop("hover_color")
-        if "normal_color" in kwargs:
-            self._normal_color = kwargs.pop("normal_color")
-        if "clicked_color" in kwargs:
-            self._clicked_color = kwargs.pop("clicked_color")
+        self._link = kwargs.pop("link", self._link)
+        self._hover_color = kwargs.pop("hover_color", self._hover_color)
+        self._normal_color = kwargs.pop("normal_color", self._normal_color)
+        self._clicked_color = kwargs.pop("clicked_color", self._clicked_color)
         ttk.Label.configure(self, **kwargs)
         self._on_leave()
 
@@ -119,3 +113,9 @@ class LinkLabel(ttk.Label):
         keys = ttk.Label.keys(self)
         keys.extend(["link", "normal_color", "hover_color", "clicked_color"])
         return keys
+
+
+if __name__ == '__main__':
+    window = tk.Tk()
+    LinkLabel(window, text="Label").pack()
+    window.mainloop()
