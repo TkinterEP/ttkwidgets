@@ -60,7 +60,7 @@ class LinkLabel(ttk.Label):
             self.config(foreground=self._clicked_color)
         else:
             self.config(foreground=self._normal_color)
-        self.config(cursor="default")
+        self.config(cursor="")
 
     def reset(self):
         """
