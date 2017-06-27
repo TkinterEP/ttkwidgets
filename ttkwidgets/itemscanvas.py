@@ -10,19 +10,38 @@ from PIL import Image, ImageTk
 
 
 class ItemsCanvas(ttk.Frame):
+    """
+    A Tkinter Frame containing a Canvas upon which text items can be placed with a coloured background. The items can
+    be moved around and deleted. A background can also be set.
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        options:
+            canvaswidth: The width of the canvas in pixels
+            canvasheight: The height of the canvas in pixels
+            callback_add: Callback for when an item is created, *(int item, int rectangle)
+            callback_del: Callback for when an item is deleted, *(int item, int rectangle)
+            callback_move: Callback for when an item is moved, *(int item, int rectangle, int x, int y)
+            function_new: User defined function for when an item is created, *(self.add_item)
+        """
         # Setup Frame
         self.current = None
         self.items = {}
-        width = kwargs.pop("canvaswidth", 512)
-        height = kwargs.pop("canvasheight", 512)
+        self.item_colors = {}
+        # kwarg processing
+        self._canvaswidth = kwargs.pop("canvaswidth", 512)
+        self._canvasheight = kwargs.pop("canvasheight", 512)
+        self._function_new = kwargs.pop("function_new", None)
+        self._callback_add = kwargs.pop("callback_add", None)
+        self._callback_del = kwargs.pop("callback_del", None)
+        self._callback_move = kwargs.pop("callback_move", None)
+
         ttk.Frame.__init__(self, *args, **kwargs)
-        self._canvaswidth = width
-        self._canvasheight = height
         # Setup Canvas
         self._max_x = self._canvaswidth - 10
         self._max_y = self._canvasheight - 10
-        self.canvas = tk.Canvas(self, width=width, height=height)
+        self.canvas = tk.Canvas(self, width=self._canvaswidth, height=self._canvasheight)
         self._image = None
         self._background = None
         # Setup event bindings
@@ -33,34 +52,52 @@ class ItemsCanvas(ttk.Frame):
         self.canvas.bind("<ButtonPress-3>", self.frame_right_press)
         # Setup item menu
         self.item_menu = tk.Menu(self, tearoff=0)
-        self.item_menu.add_command(label="Edit", command=self.edit_item)
         self.item_menu.add_command(label="Delete", command=self.del_item)
         # Setup frame menu
         self.frame_menu = tk.Menu(self, tearoff=0)
-        self.frame_menu.add_command(label="New", command=self.new_item)
+        self.frame_menu.add_command(label="New", command=self._new_item)
         # Call grid_widgets last
         self.grid_widgets()
 
     def frame_right_press(self, event):
+        """
+        Callback for the press of the right mouse button in the Canvas/Frame so the menu can be opened
+        :param event: Tkinter event
+        :return: None
+        """
         self.frame_menu.post(event.x_root, event.y_root)
 
     def left_press(self, event):
+        """
+        Callback for the press of the left mouse button. Selects a new item and sets its highlightcolor.
+        :param event:
+        :return:
+        """
         if self.current:
-            self.canvas.itemconfigure(self.current, fill="black")
+            self.canvas.itemconfigure(self.current, fill=self.item_colors[self.current][1])
             self.current = None
             return
         results = self.canvas.find_withtag(tk.CURRENT)
         if len(results) is 0:
             return
         self.current = results[0]
-        self.canvas.itemconfigure(self.current, fill="blue")
+        self.canvas.itemconfigure(self.current, fill=self.item_colors[self.current][2])
 
     def left_release(self, event):
+        """
+        Callback for the release of the left button
+        """
         self.config(cursor="")
         if not self.current:
-            self.canvas.itemconfigure(tk.CURRENT, fill="black")
+            self.canvas.itemconfigure(tk.CURRENT, fill=self.item_colors[self.current][1])
 
     def left_motion(self, event):
+        """
+        Callback for the B1-Motion event, or the dragging of an item. Moves the item to the desired location, but limits
+        its movement to a place on the actual Canvas. The item cannot be moved outside of the Canvas.
+        :param event: Tkinter event
+        :return: None
+        """
         self.current = None
         item = self.canvas.find_withtag(tk.CURRENT)[0]
         rectangle = self.items[item]
@@ -75,31 +112,67 @@ class ItemsCanvas(ttk.Frame):
         self.canvas.coords(rectangle, self.canvas.bbox(item))
 
     def right_press(self, event):
+        """
+        Callback for the right press event. Opens a menu for the selected item.
+        :param event: Tkinter event
+        :return: None
+        """
         if not self.current:
             return
         self.item_menu.post(event.x_root, event.y_root)
 
     def grid_widgets(self):
+        """
+        Put the widgets in the correct position
+        """
         self.canvas.grid(sticky="nswe")
 
-    def add_item(self, text, font=("default", 12, "bold"), color="yellow"):
-        item = self.canvas.create_text(0, 0, anchor=tk.NW, text=text, font=font, fill="black", tag="item")
-        rectangle = self.canvas.create_rectangle(self.canvas.bbox(item), fill=color)
+    def add_item(self, text, font=("default", 12, "bold"), backgroundcolor="yellow", textcolor="black",
+                 highlightcolor="blue"):
+        """
+        Add a new item on the Canvas
+        :param text: text to display
+        :param font: font, either tuple or Font object
+        :param backgroundcolor: background color
+        :param textcolor: text color
+        :param highlightcolor: the color of the text when the item is selected
+        :return: None
+        """
+        item = self.canvas.create_text(0, 0, anchor=tk.NW, text=text, font=font, fill=textcolor, tag="item")
+        rectangle = self.canvas.create_rectangle(self.canvas.bbox(item), fill=backgroundcolor)
         self.canvas.tag_lower(rectangle, item)
         self.items[item] = rectangle
-
-    def new_item(self):
-        pass
+        if callable(self._callback_add):
+            self._callback_add(item, rectangle)
+        self.item_colors[item] = (backgroundcolor, textcolor, highlightcolor)
 
     def del_item(self):
+        """
+        Delete an item on the Canvas
+        :return: None
+        """
         item = self.current
         rectangle = self.items[item]
         self.canvas.delete(item, rectangle)
+        if callable(self._callback_del):
+            self._callback_del(item, rectangle)
 
-    def edit_item(self):
-        pass
+    def _new_item(self):
+        """
+        Function that calls the user defined function to add a new item
+        :return:
+        """
+        if callable(self._function_new):
+            self._function_new(self.add_item)
 
     def set_background(self, image=None, path=None, resize=True):
+        """
+        Update the background image of the Canvas
+        :param image: PhotoImage object
+        :param path: str path
+        :param resize: if resize is True, the image with path will be opened and then resized to the Canvas size
+        :return: None
+        """
         if not image and not path:
             raise ValueError("You must either pass a PhotoImage object or a path object")
         if image and path:
@@ -119,3 +192,35 @@ class ItemsCanvas(ttk.Frame):
             self._image = ImageTk.PhotoImage(img)
         self._background = self.canvas.create_image(0, 0, image=self._image, anchor=tk.NW, tag="background")
         self.canvas.tag_lower("background")
+
+    def cget(self, key):
+        """
+        Overridden cget function to support additional options
+        """
+        if key is "canvaswidth":
+            return self._canvaswidth
+        elif key is "canvasheight":
+            return self._canvasheight
+        elif key is "function_new":
+            return self._function_new
+        elif key is "callback_add":
+            return self._callback_add
+        elif key is "callback_del":
+            return self._callback_del
+        elif key is "callback_move":
+            return self._callback_move
+        else:
+            ttk.Frame.cget(self, key)
+
+    def config(self, **kwargs):
+        """
+        Overridden config function to support additional options
+        """
+        self._canvaswidth = kwargs.pop("canvaswidth", self._canvaswidth)
+        self._canvasheight = kwargs.pop("canvasheight", self._canvasheight)
+        self.canvas.config(width=self._canvaswidth, height=self._canvasheight)
+        self._function_new = kwargs.pop("function_new", self._function_new)
+        self._callback_add = kwargs.pop("callback_add", self._callback_add)
+        self._callback_del = kwargs.pop("callback_del", self._callback_del)
+        self._callback_move = kwargs.pop("callback_move", self._callback_move)
+        self.config(**kwargs)
