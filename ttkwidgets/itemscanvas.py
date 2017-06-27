@@ -231,3 +231,9 @@ class ItemsCanvas(ttk.Frame):
         self._callback_del = kwargs.pop("callback_del", self._callback_del)
         self._callback_move = kwargs.pop("callback_move", self._callback_move)
         ttk.Frame.config(self, **kwargs)
+
+    def __getitem__(self, item):
+        return self.cget(item)
+
+    def __setitem__(self, key, value):
+        self.config(key=value)
