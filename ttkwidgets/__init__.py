@@ -10,3 +10,4 @@ from ttkwidgets.fontframe import FontSizeDropdown, FontPropertiesFrame, FontFami
     FontSelectFrame, FontChooser, askfont
 from ttkwidgets.debugwindow import DebugWindow
 from ttkwidgets.checkboxtreeview import CheckboxTreeview
+from ttkwidgets.itemscanvas import ItemsCanvas
