@@ -32,7 +32,8 @@ class LinkLabel(ttk.Label):
         self._normal_color = kwargs.pop("normal_color", "#0563c1")
         self._hover_color = kwargs.pop("hover_color", "#057bc1")
         self._clicked_color = kwargs.pop("clicked_color", "#954f72")
-        ttk.Label.__init__(self, master, foreground=self._normal_color, **kwargs)
+        ttk.Label.__init__(self, master, **kwargs)
+        self.config(foreground=self._normal_color)
         self.__clicked = False
         self.bind("<Button-1>", self.open_link)
         self.bind("<Enter>", self._on_enter)
