@@ -3,8 +3,12 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
-import tkinter as tk
-from tkinter import ttk
+try:
+    import Tkinter as tk
+    import ttk
+except ImportError:
+    import tkinter as tk
+    from tkinter import ttk
 import os
 from PIL import Image, ImageTk
 
