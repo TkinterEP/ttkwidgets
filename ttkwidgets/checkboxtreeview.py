@@ -1,0 +1,180 @@
+# -*- coding: utf-8 -*-
+"""
+Author: Juliette Monsel
+License: GNU GPLv3
+Source: This repository
+
+Treeview with checkboxes at each item and a noticeable disabled style
+"""
+
+try:
+    import ttk
+except ImportError:
+    from tkinter import ttk
+
+import os
+from PIL import Image, ImageTk
+from ttkwidgets.utilities import get_assets_directory
+
+IM_CHECKED = os.path.join(get_assets_directory(), "checked.png")
+IM_UNCHECKED = os.path.join(get_assets_directory(), "unchecked.png")
+IM_TRISTATE = os.path.join(get_assets_directory(), "tristate.png")
+
+class CheckboxTreeview(ttk.Treeview):
+    """
+        Treeview widget with checkboxes left of each item.
+        The checkboxes are done via the image attribute of the item, so to keep
+        the checkbox, you cannot add an image to the item.
+    """
+
+    def __init__(self, master=None, **kw):
+        ttk.Treeview.__init__(self, master, style='Checkbox.Treeview', **kw)
+        # style (make a noticeable disabled style)
+        style = ttk.Style(self)
+        style.map("Checkbox.Treeview",
+                  fieldbackground=[("disabled", '#E6E6E6')],
+                  foreground=[("disabled", 'gray40')],
+                  background=[("disabled", '#E6E6E6')])
+        # checkboxes are implemented with pictures
+        self.im_checked = ImageTk.PhotoImage(Image.open(IM_CHECKED), master=self)
+        self.im_unchecked = ImageTk.PhotoImage(Image.open(IM_UNCHECKED), master=self)
+        self.im_tristate = ImageTk.PhotoImage(Image.open(IM_TRISTATE), master=self)
+        self.tag_configure("unchecked", image=self.im_unchecked)
+        self.tag_configure("tristate", image=self.im_tristate)
+        self.tag_configure("checked", image=self.im_checked)
+        # check / uncheck boxes on click
+        self.bind("<Button-1>", self._box_click, True)
+
+    def expand_all(self):
+        def aux(item):
+            self.item(item, open=True)
+            children = self.get_children(item)
+            for c in children:
+                aux(c)
+        children = self.get_children("")
+        for c in children:
+            aux(c)
+
+    def collapse_all(self):
+        def aux(item):
+            self.item(item, open=False)
+            children = self.get_children(item)
+            for c in children:
+                aux(c)
+        children = self.get_children("")
+        for c in children:
+            aux(c)
+
+    def state(self, states=None):
+        if states:
+            if "disabled" in states:
+                self.bind('<Button-1>', lambda e: 'break')
+            elif "!disabled" in states:
+                self.unbind("<Button-1>")
+                self.bind("<Button-1>", self._box_click, True)
+            return ttk.Treeview.state(self, states)
+        else:
+            return ttk.Treeview.state(self)
+
+    def change_state(self, item, state):
+        """ replace the current state of the item
+            (ie replace the current state tag but keeps the other tags) """
+        tags = self.item(item, "tags")
+        states = ("checked", "unchecked", "tristate")
+        new_tags = [t for t in tags if not t in states]
+        new_tags.append(state)
+        self.item(item, tags=tuple(new_tags))
+
+    def tag_add(self, item, tag):
+        """ add tag to the tags of item """
+        tags = self.item(item, "tags")
+        self.item(item, tags=tags + (tag,))
+
+    def tag_del(self, item, tag):
+        """ add tag to the tags of item """
+        tags = list(self.item(item, "tags"))
+        if tag in tags:
+            tags.remove(tag)
+            self.item(item, tags=tuple(tags))
+
+    def insert(self, parent, index, iid=None, **kw):
+        """ same method as for standard treeview but add the tag for the box
+            state accordingly to the parent state if no tag among
+            ('checked', 'unchecked', 'tristate') is given """
+        if self.tag_has("checked", parent):
+            tag = "checked"
+        else:
+            tag = 'unchecked'
+        if not "tags" in kw:
+            kw["tags"] = (tag,)
+        elif not ("unchecked" in kw["tags"] or "checked" in kw["tags"]
+                  or "tristate" in kw["tags"]):
+            kw["tags"] += (tag,)
+
+        ttk.Treeview.insert(self, parent, index, iid, **kw)
+
+    def _check_descendant(self, item):
+        """ check the boxes of item's descendants """
+        children = self.get_children(item)
+        for iid in children:
+            self.change_state(iid, "checked")
+            self._check_descendant(iid)
+
+    def _check_ancestor(self, item):
+        """ check the box of item and change the state of the boxes of item's
+            ancestors accordingly """
+        self.change_state(item, "checked")
+        parent = self.parent(item)
+        if parent:
+            children = self.get_children(parent)
+            b = ["checked" in self.item(c, "tags") for c in children]
+            if False in b:
+                # at least one box is not checked and item's box is checked
+                self._tristate_parent(parent)
+            else:
+                # all boxes of the children are checked
+                self._check_ancestor(parent)
+
+    def _tristate_parent(self, item):
+        """ put the box of item in tristate and change the state of the boxes of
+            item's ancestors accordingly """
+        self.change_state(item, "tristate")
+        parent = self.parent(item)
+        if parent:
+            self._tristate_parent(parent)
+
+    def _uncheck_descendant(self, item):
+        """ uncheck the boxes of item's descendant """
+        children = self.get_children(item)
+        for iid in children:
+            self.change_state(iid, "unchecked")
+            self._uncheck_descendant(iid)
+
+    def _uncheck_ancestor(self, item):
+        """ uncheck the box of item and change the state of the boxes of item's
+            ancestors accordingly """
+        self.change_state(item, "unchecked")
+        parent = self.parent(item)
+        if parent:
+            children = self.get_children(parent)
+            b = ["unchecked" in self.item(c, "tags") for c in children]
+            if False in b:
+                # at least one box is checked and item's box is unchecked
+                self._tristate_parent(parent)
+            else:
+                # no box is checked
+                self._uncheck_ancestor(parent)
+
+    def _box_click(self, event):
+        """ check or uncheck box when clicked """
+        x, y, widget = event.x, event.y, event.widget
+        elem = widget.identify("element", x, y)
+        if "image" in elem:
+            # a box was clicked
+            item = self.identify_row(y)
+            if self.tag_has("unchecked", item) or self.tag_has("tristate", item):
+                self._check_ancestor(item)
+                self._check_descendant(item)
+            else:
+                self._uncheck_descendant(item)
+                self._uncheck_ancestor(item)

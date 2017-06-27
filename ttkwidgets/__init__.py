@@ -9,3 +9,4 @@ from ttkwidgets.autocompletewidgets import AutocompleteCombobox, AutocompleteEnt
 from ttkwidgets.fontframe import FontSizeDropdown, FontPropertiesFrame, FontFamilyDropdown, FontFamilyListbox, \
     FontSelectFrame, FontChooser, askfont
 from ttkwidgets.debugwindow import DebugWindow
+from ttkwidgets.checkboxtreeview import CheckboxTreeview
