@@ -3,7 +3,7 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
-# Based on an idea by Nelson Brochado (https://www.github.com/nbroltkinter-kit)
+# Based on an idea by Nelson Brochado (https://www.github.com/nbrol/tkinter-kit)
 try:
     import Tkinter as tk
     import ttk
