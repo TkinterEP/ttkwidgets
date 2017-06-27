@@ -88,7 +88,7 @@ class ItemsCanvas(ttk.Frame):
         Callback for the release of the left button
         """
         self.config(cursor="")
-        if not self.current:
+        if self.current:
             self.canvas.itemconfigure(tk.CURRENT, fill=self.item_colors[self.current][1])
 
     def left_motion(self, event):
@@ -99,7 +99,10 @@ class ItemsCanvas(ttk.Frame):
         :return: None
         """
         self.current = None
-        item = self.canvas.find_withtag(tk.CURRENT)[0]
+        results = self.canvas.find_withtag(tk.CURRENT)
+        if len(results) is 0:
+            return
+        item = results[0]
         rectangle = self.items[item]
         self.config(cursor="exchange")
         self.canvas.itemconfigure(item, fill="blue")
