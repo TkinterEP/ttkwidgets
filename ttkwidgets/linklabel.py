@@ -66,7 +66,7 @@ class LinkLabel(ttk.Label):
     def reset(self):
         """
         Reset Label to unclicked status if previously clicked
-        :return:
+        :return: None
         """
         self.__clicked = False
         self._on_leave()
