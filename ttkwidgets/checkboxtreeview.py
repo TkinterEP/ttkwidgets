@@ -118,9 +118,11 @@ class CheckboxTreeview(ttk.Treeview):
             self.item(item, tags=tuple(tags))
 
     def insert(self, parent, index, iid=None, **kw):
-        """ Same method as for standard treeview but add the tag for the box
-            state accordingly to the parent state if no tag among
-            ('checked', 'unchecked', 'tristate') is given. """
+        """
+        Same method as for standard treeview but add the tag for the box
+        state accordingly to the parent state if no tag among
+        ('checked', 'unchecked', 'tristate') is given.
+        """
         if self.tag_has("checked", parent):
             tag = "checked"
         else:
@@ -141,8 +143,10 @@ class CheckboxTreeview(ttk.Treeview):
             self._check_descendant(iid)
 
     def _check_ancestor(self, item):
-        """ Check the box of item and change the state of the boxes of item's
-            ancestors accordingly. """
+        """
+        Check the box of item and change the state of the boxes of item's
+        ancestors accordingly.
+        """
         self.change_state(item, "checked")
         parent = self.parent(item)
         if parent:
@@ -156,8 +160,10 @@ class CheckboxTreeview(ttk.Treeview):
                 self._check_ancestor(parent)
 
     def _tristate_parent(self, item):
-        """ Put the box of item in tristate and change the state of the boxes of
-            item's ancestors accordingly. """
+        """
+        Put the box of item in tristate and change the state of the boxes of
+        item's ancestors accordingly.
+        """
         self.change_state(item, "tristate")
         parent = self.parent(item)
         if parent:
@@ -171,8 +177,10 @@ class CheckboxTreeview(ttk.Treeview):
             self._uncheck_descendant(iid)
 
     def _uncheck_ancestor(self, item):
-        """ Uncheck the box of item and change the state of the boxes of item's
-            ancestors accordingly. """
+        """
+        Uncheck the box of item and change the state of the boxes of item's
+        ancestors accordingly.
+        """
         self.change_state(item, "unchecked")
         parent = self.parent(item)
         if parent:
