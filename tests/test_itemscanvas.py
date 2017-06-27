@@ -2,6 +2,9 @@
 # For license see LICENSE
 from ttkwidgets import ItemsCanvas
 from tests import BaseWidgetTest
+from ttkwidgets.utilities import get_assets_directory
+import os
+from PIL import Image, ImageTk
 try:
     import Tkinter as tk
 except ImportError:
@@ -41,6 +44,17 @@ class TestItemsCanvas(BaseWidgetTest):
         canvas.right_press(self.TkinterEvent())
         canvas.left_press(self.TkinterEvent())
         canvas.left_release(self.TkinterEvent())
+
+    def test_itemscanvas_background(self):
+        canvas = ItemsCanvas()
+        path = os.path.join(get_assets_directory(), "open.png")
+        img = ImageTk.PhotoImage(Image.open(path))
+        canvas.set_background(image=img)
+        self.window.update()
+        canvas.set_background(path=path)
+        self.window.update()
+        self.assertRaises(ValueError, lambda: canvas.set_background(image=img, path=path))
+        self.assertRaises(ValueError, canvas.set_background)
 
     class TkinterEvent(object):
         x_root = 0
