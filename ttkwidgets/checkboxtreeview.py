@@ -20,6 +20,7 @@ IM_CHECKED = os.path.join(get_assets_directory(), "checked.png")
 IM_UNCHECKED = os.path.join(get_assets_directory(), "unchecked.png")
 IM_TRISTATE = os.path.join(get_assets_directory(), "tristate.png")
 
+
 class CheckboxTreeview(ttk.Treeview):
     """
     Treeview widget with checkboxes left of each item.
@@ -52,22 +53,26 @@ class CheckboxTreeview(ttk.Treeview):
 
     def expand_all(self):
         """ Expand all items. """
+
         def aux(item):
             self.item(item, open=True)
             children = self.get_children(item)
             for c in children:
                 aux(c)
+
         children = self.get_children("")
         for c in children:
             aux(c)
 
     def collapse_all(self):
         """ Collapse all items. """
+
         def aux(item):
             self.item(item, open=False)
             children = self.get_children(item)
             for c in children:
                 aux(c)
+
         children = self.get_children("")
         for c in children:
             aux(c)
