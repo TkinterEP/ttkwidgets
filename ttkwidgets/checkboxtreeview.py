@@ -52,7 +52,7 @@ class CheckboxTreeview(ttk.Treeview):
         self.bind("<Button-1>", self._box_click, True)
 
     def expand_all(self):
-        """ Expand all items. """
+        """Expand all items."""
 
         def aux(item):
             self.item(item, open=True)
@@ -65,7 +65,7 @@ class CheckboxTreeview(ttk.Treeview):
             aux(c)
 
     def collapse_all(self):
-        """ Collapse all items. """
+        """Collapse all items."""
 
         def aux(item):
             self.item(item, open=False)
@@ -97,21 +97,24 @@ class CheckboxTreeview(ttk.Treeview):
             return ttk.Treeview.state(self)
 
     def change_state(self, item, state):
-        """ Replace the current state of the item
-            (ie replace the current state tag but keeps the other tags). """
+        """
+        Replace the current state of the item.
+
+        i.e. replace the current state tag but keeps the other tags.
+        """
         tags = self.item(item, "tags")
         states = ("checked", "unchecked", "tristate")
-        new_tags = [t for t in tags if not t in states]
+        new_tags = [t for t in tags if t not in states]
         new_tags.append(state)
         self.item(item, tags=tuple(new_tags))
 
     def tag_add(self, item, tag):
-        """ Add tag to the tags of item. """
+        """Add tag to the tags of item."""
         tags = self.item(item, "tags")
         self.item(item, tags=tags + (tag,))
 
     def tag_del(self, item, tag):
-        """ Remove tag from sthe tags of item. """
+        """Remove tag from the tags of item."""
         tags = list(self.item(item, "tags"))
         if tag in tags:
             tags.remove(tag)
@@ -119,7 +122,9 @@ class CheckboxTreeview(ttk.Treeview):
 
     def insert(self, parent, index, iid=None, **kw):
         """
-        Same method as for standard treeview but add the tag for the box
+        Creates a new item and return the item identifier of the newly created item.
+
+        Same method as for standard ttk.Treeview but add the tag for the box
         state accordingly to the parent state if no tag among
         ('checked', 'unchecked', 'tristate') is given.
         """
@@ -127,16 +132,34 @@ class CheckboxTreeview(ttk.Treeview):
             tag = "checked"
         else:
             tag = 'unchecked'
-        if not "tags" in kw:
+        if "tags" not in kw:
             kw["tags"] = (tag,)
-        elif not ("unchecked" in kw["tags"] or "checked" in kw["tags"]
-                  or "tristate" in kw["tags"]):
+        elif not ("unchecked" in kw["tags"] or "checked" in kw["tags"] or
+                  "tristate" in kw["tags"]):
             kw["tags"] += (tag,)
 
-        ttk.Treeview.insert(self, parent, index, iid, **kw)
+        return ttk.Treeview.insert(self, parent, index, iid, **kw)
+
+    def get_checked(self):
+        """Return the list of checked items that do not have any child."""
+        checked = []
+
+        def get_checked_children(item):
+            if not self.tag_has("unchecked", item):
+                ch = self.get_children(item)
+                if not ch and self.tag_has("checked", item):
+                    checked.append(item)
+                else:
+                    for c in ch:
+                        get_checked_children(c)
+
+        ch = self.get_children("")
+        for c in ch:
+            get_checked_children(c)
+        return checked
 
     def _check_descendant(self, item):
-        """ Check the boxes of item's descendants. """
+        """Check the boxes of item's descendants."""
         children = self.get_children(item)
         for iid in children:
             self.change_state(iid, "checked")
@@ -170,7 +193,7 @@ class CheckboxTreeview(ttk.Treeview):
             self._tristate_parent(parent)
 
     def _uncheck_descendant(self, item):
-        """ Uncheck the boxes of item's descendant. """
+        """Uncheck the boxes of item's descendant."""
         children = self.get_children(item)
         for iid in children:
             self.change_state(iid, "unchecked")
@@ -194,7 +217,7 @@ class CheckboxTreeview(ttk.Treeview):
                 self._uncheck_ancestor(parent)
 
     def _box_click(self, event):
-        """ Check or uncheck box when clicked. """
+        """Check or uncheck box when clicked."""
         x, y, widget = event.x, event.y, event.widget
         elem = widget.identify("element", x, y)
         if "image" in elem:
