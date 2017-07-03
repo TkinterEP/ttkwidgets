@@ -27,6 +27,12 @@ class TestItemsCanvas(BaseWidgetTest):
         canvas.cget("callback_move")
         canvas.cget("width")
 
+    def test_itemscanvas_items(self):
+        canvas = ItemsCanvas()
+        value = canvas["canvaswidth"]
+        self.assertIsInstance(value, int)
+        canvas["canvaswidth"] = 20
+
     def test_itemscanvas_config(self):
         canvas = ItemsCanvas()
         canvas.config(canvaswidth=1024, canvasheight=1024)
