@@ -27,7 +27,7 @@ class TestItemsCanvas(BaseWidgetTest):
         canvas.cget("callback_move")
         canvas.cget("width")
 
-    def test_itemscanvas_items(self):
+    def test_itemscanvas_getsetitem(self):
         canvas = ItemsCanvas()
         value = canvas["canvaswidth"]
         self.assertIsInstance(value, int)
