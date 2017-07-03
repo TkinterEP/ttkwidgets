@@ -189,7 +189,7 @@ class ItemsCanvas(ttk.Frame):
         if path is not None and not isinstance(path, str):
             raise ValueError("The image path passed is not of str type: {0}".format(path))
         if path and not os.path.exists(path):
-            raise ValueError("The iamge path passed is not valid: {0}".format(path))
+            raise ValueError("The image path passed is not valid: {0}".format(path))
         if image is not None:
             self._image = image
         elif path is not None:
