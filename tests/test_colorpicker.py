@@ -1,6 +1,5 @@
 # Copyright (c) Juliette Monsel 2017
 # For license see LICENSE
-
 from ttkwidgets import colorpicker as tkc
 from tests import BaseWidgetTest
 import unittest
@@ -32,16 +31,6 @@ class TestFunctions(unittest.TestCase):
 
     def test_col2hue(self):
         self.assertEqual(tkc.col2hue(255, 0, 0), 0)
-
-
-class BaseWidgetTest(unittest.TestCase):
-    def setUp(self):
-        self.window = tk.Tk()
-        self.window.update()
-
-    def tearDown(self):
-        self.window.update()
-        self.window.destroy()
 
 
 class TestSpinbox(BaseWidgetTest):
