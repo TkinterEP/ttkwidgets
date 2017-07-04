@@ -1,4 +1,4 @@
-# Copyright (c) RedFantom 2017
+# Copyright (c) The ttkwidgets authors 2017
 # Available under the license found in LICENSE
 from ttkwidgets.calendarwidget import Calendar
 from ttkwidgets.scrolledframe import ScrolledFrame
