@@ -236,4 +236,4 @@ class ItemsCanvas(ttk.Frame):
         return self.cget(item)
 
     def __setitem__(self, key, value):
-        self.config(key=value)
+        self.config(**{key: value})
