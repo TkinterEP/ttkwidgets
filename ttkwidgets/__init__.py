@@ -3,7 +3,5 @@
 from ttkwidgets.calendarwidget import Calendar
 from ttkwidgets.linklabel import LinkLabel
 from ttkwidgets.scrolledlistbox import ScrolledListbox
-from ttkwidgets.fontframe import FontSizeDropdown, FontPropertiesFrame, FontFamilyDropdown, FontFamilyListbox, \
-    FontSelectFrame, FontChooser, askfont
 from ttkwidgets.debugwindow import DebugWindow
 from ttkwidgets.checkboxtreeview import CheckboxTreeview

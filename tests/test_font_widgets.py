@@ -1,6 +1,6 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
-from ttkwidgets import FontChooser, FontSelectFrame
+from ttkwidgets.font import FontChooser, FontSelectFrame
 from tests import BaseWidgetTest
 try:
     import Tkinter as tk
@@ -9,6 +9,7 @@ except ImportError:
     import tkinter as tk
     from tkinter import font
 import os
+
 
 if "TRAVIS" not in os.environ:
     class TestFontChooser(BaseWidgetTest):
