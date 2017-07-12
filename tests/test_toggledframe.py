@@ -1,6 +1,6 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
-from ttkwidgets import ToggledFrame
+from ttkwidgets.frames import ToggledFrame
 from tests import BaseWidgetTest
 try:
     import Tkinter as tk
