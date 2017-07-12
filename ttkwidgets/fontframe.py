@@ -12,7 +12,8 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
     from tkinter import font
-from ttkwidgets import ScrolledListbox, AutocompleteCombobox
+from ttkwidgets import ScrolledListbox
+from ttkwidgets.autocomplete import AutocompleteCombobox
 
 
 class FontFamilyListbox(ScrolledListbox):
