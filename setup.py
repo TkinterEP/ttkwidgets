@@ -5,6 +5,8 @@ from setuptools import setup
 setup(
     name="ttkwidgets",
     packages=["ttkwidgets"],
+    py_modules=["ttkwidgets"],
+    package_data={"ttkwidgets": ["assets/*"]},
     version="0.5.0",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     author="RedFantom and others",
