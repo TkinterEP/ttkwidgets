@@ -5,10 +5,12 @@ from tests import BaseWidgetTest
 from ttkwidgets.utilities import get_assets_directory
 import os
 from PIL import Image, ImageTk
+
 try:
     import Tkinter as tk
 except ImportError:
     import tkinter as tk
+from pynput.mouse import Controller, Button
 
 
 class TestItemsCanvas(BaseWidgetTest):
@@ -61,6 +63,50 @@ class TestItemsCanvas(BaseWidgetTest):
         self.window.update()
         self.assertRaises(ValueError, lambda: canvas.set_background(image=img, path=path))
         self.assertRaises(ValueError, canvas.set_background)
+
+    def test_itemscanvas_drag(self):
+        canvas = ItemsCanvas(self.window)
+        canvas.pack()
+        canvas.add_item("item", font=("default", 16))
+        self.window.wm_geometry("+0+0")
+        self.window.update()
+        mouse_controller = Controller()
+        mouse_controller.position = (30, 40)
+        self.window.update()
+        mouse_controller.press(Button.left)
+        self.window.update()
+        mouse_controller.move(100, 100)
+        self.window.update()
+        mouse_controller.release(Button.left)
+        self.window.update()
+
+    def test_itemscanvas_select(self):
+        canvas = ItemsCanvas()
+        canvas.pack()
+        canvas.add_item("item", font=("default", 16))
+        self.window.wm_geometry("+0+0")
+        self.window.update()
+        mouse_controller = Controller()
+        mouse_controller.position = (30, 40)
+        self.window.update()
+        mouse_controller.press(Button.left)
+        self.window.update()
+        mouse_controller.release(Button.left)
+        self.window.update()
+
+    def test_itemscanvas_menu(self):
+        canvas = ItemsCanvas()
+        canvas.pack()
+        self.window.wm_geometry("+0+0")
+        self.window.update()
+        mouse_controller = Controller()
+        mouse_controller.position = (0, 0)
+        mouse_controller.move(30, 40)
+        self.window.update()
+        mouse_controller.press(Button.right)
+        self.window.update()
+        mouse_controller.release(Button.right)
+        self.window.update()
 
     class TkinterEvent(object):
         x_root = 0
