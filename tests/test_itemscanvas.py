@@ -26,7 +26,6 @@ class TestItemsCanvas(BaseWidgetTest):
             canvas.cget(key)
             self.assertTrue(key in canvas.keys())
 
-
     def test_itemscanvas_getsetitem(self):
         canvas = ItemsCanvas()
         value = canvas["canvaswidth"]

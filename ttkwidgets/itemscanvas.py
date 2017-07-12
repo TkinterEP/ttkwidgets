@@ -241,7 +241,7 @@ class ItemsCanvas(ttk.Frame):
     def keys(self):
         keys = ttk.Frame.keys(self)
         keys.extend([
-            "canvaswith",
+            "canvaswidth",
             "canvasheight",
             "function_new",
             "callback_add",
