@@ -239,7 +239,8 @@ class ItemsCanvas(ttk.Frame):
         self.config(**{key: value})
 
     def keys(self):
-        return ttk.Frame.keys(self).extend([
+        keys = ttk.Frame.keys(self)
+        keys.extend([
             "canvaswith",
             "canvasheight",
             "function_new",
@@ -247,3 +248,4 @@ class ItemsCanvas(ttk.Frame):
             "callback_del",
             "callback_move"
         ])
+        return keys
