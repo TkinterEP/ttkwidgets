@@ -19,15 +19,13 @@ class TestItemsCanvas(BaseWidgetTest):
         canvas.pack()
         self.window.update()
 
-    def test_itemscanvas_cget(self):
+    def test_items_canvas_get_options(self):
         canvas = ItemsCanvas()
-        canvas.cget("canvaswidth")
-        canvas.cget("canvasheight")
-        canvas.cget("function_new")
-        canvas.cget("callback_add")
-        canvas.cget("callback_del")
-        canvas.cget("callback_move")
-        canvas.cget("width")
+        keys = ["canvaswidth", "canvasheight", "function_new", "callback_add", "callback_del", "callback_move", "width"]
+        for key in keys:
+            canvas.cget(key)
+            self.assertTrue(key in canvas.keys())
+
 
     def test_itemscanvas_getsetitem(self):
         canvas = ItemsCanvas()
