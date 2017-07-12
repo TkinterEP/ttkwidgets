@@ -237,3 +237,13 @@ class ItemsCanvas(ttk.Frame):
 
     def __setitem__(self, key, value):
         self.config(**{key: value})
+
+    def keys(self):
+        return ttk.Frame.keys(self).extend([
+            "canvaswith",
+            "canvasheight",
+            "function_new",
+            "callback_add",
+            "callback_del",
+            "callback_move"
+        ])
