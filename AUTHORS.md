@@ -14,3 +14,5 @@ This file contains a list of all the authors of widgets in this repository.
   * `AutocompleteEntry`, found [here](https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html), edited by RedFantom
 - Russell Adams
   * `AutocompleteCombobox`, found [here](https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html), edited by RedFantom
+- [Juliette Monsel](https://www.github.com/j4321)
+  * `CheckboxTreeview`

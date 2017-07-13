@@ -12,6 +12,7 @@ A collection of widgets for Tkinter's ttk extensions by various authors
     Copyright (C) The Python Team
     Copyright (C) Mitja Martini 2008
     Copyright (C) Russell Adams 2011
+    Copyright (C) Juliette Monsel 2017
     
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

@@ -5,7 +5,9 @@ from setuptools import setup
 setup(
     name="ttkwidgets",
     packages=["ttkwidgets"],
-    version="0.4.0",
+    py_modules=["ttkwidgets"],
+    package_data={"ttkwidgets": ["assets/*"]},
+    version="0.5.0",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     author="RedFantom and others",
     url="https://www.github.com/RedFantom/ttkwidgets",
@@ -17,3 +19,4 @@ setup(
     include_package_data=True,
     install_requires=["pillow"]
 )
+
