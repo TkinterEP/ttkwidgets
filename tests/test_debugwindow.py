@@ -36,4 +36,3 @@ class TestDebugWindow(BaseWidgetTest):
         self.assertTrue(os.path.exists("somefile.txt"))
         with open("somefile.txt", "r") as f:
             self.assertTrue("Something!" in f.read())
-        os.remove("somefile.txt")
