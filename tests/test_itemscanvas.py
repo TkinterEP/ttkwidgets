@@ -37,17 +37,32 @@ class TestItemsCanvas(BaseWidgetTest):
         canvas.config(canvaswidth=1024, canvasheight=1024)
 
     def test_itemscanvas_items(self):
-        canvas = ItemsCanvas()
+        canvas = ItemsCanvas(callback_del=lambda *args: args)
         canvas.add_item(text="Item", backgroundcolor="red", textcolor="green", highlightcolor="#ffffff",
                         font=("default", 15, "italic"))
+        canvas.current = 1
+        canvas.del_item()
         self.window.update()
 
     def test_itemscanvas_events(self):
-        canvas = ItemsCanvas()
+        canvas = ItemsCanvas(callback_add=lambda *args: args,
+                             callback_move=lambda *args: args,
+                             function_new=lambda *args: args)
+        canvas.add_item(text="Item")
         canvas.current = 1
         canvas.left_motion(self.TkinterEvent())
+        canvas.current = 1
+        canvas.canvas.itemconfigure(1, tags=("item", "current"))
+        canvas.left_motion(self.TkinterEvent())
         canvas.right_press(self.TkinterEvent())
+        canvas.current = 1
+        canvas.right_press(self.TkinterEvent())
+        canvas.frame_right_press(self.TkinterEvent())
+        canvas.frame_menu.invoke(1)
         canvas.left_press(self.TkinterEvent())
+        canvas.current = 1
+        canvas.left_press(self.TkinterEvent())
+        canvas.current = 1
         canvas.left_release(self.TkinterEvent())
 
     def test_itemscanvas_background(self):
@@ -60,6 +75,9 @@ class TestItemsCanvas(BaseWidgetTest):
         self.window.update()
         self.assertRaises(ValueError, lambda: canvas.set_background(image=img, path=path))
         self.assertRaises(ValueError, canvas.set_background)
+        self.assertRaises(ValueError, canvas.set_background, path=1)
+        self.assertRaises(ValueError, canvas.set_background, path="/path/not/existing")
+        self.assertRaises(ValueError, canvas.set_background, image=1)
 
     def test_itemscanvas_drag(self):
         canvas = ItemsCanvas(self.window)

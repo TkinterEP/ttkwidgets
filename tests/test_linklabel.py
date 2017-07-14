@@ -10,12 +10,12 @@ except ImportError:
 
 class TestLinkLabel(BaseWidgetTest):
     def test_linklabel_init(self):
-        label = LinkLabel(self.window, link="google.com", text="Visit Google")
+        label = LinkLabel(self.window, link="www.google.com", text="Visit Google")
         label.pack()
         self.window.update()
 
     def test_linklabel_events(self):
-        label = LinkLabel(self.window, link="google.com", text="Visit Google")
+        label = LinkLabel(self.window, link="www.google.com", text="Visit Google")
         label.pack()
         self.window.update()
         label._on_enter()
@@ -26,7 +26,7 @@ class TestLinkLabel(BaseWidgetTest):
         self.window.update()
 
     def test_linklabel_config(self):
-        label = LinkLabel(self.window, link="google.com", text="Visit Google")
+        label = LinkLabel(self.window, link="www.google.com", text="Visit Google")
         label.pack()
         self.window.update()
         label.keys()
