@@ -57,7 +57,6 @@ class TestItemsCanvas(BaseWidgetTest):
         canvas.right_press(self.TkinterEvent())
         canvas.current = 1
         canvas.right_press(self.TkinterEvent())
-        canvas.frame_right_press(self.TkinterEvent())
         canvas.frame_menu.invoke(1)
         canvas.left_press(self.TkinterEvent())
         canvas.current = 1

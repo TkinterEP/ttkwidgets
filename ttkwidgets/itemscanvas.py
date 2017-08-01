@@ -53,7 +53,7 @@ class ItemsCanvas(ttk.Frame):
         self.canvas.tag_bind("item", "<ButtonRelease-1>", self.left_release)
         self.canvas.tag_bind("item", "<B1-Motion>", self.left_motion)
         self.canvas.tag_bind("item", "<ButtonPress-3>", self.right_press)
-        self.canvas.bind("<ButtonPress-3>", self.frame_right_press)
+        self.canvas.bind("<ButtonPress-3>", self.right_press)
         # Setup item menu
         self.item_menu = tk.Menu(self, tearoff=0)
         self.item_menu.add_command(label="Delete", command=self.del_item)
@@ -63,20 +63,13 @@ class ItemsCanvas(ttk.Frame):
         # Call grid_widgets last
         self.grid_widgets()
 
-    def frame_right_press(self, event):
-        """
-        Callback for the press of the right mouse button in the Canvas/Frame so the menu can be opened
-        :param event: Tkinter event
-        :return: None
-        """
-        self.frame_menu.post(event.x_root, event.y_root)
-
     def left_press(self, event):
         """
         Callback for the press of the left mouse button. Selects a new item and sets its highlightcolor.
         :param event:
         :return:
         """
+        self.set_current()
         if self.current:
             self.canvas.itemconfigure(self.current, fill=self.item_colors[self.current][1])
             self.current = None
@@ -92,7 +85,7 @@ class ItemsCanvas(ttk.Frame):
         Callback for the release of the left button
         """
         self.config(cursor="")
-        if self.current:
+        if len(self.canvas.find_withtag("current")) != 0:
             self.canvas.itemconfigure(tk.CURRENT, fill=self.item_colors[self.current][1])
 
     def left_motion(self, event):
@@ -102,7 +95,7 @@ class ItemsCanvas(ttk.Frame):
         :param event: Tkinter event
         :return: None
         """
-        self.current = None
+        self.set_current()
         results = self.canvas.find_withtag(tk.CURRENT)
         if len(results) is 0:
             return
@@ -120,13 +113,17 @@ class ItemsCanvas(ttk.Frame):
 
     def right_press(self, event):
         """
-        Callback for the right press event. Opens a menu for the selected item.
-        :param event: Tkinter event
-        :return: None
+        Callback for the right mouse button event to pop up the correct menu
         """
-        if not self.current:
-            return
-        self.item_menu.post(event.x_root, event.y_root)
+        self.set_current()
+        current = self.canvas.find_withtag("current")
+        if current and current[0] in self.canvas.find_withtag("item"):
+            # Display item_menu
+            self.current = current[0]
+            self.item_menu.tk_popup(event.x_root, event.y_root)
+        else:
+            # Display frame_menu
+            self.frame_menu.tk_popup(event.x_root, event.y_root)
 
     def grid_widgets(self):
         """
@@ -255,3 +252,10 @@ class ItemsCanvas(ttk.Frame):
             "callback_move"
         ])
         return keys
+
+    def set_current(self):
+        results = self.canvas.find_withtag(tk.CURRENT)
+        if len(results) == 0:
+            self.current = None
+        else:
+            self.current = results[0]
