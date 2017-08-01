@@ -54,9 +54,9 @@ class TestItemsCanvas(BaseWidgetTest):
         canvas.current = 1
         canvas.canvas.itemconfigure(1, tags=("item", "current"))
         canvas.left_motion(self.TkinterEvent())
-        canvas.right_press(self.TkinterEvent())
+        # canvas.right_press(self.TkinterEvent())
         canvas.current = 1
-        canvas.right_press(self.TkinterEvent())
+        # canvas.right_press(self.TkinterEvent())
         canvas.frame_menu.invoke(1)
         canvas.left_press(self.TkinterEvent())
         canvas.current = 1
