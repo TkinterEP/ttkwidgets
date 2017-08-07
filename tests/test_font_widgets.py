@@ -16,6 +16,7 @@ if "TRAVIS" not in os.environ:
         def test_fontchooser_init(self):
             chooser = FontChooser(self.window)
             self.window.update()
+            chooser._close()
 
         def test_fontchooser_noselection(self):
             chooser = FontChooser(self.window)
@@ -63,7 +64,6 @@ if "TRAVIS" not in os.environ:
             results = chooser.font
             self.assertEqual(results[0][1], 14)
 
-
     class TestFontSelectFrame(BaseWidgetTest):
         def test_fontselectframe_init(self):
             frame = FontSelectFrame(self.window)
@@ -84,4 +84,6 @@ if "TRAVIS" not in os.environ:
             self.assertEqual(len(results[0]), 2)
             self.assertIsInstance(results[1], font.Font)
 
-
+            frame._family_dropdown.event_generate('<<ComboboxSelected>>')
+            frame._size_dropdown.event_generate('<<ComboboxSelected>>')
+            frame._properties_frame._italic_button.invoke()
