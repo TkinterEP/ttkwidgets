@@ -36,6 +36,10 @@ if "TRAVIS" not in os.environ:
             self.assertIsInstance(results[0], tuple)
             self.assertEqual(len(results[0]), 2)
             self.assertIsInstance(results[1], font.Font)
+            chooser._on_family('')
+            self.window.update()
+            results = chooser.font
+            self.assertIsNone(results[0])
 
         def test_fontchooser_properties(self):
             chooser = FontChooser(self.window)
@@ -47,8 +51,13 @@ if "TRAVIS" not in os.environ:
             chooser._font_properties_frame._on_click()
             self.window.update()
             results = chooser.font
-            print(results)
             self.assertTrue("bold" in results[0])
+
+            chooser._on_properties((True, True, True, True))
+            self.window.update()
+            results = chooser.font
+            self.assertEqual(results[0][2:], ('bold', 'italic',
+                                              'underline', 'overstrike'))
 
         def test_fontchooser_size(self):
             chooser = FontChooser(self.window)
@@ -84,6 +93,10 @@ if "TRAVIS" not in os.environ:
             self.assertEqual(len(results[0]), 2)
             self.assertIsInstance(results[1], font.Font)
 
-            frame._family_dropdown.event_generate('<<ComboboxSelected>>')
-            frame._size_dropdown.event_generate('<<ComboboxSelected>>')
-            frame._properties_frame._italic_button.invoke()
+            frame._on_size(20)
+            frame._on_family('Arial')
+            frame._on_properties((True, True, True, True))
+            self.window.update()
+            results = frame.font
+            self.assertEqual(results[0], ('Arial', 20, 'bold', 'italic',
+                                          'underline', 'overstrike'))

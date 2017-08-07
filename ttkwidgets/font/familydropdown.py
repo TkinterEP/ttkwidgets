@@ -28,7 +28,7 @@ class FontFamilyDropdown(AutocompleteCombobox):
         """
         font_families = sorted([item for item in font.families()])
         self._fonts = font_families
-        self._font = tk.StringVar()
+        self._font = tk.StringVar(master)
         self.__callback = callback
         AutocompleteCombobox.__init__(self, master, textvariable=self._font, completevalues=font_families, **kwargs)
         self.bind("<<ComboboxSelected>>", self._on_select)
