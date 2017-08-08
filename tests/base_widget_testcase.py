@@ -9,7 +9,7 @@ except ImportError:
 
 class BaseWidgetTest(unittest.TestCase):
     def setUp(self):
-        self.window = tk.Tk()
+        self.window = tk.Toplevel()
         self.window.update()
 
     def tearDown(self):

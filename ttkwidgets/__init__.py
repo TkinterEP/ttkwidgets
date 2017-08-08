@@ -5,3 +5,4 @@ from ttkwidgets.linklabel import LinkLabel
 from ttkwidgets.scrolledlistbox import ScrolledListbox
 from ttkwidgets.debugwindow import DebugWindow
 from ttkwidgets.checkboxtreeview import CheckboxTreeview
+from ttkwidgets.itemscanvas import ItemsCanvas
