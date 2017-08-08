@@ -46,13 +46,3 @@ class ToggledFrame(ttk.Frame):
             self.__checkbutton_var.set(True)
             self.interior.grid(row=1, column=0, sticky="nswe")
             self._checkbutton.config(image=self._open_image)
-
-
-if __name__ == '__main__':
-    window = tk.Tk()
-    frame = ToggledFrame(window, text="Value", width=10)
-    frame.pack()
-    button = ttk.Button(frame.interior, text="Button", command=window.destroy)
-    button.grid()
-    frame.toggle()
-    window.mainloop()

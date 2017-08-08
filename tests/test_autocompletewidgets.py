@@ -1,6 +1,6 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
-from ttkwidgets import AutocompleteCombobox, AutocompleteEntry
+from ttkwidgets.autocomplete import AutocompleteCombobox, AutocompleteEntry
 from tests import BaseWidgetTest
 try:
     import Tkinter as tk
