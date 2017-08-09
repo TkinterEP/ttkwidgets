@@ -6,7 +6,7 @@ setup(
     name="ttkwidgets",
     packages=["ttkwidgets"],
     py_modules=["ttkwidgets"],
-    package_data={"ttkwidgets": ["assets/*"]},
+    package_data={"ttkwidgets": ["assets/*", "font/*", "color/*", "frames/*", "autocomplete/*"]},
     version="0.6.0",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     author="RedFantom and others",
@@ -17,6 +17,7 @@ setup(
                  "Programming Language :: Python :: 3",
                  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"],
     include_package_data=True,
-    install_requires=["pillow"]
+    install_requires=["pillow"],
+    zip_safe=False
 )
 
