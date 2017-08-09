@@ -7,7 +7,7 @@ setup(
     packages=["ttkwidgets"],
     py_modules=["ttkwidgets"],
     package_data={"ttkwidgets": ["assets/*"]},
-    version="0.5.0",
+    version="0.6.0",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     author="RedFantom and others",
     url="https://www.github.com/RedFantom/ttkwidgets",
