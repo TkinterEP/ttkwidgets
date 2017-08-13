@@ -9,6 +9,8 @@ try:
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
+import sys
+import platform
 
 # TODO: Implement the automatic snap-in-place when Toplevel is brought close to the window again
 # TODO: Allow the user to move the Toplevel to a different location on the window
@@ -40,12 +42,18 @@ class SnapToplevel(tk.Toplevel):
                                             is used.
                        top_offset         - The offset for the tk.TOP position
                        locked             - Whether the user is allowed to move the Toplevel at all
+
+
                        All other keyword arguments, such as width and height, are passed to the Toplevel
         """
+        # Process arguments
         if not isinstance(master, tk.Tk):
             raise ValueError("SnapWindows can only be created with a Tk instance as master.")
         self._configure_function = kwargs.pop("configure_function", None)
         self._location = kwargs.pop("location", tk.RIGHT)
+        self._locked = kwargs.pop("locked", False)
+        self._border = kwargs.pop("border", 20)
+
         # TODO: Gather different offset values for different platforms
         """
         Windows 7: 15, 37 pixels (no DPI scaling)
@@ -98,9 +106,10 @@ class SnapToplevel(tk.Toplevel):
         else:
             return
         self.wm_geometry("{}x{}+{}+{}".format(new_width, new_height, new_x, new_y))
-        self.lift()
+        self.deiconify()
         if callable(self._configure_function):
             self._configure_function(event)
+        print(self.master.wm_geometry())
 
     def calculate_geometry_master(self):
         """
@@ -136,6 +145,66 @@ class SnapToplevel(tk.Toplevel):
                              format(self._location))
         return new_width, new_height, new_x, new_y
 
+    @staticmethod
+    def get_offset_values():
+        """
+        Function to get the window offset values
+        :return: offset_sides, offset_top (int, int)
+        """
+        if sys.platform == "win32":
+            # Windows
+            return SnapToplevel.get_offset_values_windows()
+        # Valid values for Linux are `linux` and `linux2`, there may be more
+        elif "linux" in sys.platform:
+            # Linux
+            return SnapToplevel.get_offset_values_linux()
+        elif sys.platform == "darwin":
+            # macOS
+            return SnapToplevel.get_offset_values_macos()
+        else:
+            raise NotImplementedError("This function is not implemented for {0}".format(platform.platform))
+
+    @staticmethod
+    def get_offset_values_windows():
+        """
+        Returns the offset values (offset_sides, offset_top) for the Windows operating system based on the version
+        """
+        if platform.system() != "Windows":
+            raise ValueError("Function called for Windows offset values while not on Windows OS.")
+        windows_version = platform.release()
+        if windows_version == "XP":
+            return
+        elif windows_version == "Vista":
+            pass
+        elif windows_version == "7":
+            window = tk.Tk()
+            dpi_value = window.winfo_pixels("1i")
+            if dpi_value == 96:
+                # 100% Scaling
+                return 15, 37
+            # elif dpi_value == ......
+        elif windows_version == "8" or windows_version == "8.1":
+            pass
+        elif windows_version == "10":
+            pass
+        else:
+            raise NotImplementedError("This function only supports Windows versions: XP, Vista, 7, 8, 8.1 and 10")
+
+    @staticmethod
+    def get_offset_values_linux():
+        """
+        Returns the offset values based on the window manager
+        """
+        pass
+
+    @staticmethod
+    def get_offset_values_macos():
+        """
+        Returns the offset values (offset_sides, offset_top) for the macOS operating system.
+        """
+        # TODO: Check if these values are correct on a macOS system
+        # These values were determined based on a screenshot
+        return 3, 25
 
 if __name__ == '__main__':
     window = tk.Tk()
