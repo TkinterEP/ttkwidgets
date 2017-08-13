@@ -9,12 +9,8 @@ try:
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
-import sys
-import platform
 
-# TODO: Implement the automatic snap-in-place when Toplevel is brought close to the window again
 # TODO: Allow the user to move the Toplevel to a different location on the window
-# TODO: Allow the developer to lock the SnapToplevel in place
 
 
 class SnapToplevel(tk.Toplevel):
@@ -30,6 +26,7 @@ class SnapToplevel(tk.Toplevel):
     Is not guaranteed to work on all platforms due to Tkinter event and window manager restrictions. Functionality
     depends on whether a <Configure> event is generated upon moving the Tk instance.
     """
+
     def __init__(self, master, **kwargs):
         """
         :param master: master Tk instance
@@ -40,6 +37,7 @@ class SnapToplevel(tk.Toplevel):
                        locked             - Whether the user is allowed to move the Toplevel at all
                        offset_sides       - Override default value
                        offset_top         - Override default value
+                       allow_change       - Allow the changing of the Toplevel anchor by moving the window
 
                        All other keyword arguments, such as width and height, are passed to the Toplevel
         """
@@ -49,7 +47,7 @@ class SnapToplevel(tk.Toplevel):
         self._configure_function = kwargs.pop("configure_function", None)
         self._location = kwargs.pop("location", tk.RIGHT)
         self._locked = kwargs.pop("locked", False)
-        self._border = kwargs.pop("border", 20)
+        self._border = kwargs.pop("border", 40)
         self._offset_sides = kwargs.pop("offset_sides", None)
         self._offset_top = kwargs.pop("offset_top", None)
         # Tk.bind(self, event_name) returns an empty string if no function was bound to the event
@@ -66,14 +64,23 @@ class SnapToplevel(tk.Toplevel):
         self.master.bind("<Configure>", self.configure_callback)
         self.master.bind("<Unmap>", self.minimize)
         self.master.bind("<Map>")
+        self._snapped = True
+        self.update()
+        self.master.update()
+        self._geometry = self.wm_geometry()
+        self._master_geometry = self.wm_geometry()
+        self._distance = 0
 
         # Call the configure function to set up initial location
         # First create a fake Tkinter event
         class Event(object):
             widget = self.master
+
         self.configure_callback(Event())
-        # Lift self to front
+
+        # Lift self to front, but focus master
         self.deiconify()
+        self.master.focus_set()
 
     def minimize(self, event):
         """
@@ -92,22 +99,49 @@ class SnapToplevel(tk.Toplevel):
         The callback for the <Configure> Tkinter event, generated when a window is moved or resized.
         """
         if event.widget is self.master:
-            new_width, new_height, new_x, new_y = self.calculate_geometry_master()
+            self.set_geometry_master()
         elif event.widget is self:
-            return
+            self.set_geometry_self()
         else:
             return
-        self.wm_geometry("{}x{}+{}+{}".format(new_width, new_height, new_x, new_y))
         if callable(self._configure_function):
             self._configure_function(event)
-        print(self.master.wm_geometry())
 
-    def calculate_geometry_master(self):
+    def _unlock(self):
+        self._locked = False
+
+    def set_geometry_self(self):
+        if self._locked:
+            self.set_geometry_master()
+        else:
+            if self.wm_geometry() != self._geometry:
+                if self._snapped:
+                    self._geometry = self.wm_geometry()
+                    distance = self.get_distance_to_master()
+                    if distance > self._border:
+                        self._snapped = False
+                        pass
+                else:
+                    distance = self.get_distance_to_master()
+                    if distance < self._border:
+                        self._snapped = True
+                        self._locked = True
+                        self.after(500, self._unlock)
+                        self.set_geometry_master()
+            else:
+                return
+
+    def get_distance_to_master(self):
+        return max((abs(self.winfo_rootx() - self.master.winfo_rootx()) - self.winfo_width(),
+                    abs(self.winfo_rooty() - self.master.winfo_rooty()) - self.winfo_height()))
+
+    def set_geometry_master(self):
         """
-        Function to calculate the new geometry of the window
+        Function to calculate the new geometry of the window if it is snapped to the master and the master was moved
         """
-        if not isinstance(self.master, tk.Tk):
-            raise ValueError()
+        # If the Toplevel is not snapped to the window, we want to do nothing
+        if not self.snapped:
+            return
         master_x, master_y = self.master.winfo_x(), self.master.winfo_y()
         required_width, required_height = self.winfo_reqwidth(), self.winfo_reqheight()
         master_width, master_height = self.master.winfo_width(), self.master.winfo_height()
@@ -134,7 +168,7 @@ class SnapToplevel(tk.Toplevel):
         else:
             raise ValueError("Location is not a valid value: {0}. Was the private attribute altered?".
                              format(self._location))
-        return new_width, new_height, new_x, new_y
+        self.wm_geometry("{}x{}+{}+{}".format(new_width, new_height, new_x, new_y))
 
     def get_offset_values(self):
         """
@@ -148,10 +182,20 @@ class SnapToplevel(tk.Toplevel):
         offset_top = abs(content_y - root_y)
         return offset_sides, offset_top
 
+    def cget(self, *args):
+        pass
+
+    def config(self, **kwargs):
+        pass
+
+    def configure(self, **kwargs):
+        self.config(**kwargs)
+
+    @property
+    def snapped(self):
+        return self._snapped
+
 if __name__ == '__main__':
     window = tk.Tk()
     snap = SnapToplevel(window, location=tk.LEFT)
     window.mainloop()
-
-
-
