@@ -37,12 +37,9 @@ class SnapToplevel(tk.Toplevel):
                                             the master Tk instance or this SnapToplevel instance
                        location           - either tk.LEFT, tk.RIGHT, tk.TOP or tk.BOTTOM - Location of the SnapToplevel
                                             relative to the master Tk instance, defaults to tk.RIGHT
-                       offset             - A custom offset in pixels for the window. The platform the user is using
-                                            may call for different values. For the tk.TOP location, the top_offset value
-                                            is used.
-                       top_offset         - The offset for the tk.TOP position
                        locked             - Whether the user is allowed to move the Toplevel at all
-
+                       offset_sides       - Override default value
+                       offset_top         - Override default value
 
                        All other keyword arguments, such as width and height, are passed to the Toplevel
         """
@@ -53,16 +50,8 @@ class SnapToplevel(tk.Toplevel):
         self._location = kwargs.pop("location", tk.RIGHT)
         self._locked = kwargs.pop("locked", False)
         self._border = kwargs.pop("border", 20)
-
-        # TODO: Gather different offset values for different platforms
-        """
-        Windows 7: 15, 37 pixels (no DPI scaling)
-        """
-        self._offset = kwargs.pop("offset", 15)
-        self._top_offset = kwargs.pop("top_offset", 37)
-        if not isinstance(self._offset, int):
-            raise ValueError("offset option must be of int type. Given value is of {0} type.".
-                             format(type(self._offset)))
+        self._offset_sides = kwargs.pop("offset_sides", None)
+        self._offset_top = kwargs.pop("offset_top", None)
         # Tk.bind(self, event_name) returns an empty string if no function was bound to the event
         # It returns something like below if one was bound:
         # {"[55632584<lambda> %# %b %f %h %k %s %t %w %x %y %A %E %K %N %W %T %X %Y %D]" == "break"} break\n
@@ -70,6 +59,9 @@ class SnapToplevel(tk.Toplevel):
         if not self._configure_function and not master.bind("<Configure>") == "":
             raise ValueError("No original Configure binding provided while one was bound to the master Tk instance.")
         tk.Toplevel.__init__(self, master, **kwargs)
+        offset_sides, offset_top = self.get_offset_values()
+        self._offset_sides = self._offset_sides if self._offset_sides is not None else offset_sides
+        self._offset_top = self._offset_top if self._offset_top is not None else offset_top
         self.bind("<Configure>", self.configure_callback)
         self.master.bind("<Configure>", self.configure_callback)
         self.master.bind("<Unmap>", self.minimize)
@@ -106,7 +98,6 @@ class SnapToplevel(tk.Toplevel):
         else:
             return
         self.wm_geometry("{}x{}+{}+{}".format(new_width, new_height, new_x, new_y))
-        self.deiconify()
         if callable(self._configure_function):
             self._configure_function(event)
         print(self.master.wm_geometry())
@@ -121,23 +112,23 @@ class SnapToplevel(tk.Toplevel):
         required_width, required_height = self.winfo_reqwidth(), self.winfo_reqheight()
         master_width, master_height = self.master.winfo_width(), self.master.winfo_height()
         if self._location == tk.RIGHT:
-            new_x = master_x + master_width + self._offset
+            new_x = master_x + master_width + self._offset_sides * 2
             new_y = master_y
             new_width = required_width
             new_height = master_height
         elif self._location == tk.LEFT:
-            new_x = master_x - required_width - self._offset
+            new_x = master_x - required_width - self._offset_sides * 2
             new_y = master_y
             new_width = required_width
             new_height = master_height
         elif self._location == tk.TOP:
             new_x = master_x
-            new_y = master_y - required_height - self._top_offset
+            new_y = master_y - required_height - self._offset_top - self._offset_sides
             new_width = master_width
             new_height = required_height
         elif self._location == tk.BOTTOM:
             new_x = master_x
-            new_y = master_y + required_height + self._offset
+            new_y = master_y + required_height + self._offset_sides * 2
             new_width = master_width
             new_height = required_height
         else:
@@ -145,70 +136,21 @@ class SnapToplevel(tk.Toplevel):
                              format(self._location))
         return new_width, new_height, new_x, new_y
 
-    @staticmethod
-    def get_offset_values():
+    def get_offset_values(self):
         """
         Function to get the window offset values
         :return: offset_sides, offset_top (int, int)
         """
-        if sys.platform == "win32":
-            # Windows
-            return SnapToplevel.get_offset_values_windows()
-        # Valid values for Linux are `linux` and `linux2`, there may be more
-        elif "linux" in sys.platform:
-            # Linux
-            return SnapToplevel.get_offset_values_linux()
-        elif sys.platform == "darwin":
-            # macOS
-            return SnapToplevel.get_offset_values_macos()
-        else:
-            raise NotImplementedError("This function is not implemented for {0}".format(platform.platform))
-
-    @staticmethod
-    def get_offset_values_windows():
-        """
-        Returns the offset values (offset_sides, offset_top) for the Windows operating system based on the version
-        """
-        if platform.system() != "Windows":
-            raise ValueError("Function called for Windows offset values while not on Windows OS.")
-        windows_version = platform.release()
-        if windows_version == "XP":
-            return
-        elif windows_version == "Vista":
-            pass
-        elif windows_version == "7":
-            window = tk.Tk()
-            dpi_value = window.winfo_pixels("1i")
-            if dpi_value == 96:
-                # 100% Scaling
-                return 15, 37
-            # elif dpi_value == ......
-        elif windows_version == "8" or windows_version == "8.1":
-            pass
-        elif windows_version == "10":
-            pass
-        else:
-            raise NotImplementedError("This function only supports Windows versions: XP, Vista, 7, 8, 8.1 and 10")
-
-    @staticmethod
-    def get_offset_values_linux():
-        """
-        Returns the offset values based on the window manager
-        """
-        pass
-
-    @staticmethod
-    def get_offset_values_macos():
-        """
-        Returns the offset values (offset_sides, offset_top) for the macOS operating system.
-        """
-        # TODO: Check if these values are correct on a macOS system
-        # These values were determined based on a screenshot
-        return 3, 25
+        self.master.update()
+        root_x, root_y = self.master.winfo_rootx(), self.master.winfo_rooty()
+        content_x, content_y = self.master.winfo_x(), self.master.winfo_y()
+        offset_sides = abs(content_x - root_x)
+        offset_top = abs(content_y - root_y)
+        return offset_sides, offset_top
 
 if __name__ == '__main__':
     window = tk.Tk()
-    snap = SnapToplevel(window, location=tk.TOP)
+    snap = SnapToplevel(window, location=tk.LEFT)
     window.mainloop()
 
 
