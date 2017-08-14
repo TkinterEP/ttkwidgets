@@ -139,12 +139,12 @@ class SnapToplevel(tk.Toplevel):
         """
         The callback for the <Configure> Tkinter event, generated when a window is moved or resized.
         """
-        if event.widget is self.master:
-            self.set_geometry_master()
-        elif event.widget is self:
-            self.set_geometry_self()
-        else:
-            return
+        # First check if an update is necessary
+        if self._master_geometry != self.master.wm_geometry() or self._geometry != self.wm_geometry():
+            if event.widget is self.master:
+                self.set_geometry_master()
+            elif event.widget is self:
+                self.set_geometry_self()
         if callable(self._configure_function):
             self._configure_function(event)
 
