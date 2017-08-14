@@ -113,6 +113,9 @@ class Balloon(ttk.Frame):
         self.__width = kwargs.pop("width", self.__width)
         self._timeout = kwargs.pop("timeout", self._timeout)
         self.__background = kwargs.pop("background", self.__background)
+        if self._toplevel:
+            self._on_leave(None)
+            self.show()
         ttk.Frame.config(self, **kwargs)
 
     def configure(self, **kwargs):
