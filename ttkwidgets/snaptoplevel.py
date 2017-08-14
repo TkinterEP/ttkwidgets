@@ -341,8 +341,3 @@ class SnapToplevel(tk.Toplevel):
     @property
     def snapped(self):
         return self._snapped
-
-if __name__ == '__main__':
-    window = tk.Tk()
-    snap = SnapToplevel(window, allow_change=True)
-    window.mainloop()
