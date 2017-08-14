@@ -117,5 +117,6 @@ class TestSnapToplevel(BaseWidgetTest):
 
     def test_snaptoplevel_set_geometry_self_allow_change(self):
         snap = SnapToplevel(self.window, allow_change=True)
+        snap._snapped = False
         self.window.update()
         snap.set_geometry_self()
