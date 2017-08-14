@@ -22,13 +22,19 @@ class TestSnapToplevel(BaseWidgetTest):
         snap = SnapToplevel(self.window, configure_function=configure_function)
         self.window.update()
 
-        snap.config(border=50, anchor=tk.LEFT, offset_sides=10, offset_top=30, allow_change=True, resizable=True)
+        snap.configure(border=50)
+        snap.config(border=50, anchor=tk.LEFT, offset_sides=10, offset_top=30, allow_change=True, resizable=True,
+                    configure_function=None, locked=False, width=300)
+
         self.assertEqual(snap.cget("border"), 50)
         self.assertEqual(snap.cget("anchor"), tk.LEFT)
         self.assertEqual(snap.cget("offset_sides"), 10)
         self.assertEqual(snap.cget("offset_top"), 30)
         self.assertEqual(snap.cget("allow_change"), True)
         self.assertEqual(snap.cget("resizable"), True)
+        self.assertEqual(snap.cget("configure_function"), None)
+        self.assertEqual(snap.cget("locked"), False)
+        self.assertEqual(snap.cget("width"), 300)
 
     def test_snaptoplevel_kwargs_raise(self):
         self.assertRaises(ValueError, lambda: SnapToplevel(tk.Label()))
@@ -57,8 +63,10 @@ class TestSnapToplevel(BaseWidgetTest):
             self.assertGreaterEqual(value, 0)
 
     def test_snaptoplevel_set_geometry_master(self):
-        snap = SnapToplevel(self.window)
-        snap.set_geometry_master()
+        for anchor in (tk.RIGHT, tk.LEFT, tk.TOP, tk.BOTTOM):
+            window = tk.Toplevel()
+            snap = SnapToplevel(window, anchor=anchor)
+            snap.set_geometry_master()
 
     def test_snaptoplevel_get_points_sides_for_window(self):
         self.window.update()
@@ -101,3 +109,13 @@ class TestSnapToplevel(BaseWidgetTest):
         for value in results.values():
             self.assertIsInstance(value, int)
             self.assertGreaterEqual(value, 0)
+
+    def test_snaptoplevel_set_geometry_self_not_allow_change(self):
+        snap = SnapToplevel(self.window, allow_change=False)
+        self.window.update()
+        snap.set_geometry_self()
+
+    def test_snaptoplevel_set_geometry_self_allow_change(self):
+        snap = SnapToplevel(self.window, allow_change=True)
+        self.window.update()
+        snap.set_geometry_self()
