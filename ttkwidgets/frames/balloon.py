@@ -71,7 +71,10 @@ class Balloon(ttk.Frame):
         """
         if self._toplevel:
             self._toplevel.destroy()
-        self.master.after_cancel(self._id)
+            self._toplevel = None
+        if self._id:
+            self.master.after_cancel(self._id)
+            self._id = None
 
     def show(self):
         """
