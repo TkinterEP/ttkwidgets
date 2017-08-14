@@ -42,8 +42,8 @@ class SnapToplevel(tk.Toplevel):
                        All other keyword arguments, such as width and height, are passed to the Toplevel
         """
         # Process given arguments
-        if not isinstance(master, tk.Tk):
-            raise ValueError("SnapWindows can only be created with a Tk instance as master.")
+        if not isinstance(master, tk.Tk) and not isinstance(master, tk.Toplevel):
+            raise ValueError("SnapWindows can only be created with a Tk or Toplevel instance as master.")
         self._configure_function = kwargs.pop("configure_function", None)
         self._anchor = kwargs.pop("anchor", tk.RIGHT)
         self._locked = kwargs.pop("locked", False)
@@ -105,7 +105,7 @@ class SnapToplevel(tk.Toplevel):
         :raises: ValueError if an invalid value is found
         """
         if (self._anchor != tk.LEFT and self._anchor != tk.RIGHT and self._anchor != tk.TOP and
-                    self._anchor != tk.BOTTOM):
+                self._anchor != tk.BOTTOM):
             raise ValueError("anchor can only be set to tk.LEFT, tk.RIGHT, tk.TOP, tk.BOTTOM and not {}".
                              format(self._anchor))
         if not isinstance(self._locked, bool):
