@@ -108,7 +108,7 @@ class Balloon(ttk.Frame):
         elif key == "background":
             return self.__background
         else:
-            return tk.Frame.cget(self, key)
+            return ttk.Frame.cget(self, key)
 
     def config(self, **kwargs):
         self.__headertext = kwargs.pop("headertext", self.__headertext)
