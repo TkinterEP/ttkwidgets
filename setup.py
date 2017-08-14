@@ -9,7 +9,7 @@ setup(
     package_data={"ttkwidgets": ["assets/*"]},
     version="0.6.0",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
-    author="RedFantom and others",
+    author="The ttkwidgets authors",
     url="https://www.github.com/RedFantom/ttkwidgets",
     download_url="https://www.github.com/RedFantom/ttkwidgets/releases",
     license="AGPL",
