@@ -31,7 +31,7 @@ class SnapToplevel(tk.Toplevel):
         :param master: master Tk instance
         :param kwargs: configure_function - callable object which has to be called upon a <Configure> event of either
                                             the master Tk instance or this SnapToplevel instance
-                       location           - either tk.LEFT, tk.RIGHT, tk.TOP or tk.BOTTOM - Location of the SnapToplevel
+                       anchor             - either tk.LEFT, tk.RIGHT, tk.TOP or tk.BOTTOM - Location of the SnapToplevel
                                             relative to the master Tk instance, defaults to tk.RIGHT
                        locked             - Whether the user is allowed to move the Toplevel at all
                        offset_sides       - Override default value
@@ -45,7 +45,7 @@ class SnapToplevel(tk.Toplevel):
         if not isinstance(master, tk.Tk):
             raise ValueError("SnapWindows can only be created with a Tk instance as master.")
         self._configure_function = kwargs.pop("configure_function", None)
-        self._location = kwargs.pop("location", tk.RIGHT)
+        self._anchor = kwargs.pop("anchor", tk.RIGHT)
         self._locked = kwargs.pop("locked", False)
         self._border = kwargs.pop("border", 40)
         self._offset_sides = kwargs.pop("offset_sides", None)
@@ -86,7 +86,7 @@ class SnapToplevel(tk.Toplevel):
         self._master_geometry = self.wm_geometry()
         self._distance = 0
 
-        # Call the configure function to set up initial location
+        # Call the configure function to set up initial anchor
         # First create a fake Tkinter event
         class Event(object):
             widget = self.master
@@ -104,10 +104,10 @@ class SnapToplevel(tk.Toplevel):
         Check if all the attribute values set through arguments are valid
         :raises: ValueError if an invalid value is found
         """
-        if (self._location != tk.LEFT and self._location != tk.RIGHT and self._location != tk.TOP and
-                    self._location != tk.BOTTOM):
-            raise ValueError("location can only be set to tk.LEFT, tk.RIGHT, tk.TOP, tk.BOTTOM and not {}".
-                             format(self._location))
+        if (self._anchor != tk.LEFT and self._anchor != tk.RIGHT and self._anchor != tk.TOP and
+                    self._anchor != tk.BOTTOM):
+            raise ValueError("anchor can only be set to tk.LEFT, tk.RIGHT, tk.TOP, tk.BOTTOM and not {}".
+                             format(self._anchor))
         if not isinstance(self._locked, bool):
             raise ValueError("locked can only be set to a bool value, not {}".format(self._locked))
         if not isinstance(self._border, int):
@@ -167,13 +167,13 @@ class SnapToplevel(tk.Toplevel):
         elif self._snapped:
             self._geometry = self.wm_geometry()
             # If the minimum distance is larger than the border distance, the window is not snapped
-            if distance_dictionary[self._location] > self._border:
+            if distance_dictionary[self._anchor] > self._border:
                 self._snapped = False
                 return
 
         elif not self._allow_change:
             # Changing of the anchor point is not allowed
-            if distance_dictionary[self._location] < self._border and not self._snapped:
+            if distance_dictionary[self._anchor] < self._border and not self._snapped:
                 self._snap()
             else:
                 return
@@ -181,14 +181,14 @@ class SnapToplevel(tk.Toplevel):
             # Changing of the anchor point is allowed
             distance = min(distance_dictionary.values())
             # Check if the anchor point as to be changed
-            if distance <= distance_dictionary[self._location] and distance < self._border + self._offset_sides:
+            if distance <= distance_dictionary[self._anchor] and distance < self._border + self._offset_sides:
 
-                for location, location_distance in distance_dictionary.items():
-                    if distance == location_distance:
-                        self._location = location
+                for anchor, anchor_distance in distance_dictionary.items():
+                    if distance == anchor_distance:
+                        self._anchor = anchor
                         self._snap()
                         return
-            elif distance_dictionary[self._location] < self._border:
+            elif distance_dictionary[self._anchor] < self._border:
                 self._snap()
         return
 
@@ -266,29 +266,29 @@ class SnapToplevel(tk.Toplevel):
         master_x, master_y = self.master.winfo_x(), self.master.winfo_y()
         required_width, required_height = self.winfo_reqwidth(), self.winfo_reqheight()
         master_width, master_height = self.master.winfo_width(), self.master.winfo_height()
-        if self._location == tk.RIGHT:
+        if self._anchor == tk.RIGHT:
             new_x = master_x + master_width + self._offset_sides * 2
             new_y = master_y
             new_width = required_width
             new_height = master_height
-        elif self._location == tk.LEFT:
+        elif self._anchor == tk.LEFT:
             new_x = master_x - required_width - self._offset_sides * 2
             new_y = master_y
             new_width = required_width
             new_height = master_height
-        elif self._location == tk.TOP:
+        elif self._anchor == tk.TOP:
             new_x = master_x
             new_y = master_y - required_height - self._offset_top - self._offset_sides
             new_width = master_width
             new_height = required_height
-        elif self._location == tk.BOTTOM:
+        elif self._anchor == tk.BOTTOM:
             new_x = master_x
             new_y = master_y + required_height + self._offset_top + self._offset_sides
             new_width = master_width
             new_height = required_height
         else:
             raise ValueError("Location is not a valid value: {0}. Was the private attribute altered?".
-                             format(self._location))
+                             format(self._anchor))
         return new_x, new_y, new_width, new_height
 
     def get_offset_values(self):
