@@ -7,5 +7,5 @@ from ttkwidgets import SnapToplevel
 
 
 window = tk.Tk()
-top = SnapToplevel(window, location=tk.RIGHT, allow_change=True, locked=False)
+top = SnapToplevel(window, anchor=tk.RIGHT, allow_change=True, locked=False)
 window.mainloop()
