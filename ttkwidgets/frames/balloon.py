@@ -123,11 +123,3 @@ class Balloon(ttk.Frame):
 
     def configure(self, **kwargs):
         self.config(**kwargs)
-
-
-if __name__ == '__main__':
-    window = tk.Tk()
-    button = tk.Button(window, text="Button", command=window.destroy)
-    button.pack()
-    balloon = Balloon(button)
-    window.mainloop()
