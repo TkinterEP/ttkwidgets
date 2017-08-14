@@ -57,7 +57,7 @@ class SnapToplevel(tk.Toplevel):
         # It returns something like below if one was bound:
         # {"[55632584<lambda> %# %b %f %h %k %s %t %w %x %y %A %E %K %N %W %T %X %Y %D]" == "break"} break\n
         # This is probably because the implementation is not correct in the C bindings of Tkinter
-        if not self._configure_function and not master.bind("<Configure>") == "":
+        if not self._configure_function and master.bind("<Configure>") != "":
             raise ValueError("No original Configure binding provided while one was bound to the master Tk instance.")
 
         # Initialize Toplevel
