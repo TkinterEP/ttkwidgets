@@ -63,7 +63,7 @@ class Balloon(ttk.Frame):
         """
         Creates a delayed callback for the <Enter> event
         """
-        self._id = self.master.after(self._timeout * 1000, func=self.show)
+        self._id = self.master.after(int(self._timeout * 1000), func=self.show)
 
     def _on_leave(self, event):
         """
