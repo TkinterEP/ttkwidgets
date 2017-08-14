@@ -95,7 +95,30 @@ class Balloon(ttk.Frame):
         self._toplevel.geometry("{0}x{1}+{2}+{3}".format(self._canvas.winfo_width(), self._canvas.winfo_height(),
                                                          x + 2, y + 2))
 
-    # TODO: Implement custom cget and config functions
+    def cget(self, key):
+        if key == "headertext":
+            return self.__headertext
+        elif key == "text":
+            return self.__text
+        elif key == "width":
+            return self.__width
+        elif key == "timeout":
+            return self._timeout
+        elif key == "background":
+            return self.__background
+        else:
+            return tk.Frame.cget(self, key)
+
+    def config(self, **kwargs):
+        self.__headertext = kwargs.pop("headertext", self.__headertext)
+        self.__text = kwargs.pop("text", self.__text)
+        self.__width = kwargs.pop("width", self.__width)
+        self._timeout = kwargs.pop("timeout", self._timeout)
+        self.__background = kwargs.pop("background", self.__background)
+        ttk.Frame.config(self, **kwargs)
+
+    def configure(self, **kwargs):
+        self.config(**kwargs)
 
 
 if __name__ == '__main__':
