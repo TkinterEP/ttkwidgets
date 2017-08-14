@@ -303,11 +303,37 @@ class SnapToplevel(tk.Toplevel):
         offset_top = abs(content_y - root_y)
         return offset_sides, offset_top
 
-    def cget(self, *args):
-        pass
+    def cget(self, key):
+        if key == "configure_function":
+            return self._configure_function
+        elif key == "anchor":
+            return self._anchor
+        elif key == "locked":
+            return self._locked
+        elif key == "border":
+            return self._border
+        elif key == "offset_sides":
+            return self._offset_sides
+        elif key == "offset_top":
+            return self._offset_top
+        elif key == "resizable":
+            return self._resizable
+        elif key == "allow_change":
+            return self._allow_change
+        else:
+            return tk.Toplevel.cget(self, key)
 
     def config(self, **kwargs):
-        pass
+        self._configure_function = kwargs.pop("configure_function", self._configure_function)
+        self._anchor = kwargs.pop("anchor", self._anchor)
+        self._locked = kwargs.pop("locked", self._locked)
+        self._border = kwargs.pop("border", self._border)
+        self._offset_sides = kwargs.pop("offset_sides", self._offset_sides)
+        self._offset_top = kwargs.pop("offset_top", self._offset_top)
+        self._resizable = kwargs.pop("resizable", self._resizable)
+        self._allow_change = kwargs.pop("allow_change", self._allow_change)
+        self.check_keyword_arguments()
+        return tk.Toplevel.config(self, **kwargs)
 
     def configure(self, **kwargs):
         self.config(**kwargs)
