@@ -1,11 +1,20 @@
+codecov:
+  branch: master
+
 coverage:
-  ci:
-    - travis
-    - appveyor
+  range: 50...100
+
   status:
-    patch: false
-    changes: false
     project:
-      default:
-        target: '80'
-comment: false
+      enabled: yes
+      target: 80%
+    patch:
+      enabled: yes
+      target: 80%
+      if_no_uploads: error
+      if_not_found: success
+    changes: false
+
+comment:
+  layout: "header, diff"
+behavior: default
