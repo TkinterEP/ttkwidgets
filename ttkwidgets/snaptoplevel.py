@@ -52,13 +52,10 @@ class SnapToplevel(tk.Toplevel):
         self._offset_top = kwargs.pop("offset_top", None)
         self._resizable = kwargs.pop("resizable", False)
         self._allow_change = kwargs.pop("allow_change", False)
-
-        # Tk.bind(self, event_name) returns an empty string if no function was bound to the event
-        # It returns something like below if one was bound:
-        # {"[55632584<lambda> %# %b %f %h %k %s %t %w %x %y %A %E %K %N %W %T %X %Y %D]" == "break"} break\n
-        # This is probably because the implementation is not correct in the C bindings of Tkinter
-        if not self._configure_function and master.bind("<Configure>") != "":
-            raise ValueError("No original Configure binding provided while one was bound to the master Tk instance.")
+        self._wait = kwargs.pop("wait", 5)
+        self._width = kwargs.get("width", None)
+        self._height = kwargs.get("height", None)
+        self.__index = 0
 
         # Initialize Toplevel
         tk.Toplevel.__init__(self, master, **kwargs)
@@ -98,6 +95,8 @@ class SnapToplevel(tk.Toplevel):
 
         # Set resizability
         self.wm_resizable(self._resizable, self._resizable)
+
+        self.set_geometry_master()
 
     def check_keyword_arguments(self):
         """
@@ -139,14 +138,25 @@ class SnapToplevel(tk.Toplevel):
         """
         The callback for the <Configure> Tkinter event, generated when a window is moved or resized.
         """
-        # First check if an update is necessary
-        if self._master_geometry != self.master.wm_geometry() or self._geometry != self.wm_geometry():
-            if event.widget is self.master:
-                self.set_geometry_master()
-            elif event.widget is self:
-                self.set_geometry_self()
         if callable(self._configure_function):
             self._configure_function(event)
+        if self.__index < self._wait:
+            self.__index += 1
+            return
+        self.__index = 0
+        # First check if an update is necessary
+        try:
+            if self._master_geometry != self.master.wm_geometry() or self._geometry != self.wm_geometry():
+                self._master_geometry = self.master.wm_geometry()
+                self._geometry = self.wm_geometry()
+                if event.widget is self.master:
+                    self.set_geometry_master()
+                elif event.widget is self:
+                    self.set_geometry_self()
+        except tk.TclError:
+            # If this error is thrown, it is very likely an error due to the SnapToplevel being destroyed
+            pass
+        return
 
     def _unlock(self):
         """
@@ -254,9 +264,18 @@ class SnapToplevel(tk.Toplevel):
         # If the Toplevel is not snapped to the window, we want to do nothing
         if not self.snapped:
             return
-        new_x, new_y, new_width, new_height = self.get_new_geometry_master()
+        try:
+            new_x, new_y, new_width, new_height = self.get_new_geometry_master()
+        except tk.TclError:
+            return
         if self._resizable:
             new_width, new_height = self.winfo_width(), self.winfo_height()
+        else:
+            if self._width:
+                new_width = self._width
+            if self._height:
+                new_height = self._height
+
         self.wm_geometry("{}x{}+{}+{}".format(new_width, new_height, new_x, new_y))
 
     def get_new_geometry_master(self):
