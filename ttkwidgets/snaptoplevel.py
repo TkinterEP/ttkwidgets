@@ -341,3 +341,9 @@ class SnapToplevel(tk.Toplevel):
     @property
     def snapped(self):
         return self._snapped
+
+    def destroy(self):
+        self.master.unbind("<Configure>")
+        if self._configure_function:
+            self.master.bind("<Configure>", self._configure_function)
+        tk.Toplevel.destroy(self)
