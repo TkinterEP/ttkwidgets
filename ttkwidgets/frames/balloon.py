@@ -30,8 +30,6 @@ class Balloon(ttk.Frame):
         :param background: background color of the help Balloon
         :param kwargs: keyword arguments for Frame creation
         """
-        if background is "white":
-            raise ValueError("White is the only background color not currently allowed.")
         ttk.Frame.__init__(self, master, **kwargs)
         self._toplevel = None
         self._canvas = None
