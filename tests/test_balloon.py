@@ -25,15 +25,21 @@ class TestBalloon(BaseWidgetTest):
 
         balloon.config(headertext="New Help", text="This is another test for the Balloon widget.", width=400,
                        timeout=3, background="black")
-        self.assertEqual(balloon.cget("headertext"), "New Help")
-        self.assertEqual(balloon.cget("text"), "This is another test for the Balloon widget.")
-        self.assertEqual(balloon.cget("width"), 400)
-        self.assertEqual(balloon.cget("timeout"), 3)
-        self.assertEqual(balloon.cget("background"), "black")
+        self.assertEqual(balloon["headertext"], "New Help")
+        self.assertEqual(balloon["text"], "This is another test for the Balloon widget.")
+        self.assertEqual(balloon["width"], 400)
+        self.assertEqual(balloon["timeout"], 3)
+        self.assertEqual(balloon["background"], "black")
 
         # Keys for the Frame widget
         balloon.configure(height=40)
         self.assertEqual(balloon.cget("height"), 40)
+
+        balloon['height'] = 50
+        self.assertEqual(balloon["height"], 50)
+
+        for key in ["headertext", "text", "width", "timeout", "background"]:
+            self.assertIn(key, balloon.keys())
 
     def test_balloon_show(self):
         balloon = Balloon(self.window)
@@ -61,5 +67,4 @@ class TestBalloon(BaseWidgetTest):
         balloon = Balloon(self.window)
         balloon._on_enter(None)
         balloon._on_leave(None)
-
 

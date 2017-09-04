@@ -40,7 +40,7 @@ class Balloon(ttk.Frame):
         # https://www.iconfinder.com/icons/26486/balloon_help_information_icon#size=16
         # Under CC Attribution License
         self._image = Image.open(os.path.join(get_assets_directory(), "balloon.png"))
-        self._photo_image = ImageTk.PhotoImage(self._image)
+        self._photo_image = ImageTk.PhotoImage(self._image, master=self)
         self.__background = background
         self.__headertext = headertext
         self.__text = text
@@ -50,6 +50,12 @@ class Balloon(ttk.Frame):
         self._timeout = timeout
         self.master.bind("<Enter>", self._on_enter)
         self.master.bind("<Leave>", self._on_leave)
+
+    def __getitem__(self, key):
+        return self.cget(key)
+
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
 
     def _grid_widgets(self):
         """
@@ -123,3 +129,8 @@ class Balloon(ttk.Frame):
 
     def configure(self, **kwargs):
         self.config(**kwargs)
+
+    def keys(self):
+        keys = ttk.Frame.keys(self)
+        keys.extend(["headertext", "text", "width", "timeout", "background"])
+        return keys
