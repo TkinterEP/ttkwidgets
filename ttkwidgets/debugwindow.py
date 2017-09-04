@@ -62,6 +62,9 @@ class DebugWindow(tk.Toplevel):
                 self.text.insert(tk.END, sub)
                 self.text.insert(tk.END, "\n")
 
+    def flush(self):
+        pass
+
     def quit(self):
         """Restore previous stdout/stderr and destroy the window."""
         sys.stdout = self._oldstdout
