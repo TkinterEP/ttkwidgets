@@ -21,7 +21,10 @@ class DebugWindow(tk.Toplevel):
     def __init__(self, master=None, title="Debug window", stdout=True, stderr=False, width=70, **kwargs):
         self._width = width
         tk.Toplevel.__init__(self, master, **kwargs)
+        self.protocol("WM_DELETE_WINDOW", self.quit)
         self.wm_title(title)
+        self._oldstdout = sys.stdout
+        self._oldstderr = sys.stderr
         if stdout:
             sys.stdout = self
         if stderr:
@@ -30,7 +33,7 @@ class DebugWindow(tk.Toplevel):
         self.config(menu=self.menu)
         self.filemenu = tk.Menu(self.menu, tearoff=0)
         self.filemenu.add_command(label="Save file", command=self.save)
-        self.filemenu.add_command(label="Exit", command=self.destroy)
+        self.filemenu.add_command(label="Exit", command=self.quit)
         self.menu.add_cascade(label="File", menu=self.filemenu)
         self.text = tk.Text(self, width=width)
         self.scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
@@ -59,6 +62,8 @@ class DebugWindow(tk.Toplevel):
                 self.text.insert(tk.END, sub)
                 self.text.insert(tk.END, "\n")
 
-
-if __name__ == '__main__':
-    DebugWindow().mainloop()
+    def quit(self):
+        """Restore previous stdout/stderr and destroy the window."""
+        sys.stdout = self._oldstdout
+        sys.stderr = self._oldstderr
+        self.destroy()
