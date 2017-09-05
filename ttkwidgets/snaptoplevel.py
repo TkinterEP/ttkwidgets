@@ -25,7 +25,9 @@ class SnapToplevel(tk.Toplevel):
     Is not guaranteed to work on all platforms due to Tkinter event and window manager restrictions. Functionality
     depends on whether a <Configure> event is generated upon moving the Tk instance.
     """
-
+    # TODO: In spite of the notice above, try to adjust SnapToplevel for the window decorations on at least the most
+    # TODO: used window managers.
+    # TODO: Adjust SnapToplevel based on Windows DPI scaling
     def __init__(self, master, **kwargs):
         """
         :param master: master Tk instance
