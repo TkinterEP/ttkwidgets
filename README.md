@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/RedFantom/ttkwidgets.svg?branch=master)](https://travis-ci.org/RedFantom/ttkwidgets)
 [![Build status](https://ci.appveyor.com/api/projects/status/c6j6td273u3y6rw7/branch/master?svg=true)](https://ci.appveyor.com/project/RedFantom/ttkwidgets/branch/master)
 [![codecov](https://codecov.io/gh/RedFantom/ttkwidgets/branch/master/graph/badge.svg)](https://codecov.io/gh/RedFantom/ttkwidgets)
+[![PyPI version](https://badge.fury.io/py/ttkwidgets.svg)](https://badge.fury.io/py/ttkwidgets)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 A collection of widgets for Tkinter's ttk extensions by various authors
