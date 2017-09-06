@@ -37,3 +37,4 @@ class TestDebugWindow(BaseWidgetTest):
         with open("somefile.txt", "r") as f:
             self.assertTrue("Something!" in f.read())
         os.remove('somefile.txt')
+
