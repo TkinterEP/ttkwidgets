@@ -35,7 +35,7 @@ class DebugWindow(tk.Toplevel):
         self.filemenu.add_command(label="Save file", command=self.save)
         self.filemenu.add_command(label="Exit", command=self.quit)
         self.menu.add_cascade(label="File", menu=self.filemenu)
-        self.text = tk.Text(self, width=width)
+        self.text = tk.Text(self, width=width, wrap=tk.WORD)
         self.scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         self.text.config(yscrollcommand=self.scroll.set)
         self.text.bind("<Key>", lambda e: "break")
@@ -53,14 +53,7 @@ class DebugWindow(tk.Toplevel):
         self.scroll.grid(row=0, column=1, sticky="ns")
 
     def write(self, line):
-        while True:
-            if len(line) <= self._width:
-                self.text.insert(tk.END, line)
-                break
-            else:
-                sub = line[:self._width]
-                self.text.insert(tk.END, sub)
-                self.text.insert(tk.END, "\n")
+        self.text.insert(tk.END, line)
 
     def flush(self):
         pass
