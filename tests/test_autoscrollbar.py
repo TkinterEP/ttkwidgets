@@ -13,6 +13,9 @@ class TestAutoScrollbar(BaseWidgetTest):
         scroll = AutoScrollbar(self.window, orient='vertical')
         # pack layout
         scroll.pack(side='right', fill='y')
+        info = scroll._get_info("pack")
+        self.assertEqual(info["side"], "right")
+        self.assertEqual(info["fill"], "y")
         self.window.update()
         scroll.set(-0.1, 1.1)
         self.window.update()
