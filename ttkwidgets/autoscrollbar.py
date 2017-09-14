@@ -41,14 +41,32 @@ class AutoScrollbar(ttk.Scrollbar):
                 self.grid()
         ttk.Scrollbar.set(self, lo, hi)
 
+    def _get_info(self, layout):
+        """Alternative to pack_info and place_info in case of bug."""
+        info = self.tk.call(layout, 'info', self._w).string.split("-")
+        dic = {}
+        for i in info:
+            if i:
+                key, val = i.strip().split()
+                dic[key] = val
+        return dic
+
     def place(self, **kw):
         ttk.Scrollbar.place(self, **kw)
-        self._place_kw = self.place_info()
+        try:
+            self._place_kw = self.place_info()
+        except TypeError:
+            # bug in some tkinter versions
+            self._place_kw = self._get_info("place")
         self._layout = 'place'
 
     def pack(self, **kw):
         ttk.Scrollbar.pack(self, **kw)
-        self._pack_kw = self.pack_info()
+        try:
+            self._pack_kw = self.pack_info()
+        except TypeError:
+            # bug in some tkinter versions
+            self._pack_kw = self._get_info("pack")
         self._layout = 'pack'
 
     def grid(self, **kw):
