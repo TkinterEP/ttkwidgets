@@ -43,7 +43,7 @@ class AutoScrollbar(ttk.Scrollbar):
 
     def _get_info(self, layout):
         """Alternative to pack_info and place_info in case of bug."""
-        info = self.tk.call(layout, 'info', self._w).string.split("-")
+        info = str(self.tk.call(layout, 'info', self._w)).split("-")
         dic = {}
         for i in info:
             if i:
