@@ -17,7 +17,7 @@ class AutoHideScrollbar(ttk.Scrollbar):
         """
         Create the scrollbar.
 
-        Take the same arguments than ttk.Scrollbar
+        Take the same arguments as ttk.Scrollbar
         """
         ttk.Scrollbar.__init__(self, *args, **kwargs)
         self._pack_kw = {}
