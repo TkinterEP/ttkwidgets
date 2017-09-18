@@ -1,16 +1,16 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
-from ttkwidgets import AutoScrollbar
+from ttkwidgets import AutoHideScrollbar
 from tests import BaseWidgetTest
 
 
-class TestAutoScrollbar(BaseWidgetTest):
-    def test_autoscrollbar_init(self):
-        AutoScrollbar(self.window)
+class TestAutoHideScrollbar(BaseWidgetTest):
+    def test_autohidescrollbar_init(self):
+        AutoHideScrollbar(self.window)
         self.window.update()
 
-    def test_autoscrollbar_methods(self):
-        scroll = AutoScrollbar(self.window, orient='vertical')
+    def test_autohidescrollbar_methods(self):
+        scroll = AutoHideScrollbar(self.window, orient='vertical')
         # pack layout
         scroll.pack(side='right', fill='y')
         info = scroll._get_info("pack")
