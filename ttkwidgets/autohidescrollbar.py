@@ -11,8 +11,8 @@ except ImportError:
     from tkinter import ttk
 
 
-class AutoScrollbar(ttk.Scrollbar):
-    """Scrollbar that automatically hide when not needed."""
+class AutoHideScrollbar(ttk.Scrollbar):
+    """Scrollbar that automatically hides when not needed."""
     def __init__(self, *args, **kwargs):
         """
         Create the scrollbar.
