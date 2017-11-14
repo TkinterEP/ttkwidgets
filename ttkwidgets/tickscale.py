@@ -197,7 +197,7 @@ class TickScale(ttk.Frame):
         if self._tickinterval:
             self.ticks = []
             self.ticklabels = []
-            nb_interv = round(self._extent / self._tickinterval)
+            nb_interv = int(round(self._extent / self._tickinterval))
             for i in range(nb_interv + 1):
                 tick = self._start + i * self._tickinterval
                 self.ticks.append(tick)
