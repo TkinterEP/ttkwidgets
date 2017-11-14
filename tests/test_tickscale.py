@@ -17,8 +17,7 @@ class TestTickScale(BaseWidgetTest):
                   digits=2, length=400, cursor='watch').pack()
         self.window.update()
         TickScale(self.window, orient='horizontal', from_=0, to=10,
-                  tickinterval=0, showvalue=False,
-                  command=lambda value: print(value)).pack()
+                  tickinterval=0, showvalue=False).pack()
         self.window.update()
 
     def test_tickscale_methods(self):
