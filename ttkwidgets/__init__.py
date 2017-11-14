@@ -7,3 +7,4 @@ from ttkwidgets.scrolledlistbox import ScrolledListbox
 from ttkwidgets.debugwindow import DebugWindow
 from ttkwidgets.checkboxtreeview import CheckboxTreeview
 from ttkwidgets.itemscanvas import ItemsCanvas
+from ttkwidgets.tickscale import TickScale
