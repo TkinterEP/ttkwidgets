@@ -17,8 +17,18 @@ class TestTickScale(BaseWidgetTest):
                   digits=2, length=400, cursor='watch').pack()
         self.window.update()
         TickScale(self.window, orient='horizontal', from_=0, to=10,
-                  tickinterval=0, showvalue=False).pack()
+                  tickinterval=0, tickpos='n', labelpos='s',
+                  showvalue=False).pack()
         self.window.update()
+
+        with self.assertRaises(ValueError):
+            TickScale(self.window, orient='vertical', tickpos='n')
+
+        with self.assertRaises(ValueError):
+            TickScale(self.window, orient='horizontal', tickpos='e')
+
+        with self.assertRaises(ValueError):
+            TickScale(self.window, labelpos='ne')
 
     def test_tickscale_methods(self):
         scale = TickScale(self.window, from_=0, to=10, orient='horizontal')
@@ -55,14 +65,42 @@ class TestTickScale(BaseWidgetTest):
         self.assertEqual(scale['digits'], 1)
         self.assertEqual(scale['tickinterval'], 5)
 
+        scale['labelpos'] = 's'
+        self.window.update()
+        self.assertEqual(scale['labelpos'], 's')
+
+        scale['labelpos'] = 'e'
+        self.window.update()
+        self.assertEqual(scale['labelpos'], 'e')
+
+        scale['labelpos'] = 'w'
+        self.window.update()
+        self.assertEqual(scale['labelpos'], 'w')
+
+        scale['tickpos'] = 'n'
+        self.window.update()
+        self.assertEqual(scale['tickpos'], 'n')
+
         scale['orient'] = 'vertical'
         self.window.update()
 
-        style = ttk.Style(self.window)
+        scale['tickpos'] = 'e'
+        self.window.update()
+        self.assertEqual(scale['tickpos'], 'e')
+
+        with self.assertRaises(ValueError):
+            scale.configure(orient='vertical', tickpos='n')
+
+        with self.assertRaises(ValueError):
+            scale.configure(orient='horizontal', tickpos='e')
+
+        with self.assertRaises(ValueError):
+            TickScale(self.window, labelpos='ne')
+
         scale.configure(style='my.Vertical.TScale')
         self.window.update()
-        style.configure('my.Vertical.TScale', font='TkDefaultFont 20 italic',
-                        sliderlength=50)
+        scale.style.configure('my.Vertical.TScale', font='TkDefaultFont 20 italic',
+                              sliderlength=50)
 
         scale.x = 0
 
@@ -87,8 +125,8 @@ class TestTickScale(BaseWidgetTest):
         self.window.update()
         scale['length'] = 200
         scale['digits'] = 3
-        style.configure('Horizontal.TScale', font='TkDefaultFont 20 italic',
-                        sliderlength=10)
+        scale.style.configure('Horizontal.TScale', font='TkDefaultFont 20 italic',
+                              sliderlength=10)
         self.window.update()
         scale.set(0)
         self.window.update()

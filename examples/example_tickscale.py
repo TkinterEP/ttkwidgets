@@ -19,7 +19,7 @@ style.configure('my.Horizontal.TScale', sliderlength=50,
                 font='TkDefaultFont 20 italic')
 s1 = TickScale(root, orient='vertical', style='my.Vertical.TScale',
                tickinterval=0.2, from_=-1, to=1, showvalue=True, digits=2,
-               length=400)
+               length=400, labelpos='e')
 s2 = TickScale(root, orient='horizontal', style='my.Horizontal.TScale',
                from_=0, to=10, tickinterval=2, showvalue=True, length=300)
 
