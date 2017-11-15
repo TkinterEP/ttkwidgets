@@ -34,8 +34,9 @@ class TestTickScale(BaseWidgetTest):
         scale = TickScale(self.window, from_=0, to=10, orient='horizontal')
         scale.pack()
         self.window.update()
-        self.assertEqual(scale.cget('digits'), 0)
+        self.assertEqual(scale.cget('digits'), -1)
         self.assertEqual(scale['tickinterval'], 0)
+        self.assertEqual(scale['resolution'], 0)
         self.assertTrue(scale.cget('showvalue'))
         self.assertEqual(scale['from'], 0)
         self.assertEqual(scale.cget('to'), 10)
@@ -64,6 +65,15 @@ class TestTickScale(BaseWidgetTest):
         self.assertEqual(scale['to'], 20)
         self.assertEqual(scale['digits'], 1)
         self.assertEqual(scale['tickinterval'], 5)
+
+        scale.configure(tickinterval=0.01, resolution=0.05)
+        self.window.update()
+        self.assertEqual(scale['digits'], 2)
+        self.assertEqual(scale['resolution'], 0.05)
+        self.assertEqual(scale['tickinterval'], 0.05)
+
+        scale.set(1.1036247)
+        self.assertEqual(scale.get(), 1.10)
 
         scale['labelpos'] = 's'
         self.window.update()
@@ -109,6 +119,7 @@ class TestTickScale(BaseWidgetTest):
 
         scale.configure(command=cmd)
         self.window.update()
+        scale.configure(digits=1)
         scale.set(10)
         self.window.update()
         self.assertEqual(scale.x, 20)

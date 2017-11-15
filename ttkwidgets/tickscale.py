@@ -17,15 +17,17 @@ class TickScale(ttk.Frame):
 
         Arguments:
             * master: parent window
-            * showvalue: display current value next to the slider
+            * digits: number of digits after the comma to display, if negative
+                use the %g format
             * labelpos: if showvalue is True, position of the label:
                 n, s, e, w
+            * resolution: increment by which the slider can be moved. 0 means
+                continuous sliding.
+            * showvalue: display current value next to the slider
             * tickinterval: if not 0, display ticks with the given interval
             * tickpos: if tickinterval is not 0, position of the ticks:
                 vertical scale: w or e
                 horizontal scale: n or s
-            * digits: number of digits after the comma to display, if negative
-                use the %g format
             * all ttk.Scale options:
                 class, cursor, style, takefocus, command, from, length, orient,
                 to, value, variable
@@ -38,24 +40,15 @@ class TickScale(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self._showvalue = kwargs.pop('showvalue', True)
         self._tickinterval = kwargs.pop('tickinterval', 0)
+        try:
+            self._resolution = float(kwargs.pop('resolution', 0))
+            if self._resolution < 0:
+                raise ValueError("'resolution' must be non negative.")
+        except ValueError:
+            raise TypeError("'resolution' must be a float.")
+        if self._tickinterval != 0 and self._resolution > self._tickinterval:
+            self._tickinterval = self._resolution
 
-        interv = str(self._tickinterval)
-        self._digits = kwargs.pop('digits', interv[::-1].find('.'))
-        if not isinstance(self._digits, int):
-            raise TypeError("'digits' must be an integer or None.")
-
-        if 'digits' not in kwargs and self._digits < 0:
-            if 'e' not in interv:
-                self._digits = 0
-                self._formatter = '{:.' + str(self._digits) + 'f}'
-            else:
-                self._formatter = '{:g}'
-        elif self._digits < 0:
-            self._formatter = '{:g}'
-        else:
-            self._formatter = '{:.' + str(self._digits) + 'f}'
-
-        self._command = kwargs.get('command', lambda value: None)
         orient = kwargs.get('orient', 'horizontal')
         self._labelpos = kwargs.pop('labelpos',
                                     'n' if orient == 'horizontal' else 'w')
@@ -64,8 +57,48 @@ class TickScale(ttk.Frame):
         self._tickpos = kwargs.pop('tickpos',
                                    's' if orient == 'horizontal' else 'w')
 
+        self._digits = kwargs.pop('digits', None)
+
+        if 'variable' not in kwargs:
+            self._var = tk.DoubleVar(self)
+            kwargs['variable'] = self._var
+        else:
+            self._var = kwargs['variable']
+
         self.style = ttk.Style(self)
         self.scale = ttk.Scale(self, **kwargs)
+
+        if self._resolution > 0:
+            nb_steps = round((self.scale.cget('to') - self.scale.cget('from')) / self._resolution)
+            self.scale.configure(to=self.scale.cget('from') + nb_steps * self._resolution)
+
+        # adapt resolution, digits and tickinterval to avoid conflicting values
+        interv = self._get_precision(self._tickinterval)
+        resol = self._get_precision(self._resolution)
+        from_ = self._get_precision(self.scale.cget('from'))
+        to = self._get_precision(self.scale.cget('to'))
+        d = max(interv, resol, from_, to)
+        if self._tickinterval == 0 and self._resolution == 0:
+            if self._digits is None:
+                self._digits = -1
+        else:
+            if self._digits is None:
+                self._digits = d
+            if self._digits >= 0 and self._digits < d:
+                self._resolution = float('1e-{}'.format(self._digits))
+                self._tickinterval = round(self._tickinterval, self._digits)
+                if self._resolution > self._tickinterval:
+                    self._tickinterval = self._resolution
+                self.scale.configure(from_=round(self.scale.get('from'), self._digits),
+                                     to=round(self.scale.get('to'), self._digits))
+
+        if not isinstance(self._digits, int):
+            raise TypeError("'digits' must be an integer.")
+
+        if self._digits < 0:
+            self._formatter = '{:g}'
+        else:
+            self._formatter = '{:.' + str(self._digits) + 'f}'
 
         if orient == 'vertical' and self._tickpos not in ['w', 'e']:
             raise ValueError("For a vertical TickScale, 'tickpos' must be 'w' or 'e'.")
@@ -76,25 +109,25 @@ class TickScale(ttk.Frame):
         if not self._style_name:
             self._style_name = '%s.TScale' % (str(self.scale.cget('orient')).capitalize())
         self._update_slider_length()
-        self._extent = kwargs['to'] - kwargs['from_']
-        self._start = kwargs['from_']
+        self._extent = self.scale.cget('to') - self.scale.cget('from')
+        self._start = self.scale.cget('from')
+        self._var.set(self._start)
         self.ticks = []
         self.ticklabels = []
         self.label = ttk.Label(self, padding=1)
 
+        try:
+            self._trace = self._var.trace_add('write', self._increment)
+        except Exception:
+            # backward compatibility
+            self._trace = self._var.trace('w', self._increment)
+
         self._apply_style()
         self._init()
-
-        def cmd(value):
-            self._command(value)
-            self.display_value(value)
-
-        self.scale.configure(command=cmd)
 
         self.scale.bind('<Configure>', self._update_display)
         self.scale.bind('<<ThemeChanged>>', self._style_change)
 
-        self.get = self.scale.get
         self.set = self.scale.set
         self.coords = self.scale.coords
         self.instate = self.scale.instate
@@ -105,6 +138,19 @@ class TickScale(ttk.Frame):
 
     def __setitem__(self, item, value):
         self.configure({item: value})
+
+    @staticmethod
+    def _get_precision(number):
+        """
+        Return the number of digits after the comma necessary to display number.
+
+        The default number of digits after the comma of '%f' is 6, so -1 is
+        returned if number < 1e-6
+        """
+        if number < 1e-6:
+            return -1
+        else:
+            return '{:f}'.format(number).strip('0')[::-1].find('.')
 
     def keys(self):
         keys = self.scale.keys()
@@ -121,6 +167,8 @@ class TickScale(ttk.Frame):
             return self._labelpos
         elif key == 'digits':
             return self._digits
+        elif key == 'resolution':
+            return self._resolution
         else:
             return self.scale.cget(key)
 
@@ -150,6 +198,16 @@ class TickScale(ttk.Frame):
             else:
                 self._labelpos = labelpos
                 reinit = True
+        if 'resolution' in kw:
+            try:
+                self._resolution = float(kw.pop('resolution'))
+                if self._resolution < 0:
+                    raise ValueError("'resolution' must be non negative.")
+            except ValueError:
+                raise TypeError("'resolution' must be a float.")
+        if self._tickinterval != 0 and self._resolution > self._tickinterval:
+            self._tickinterval = self._resolution
+            reinit = True
         if 'digits' in kw:
             digits = kw.pop('digits')
             if not isinstance(digits, int):
@@ -161,8 +219,48 @@ class TickScale(ttk.Frame):
             else:
                 self._digits = digits
                 self._formatter = '{:.' + str(self._digits) + 'f}'
+                interv = self._get_precision(self._tickinterval)
+                resol = self._get_precision(self._resolution)
+                start = kw.get('from', kw.get('from_', self._start))
+                end = kw.get('to', self.scale.cget('to'))
+                from_ = self._get_precision(start)
+                to = self._get_precision(end)
+                d = max(interv, resol, from_, to)
+                if self._digits < d:
+                    self._resolution = float('1e-{}'.format(self._digits))
+                    self._tickinterval = round(self._tickinterval, self._digits)
+                    if self._resolution > self._tickinterval:
+                        self._tickinterval = self._resolution
+                    kw['to'] = round(end, self._digits)
+                    if 'from_' in kw:
+                        del kw['from_']
+                    kw['from'] = round(start, self._digits)
                 reinit = True
+        elif self._digits > 0:
+            start = kw.get('from', kw.get('from_', self._start))
+            end = kw.get('to', self.scale.cget('to'))
+            from_ = self._get_precision(start)
+            to = self._get_precision(end)
+            interv = self._get_precision(self._tickinterval)
+            resol = self._get_precision(self._resolution)
+            digits = max(self._digits, interv, resol, from_, to)
+            if digits != self._digits:
+                self._digits = digits
+                self._formatter = '{:.' + str(self._digits) + 'f}'
+                reinit = True
+        if 'variable' in kw:
+            self._var = kw['variable']
+            if not self._var:
+                self._var = tk.DoubleVar(self, self.get())
+                kw['variable'] = self._var
+            try:
+                self._var.trace_add('write', self._increment)
+            except Exception:
+                # backward compatibility
+                self._var.trace('w', self._increment)
+
         self.scale.configure(**kw)
+
         if 'from_' in kw or 'from' in kw or 'to' in kw:
             self._extent = self.scale.cget('to') - self.scale.cget('from')
             self._start = self.scale.cget('from')
@@ -172,14 +270,6 @@ class TickScale(ttk.Frame):
             if not self._style_name:
                 self._style_name = '%s.TScale' % (str(self.scale.cget('orient')).capitalize())
             self._style_change()
-        if 'command' in kw:
-            self._command = kw['command']
-
-            def cmd(value):
-                self._command(value)
-                self.display_value(value)
-
-            self.scale.configure(command=cmd)
         if 'orient' in kw:
             if kw['orient'] == 'vertical':
                 self._style_name = self._style_name.replace('Horizontal', 'Vertical')
@@ -194,14 +284,14 @@ class TickScale(ttk.Frame):
         if reinit:
             self._init()
 
-            def cmd(value):
-                self._command(value)
-                self.display_value(value)
-
-            self.scale.configure(command=cmd)
-
     def config(self, cnf={}, **kw):
         self.configure(cnf={}, **kw)
+
+    def get(self):
+        if self._digits >= 0:
+            return round(self.scale.get(), self._digits)
+        else:
+            return self.scale.get()
 
     def convert_to_pixels(self, value):
         """Convert value in the scale's unit into a position in pixels."""
@@ -237,6 +327,10 @@ class TickScale(ttk.Frame):
         self.label.place_forget()
         self.ticks = []
         self.ticklabels = []
+        if self._resolution > 0:
+            nb_steps = round((self.scale.cget('to') - self.scale.cget('from')) / self._resolution)
+            self.scale.configure(to=self.scale.cget('from') + nb_steps * self._resolution)
+            self._extent = self.scale.cget('to') - self.scale.cget('from')
         if str(self.scale.cget('orient')) == "horizontal":
             self.get_scale_length = self.scale.winfo_width
             self.display_value = self._display_value_horizontal
@@ -247,6 +341,13 @@ class TickScale(ttk.Frame):
             self.display_value = self._display_value_vertical
             self.place_ticks = self._place_ticks_vertical
             self._init_vertical()
+        try:
+            self._var.trace_remove('write', self._trace)
+            self._trace = self._var.trace_add('write', self._increment)
+        except Exception:
+            # backward compatibility
+            self._var.trace_vdelete('w', self._trace)
+            self._trace = self._var.trace('w', self._increment)
 
     def _init_vertical(self):
         """Create and grid the widgets for a vertical orientation."""
@@ -305,7 +406,7 @@ class TickScale(ttk.Frame):
         # ticks
         padx1_2, padx2_2 = 0, 0
         if self._tickinterval:
-            nb_interv = int(round(self._extent / self._tickinterval))
+            nb_interv = int(self._extent / self._tickinterval)
             if self._tickpos == 'w':
                 for i in range(nb_interv + 1):
                     tick = self._start + i * self._tickinterval
@@ -385,7 +486,7 @@ class TickScale(ttk.Frame):
         # ticks
         pady1_2, pady2_2 = 0, 0
         if self._tickinterval:
-            nb_interv = int(round(self._extent / self._tickinterval))
+            nb_interv = int(self._extent / self._tickinterval)
             h = self.scale.winfo_reqheight()
             if self._tickpos == 's':
                 for i in range(nb_interv + 1):
@@ -465,6 +566,14 @@ class TickScale(ttk.Frame):
             y = self.convert_to_pixels(tick)
             label.place_configure(y=y)
 
+    def _increment(self, *args):
+        """Move the slider only by increment given by resolution."""
+        value = self._var.get()
+        if self._resolution:
+            value = self._start + int(round((value - self._start) / self._resolution)) * self._resolution
+            self._var.set(value)
+        self.display_value(value)
+
     def _style_change(self, event=None):
         """Apply style and update widgets position."""
         self._apply_style()
@@ -480,5 +589,5 @@ class TickScale(ttk.Frame):
             if self._tickinterval:
                 self.place_ticks()
         except Exception:
-            # happens when configure is called during an configuration change
+            # happens when configure is called during a configuration change
             pass
