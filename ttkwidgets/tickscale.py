@@ -38,7 +38,9 @@ class TickScale(ttk.Frame):
                 to, value, variable
 
                 The style must derive from Vertical.TScale or Horizontal.TScale
-                depending on the orientation.
+                depending on the orientation. Depending on the theme, the default
+                slider length might not be correct. If it is the case, this can
+                be solve by setting the 'sliderlength' through ttk.Style.
         """
         ttk.Frame.__init__(self, master, class_='TickScale', padding=2)
         self.rowconfigure(0, weight=1)
@@ -310,16 +312,19 @@ class TickScale(ttk.Frame):
         """Apply the scale style to the frame and labels."""
         ttk.Frame.configure(self, style=self._style_name + ".TFrame")
         self.label.configure(style=self._style_name + ".TLabel")
+        bg = self.style.lookup('TFrame', 'background', default='light grey')
         for label in self.ticklabels:
             label.configure(style=self._style_name + ".TLabel")
         self.style.configure(self._style_name + ".TFrame",
-                             background=self.style.lookup(self._style_name, 'background'))
+                             background=self.style.lookup(self._style_name,
+                                                          'background',
+                                                          default=bg))
         self.style.map(self._style_name + ".TFrame",
                        background=self.style.map(self._style_name, 'background'))
         self.style.configure(self._style_name + ".TLabel",
-                             font=self.style.lookup(self._style_name, 'font'),
-                             background=self.style.lookup(self._style_name, 'background'),
-                             foreground=self.style.lookup(self._style_name, 'foreground'))
+                             font=self.style.lookup(self._style_name, 'font', default='TkDefaultFont'),
+                             background=self.style.lookup(self._style_name, 'background', default=bg),
+                             foreground=self.style.lookup(self._style_name, 'foreground', default='black'))
         self.style.map(self._style_name + ".TLabel",
                        font=self.style.map(self._style_name, 'font'),
                        background=self.style.map(self._style_name, 'background'),
@@ -346,6 +351,7 @@ class TickScale(ttk.Frame):
             self.display_value = self._display_value_vertical
             self.place_ticks = self._place_ticks_vertical
             self._init_vertical()
+        self.scale.lift()
         try:
             self._var.trace_remove('write', self._trace)
             self._trace = self._var.trace_add('write', self._increment)
@@ -437,6 +443,7 @@ class TickScale(ttk.Frame):
                                              anchor='w')
                     self.update_idletasks()
                     padx2_2 = max(self.ticklabels[i].winfo_width(), padx2_2)
+            self.update_idletasks()
             self._place_ticks_vertical()
         self.scale.grid_configure(padx=(padx1 + padx1_2 + 1, padx2 + padx2_2 + 1),
                                   pady=(pady1, pady2))
@@ -513,6 +520,7 @@ class TickScale(ttk.Frame):
                     self.ticklabels[i].place(in_=self.scale, bordermode='outside',
                                              x=0, y=-1 - pady1, anchor='s')
                 pady1_2 = self.ticklabels[-1].winfo_reqheight()
+            self.update_idletasks()
             self._place_ticks_horizontal()
         self.scale.grid_configure(pady=(pady1 + pady1_2, pady2 + pady2_2),
                                   padx=(padx1, padx2))
@@ -548,7 +556,7 @@ class TickScale(ttk.Frame):
         tick = self.ticks[0]
         label = self.ticklabels[0]
         x = self.convert_to_pixels(tick)
-        half_width = label.winfo_width() / 2
+        half_width = label.winfo_reqwidth() / 2
         if x - half_width < 0:
             x = half_width
         label.place_configure(x=x)
@@ -560,11 +568,10 @@ class TickScale(ttk.Frame):
         tick = self.ticks[-1]
         label = self.ticklabels[-1]
         x = self.convert_to_pixels(tick)
-        half_width = label.winfo_width() / 2
-        if x + half_width > self.scale.winfo_width():
+        half_width = label.winfo_reqwidth() / 2
+        if x + half_width > self.scale.winfo_reqwidth():
             x = self.scale.winfo_width() - half_width
         label.place_configure(x=x)
-        self.update_idletasks()
 
     def _place_ticks_vertical(self):
         for tick, label in zip(self.ticks, self.ticklabels):
@@ -582,6 +589,9 @@ class TickScale(ttk.Frame):
     def _style_change(self, event=None):
         """Apply style and update widgets position."""
         self._apply_style()
+        self.update_idletasks()
+        self._update_slider_length()
+        self.update_idletasks()
         self._init()
         self.update_idletasks()
         self._update_slider_length()
