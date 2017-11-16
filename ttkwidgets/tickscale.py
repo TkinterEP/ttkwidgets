@@ -1,3 +1,8 @@
+"""
+Author: Juliette Monsel
+License: GNU GPLv3
+Source: This repository
+"""
 try:
     import Tkinter as tk
     import ttk
