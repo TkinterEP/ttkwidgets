@@ -292,7 +292,7 @@ class TickScale(ttk.Frame):
             self._init()
 
     def config(self, cnf={}, **kw):
-        self.configure(cnf={}, **kw)
+        self.configure(cnf=cnf, **kw)
 
     def get(self):
         if self._digits >= 0:
