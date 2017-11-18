@@ -91,7 +91,7 @@ class TickScale(ttk.Frame):
         else:
             if self._digits is None:
                 self._digits = d
-            if self._digits >= 0 and self._digits < d:
+            if 0 <= self._digits < d:
                 self._resolution = float('1e-{}'.format(self._digits))
                 self._tickinterval = round(self._tickinterval, self._digits)
                 if self._resolution > self._tickinterval:
