@@ -210,6 +210,7 @@ class TimeLine(ttk.Frame):
         # Configure the canvas
         self.clear_timeline()
         self.create_scroll_regions()
+        self.create_scroll_region()
         self._timeline.config(width=self.pixel_width)
         # Generate the Y-coordinates for each of the rows and create the lines indicating the rows
         self.create_separating_lines()
@@ -218,7 +219,10 @@ class TimeLine(ttk.Frame):
         # Create the ticks in the _canvas_ticks
         self.create_ticks()
 
-    def create_scroll_regions(self):
+    def create_scroll_region(self):
+        """
+        Set the correct scroll regions for the categories Canvas
+        """
         canvas_width = 0
         canvas_height = 0
         for label in self._category_labels.values():
@@ -226,8 +230,6 @@ class TimeLine(ttk.Frame):
             canvas_height += label.winfo_reqheight()
             canvas_width = width if width > canvas_width else canvas_width
         self._canvas_categories.config(scrollregion="0 0 {0} {1}".format(canvas_width, canvas_height))
-        scroll_region = "0 0 {0} 0".format(int(self._width))
-        self._canvas_ticks.config(scrollregion=scroll_region)
 
     def get_time_position(self, time):
         """
@@ -248,12 +250,14 @@ class TimeLine(ttk.Frame):
         """
         Create the tick markers in the ticks canvas
         """
-        self._canvas_ticks.create_line((0, 10, self._width, 10), fill="black")
+        self._canvas_ticks.create_line((0, 10, self.pixel_width, 10), fill="black")
         ticks = list(TimeLine.range(self._start, self._finish, self._tick_resolution / self._zoom_factor))
         for tick in ticks:
             string = TimeLine.get_time_string(tick, self._unit)
             x = self.get_time_position(tick)
             self._canvas_ticks.create_text((x, 20), text=string, fill="black", font=("default", 10))
+            self._canvas_ticks.create_line((x, 5, x, 15), fill="black")
+        self._canvas_ticks.config(scrollregion="0 0 {0} {1}".format(self.pixel_width, 30))
 
     def create_separating_lines(self):
         """
@@ -356,6 +360,7 @@ class TimeLine(ttk.Frame):
         Proxy for the xview function of the TimeLine Canvas, displays the value of the scroll in time units.
         """
         self._canvas_scroll.xview(*args)
+        self._canvas_ticks.xview(*args)
 
     def __configure_timeline(self, *args):
         """
@@ -472,8 +477,9 @@ class TimeLine(ttk.Frame):
         supported_units = ["h", "m"]
         if unit not in supported_units:
             return "{}".format(time)
-        minutes = int(floor(time * 60 % 60))
-        hours = int(floor(time))
+        hours, minutes = str(time).split(".")
+        hours = int(hours)
+        minutes = int(round(float(minutes) * 60))
         return "{:02d}:{:02d}".format(hours, minutes)
 
     @staticmethod
