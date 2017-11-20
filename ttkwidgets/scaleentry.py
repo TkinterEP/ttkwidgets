@@ -15,7 +15,8 @@ class ScaleEntry(ttk.Frame):
     """
     A simple combination of a Scale and an Entry widget suitable for use with int ranges.
     """
-    def __init__(self, master=None, scalewidth=50, entrywidth=5, from_=0, to=50, compound=tk.RIGHT, **kwargs):
+    def __init__(self, master=None, scalewidth=50, entrywidth=5, from_=0, to=50,
+                 compound=tk.RIGHT, entryscalepad=0, **kwargs):
         """
         :param master: master widget
         :param scalewidth: width of the Scale in pixels
@@ -23,6 +24,7 @@ class ScaleEntry(ttk.Frame):
         :param from_: start value of the scale
         :param to: end value of the scale
         :param compound: side the Entry must be on. Supports tk.LEFT, RIGHT, TOP and BOTTOM
+        :param entryscalepad: space between the entry and the scale
         :param kwargs: keyword arguments passed on to Frame initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
@@ -30,8 +32,13 @@ class ScaleEntry(ttk.Frame):
            compound is not tk.BOTTOM:
             raise ValueError("Invalid value for compound passed {0}".format(compound))
         self.__compound = compound
+        try:
+            self.__entryscalepad = int(entryscalepad)
+        except ValueError:
+            raise ValueError("Invalid value for entryscalepad passed {0}".format(entryscalepad))
         self._variable = self.LimitedIntVar(from_, to)
-        self._scale = ttk.Scale(self, from_=from_, to=to, length=scalewidth, command=self._on_scale,
+        self._scale = ttk.Scale(self, from_=from_, to=to, length=scalewidth,
+                                command=self._on_scale,
                                 variable=self._variable)
         # Note that the textvariable keyword argument is not used to pass the LimitedIntVar
         self._entry = ttk.Entry(self, width=entrywidth)
@@ -44,9 +51,19 @@ class ScaleEntry(ttk.Frame):
         Puts the widgets in the correct position based on self.__compound
         :return: None
         """
-        self._scale.grid(row=1, column=1)
-        self._entry.grid(row=0 if self.__compound is tk.TOP else 2 if self.__compound is tk.BOTTOM else 1,
+        self._scale.grid(row=2, column=1, sticky='ew',
+                         padx=(0, self.__entryscalepad) if self.__compound is tk.RIGHT else (self.__entryscalepad, 0) if self.__compound is tk.LEFT else 0,
+                         pady=(0, self.__entryscalepad) if self.__compound is tk.BOTTOM else (self.__entryscalepad, 0) if self.__compound is tk.TOP else 0)
+        self._entry.grid(row=1 if self.__compound is tk.TOP else 3 if self.__compound is tk.BOTTOM else 2,
                          column=0 if self.__compound is tk.LEFT else 2 if self.__compound is tk.RIGHT else 1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(4, weight=1)
+
+        if self.__compound in [tk.LEFT, tk.RIGHT]:
+            self.rowconfigure(2, weight=1)
+        else:
+            self.rowconfigure(2, weight=0)
 
     def _on_entry(self, event):
         """
