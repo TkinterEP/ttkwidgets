@@ -39,6 +39,8 @@ class TestScaleEntry(BaseWidgetTest):
         scale.config_scale(length=100)
         self.window.update()
         self.assertEqual(scale.cget_scale('length'), 100)
+        print(scale._scale.grid_info())
+        print(scale._scale.grid_info()['sticky'])
         self.assertEqual(str(scale._scale.grid_info()['sticky']), 'ew')
         scale.config_scale(orient='vertical')
         self.window.update()
