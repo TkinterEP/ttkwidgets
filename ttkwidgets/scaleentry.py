@@ -23,6 +23,7 @@ class ScaleEntry(ttk.Frame):
         :param entrywidth: width of the Entry in characters
         :param from_: start value of the scale
         :param to: end value of the scale
+        :param orient: scale orientation. Supports tk.HORIZONTAL and VERTICAL
         :param compound: side the Entry must be on. Supports tk.LEFT, RIGHT, TOP and BOTTOM
         :param entryscalepad: space between the entry and the scale
         :param kwargs: keyword arguments passed on to Frame initializer
