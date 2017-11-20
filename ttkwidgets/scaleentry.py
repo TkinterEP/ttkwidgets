@@ -243,13 +243,3 @@ class ScaleEntry(ttk.Frame):
             tk.IntVar.set(self, limited_value)
             # Return False if the value had to be limited
             return limited_value is value
-
-
-if __name__ == '__main__':
-#    import tkinter as tk
-#    import ttkwidgets
-    root = tk.Tk()
-#    s = ScaleEntry(root, scalewidth=50, entrywidth=5, from_=0, to=50, compound=tk.TOP)
-#    s.pack(fill='both', expand=True)
-    s2 = ScaleEntry(root, scalewidth=50, entrywidth=5, from_=0, to=50, compound=tk.LEFT)
-    s2.pack(fill='both', expand=True)
