@@ -121,7 +121,7 @@ class ScaleEntry(ttk.Frame):
         elif key == 'to':
             return self._scale.cget('to')
         elif key == 'entrywidth':
-            return self._scale.cget('entrywidth')
+            return self._entry.cget('width')
         elif key == 'entryscalepad':
             return self.__entryscalepad
         elif key == 'compound':
@@ -185,7 +185,7 @@ class ScaleEntry(ttk.Frame):
             self._grid_widgets()
 
     def config(self, cnf={}, **kw):
-        self.configure(self, cnf, **kw)
+        self.configure(cnf, **kw)
 
     def config_entry(self, cnf={}, **kwargs):
         """
