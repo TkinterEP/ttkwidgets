@@ -73,17 +73,20 @@ class ScaleEntry(ttk.Frame):
         self._entry.delete(0, tk.END)
         self._entry.insert(0, str(self._variable.get()))
 
-    def config_entry(self, *args, **kwargs):
+    def config_entry(self, cnf={}, **kwargs):
         """
         Wrapper around the Entry widget's config function for the user
         """
-        self._entry.config(*args, **kwargs)
+        self._entry.config(cnf, **kwargs)
 
-    def config_scale(self, *args, **kwargs):
+    def config_scale(self, cnf={}, **kwargs):
         """
         Wrapper around the Scale widget's config function for the user
         """
-        self._scale.config(*args, **kwargs)
+        self._scale.config(cnf, **kwargs)
+        # udpate self._variable limits in case the ones of the scale have changed
+        self._variable.configure(high=self._scale['to'],
+                                 low=self._scale['from'])
 
     @property
     def value(self):
@@ -100,6 +103,15 @@ class ScaleEntry(ttk.Frame):
             self._low = low
             self._high = high
             tk.IntVar.__init__(self, value=low)
+
+        def configure(self, **kwargs):
+            """Configure the limits of the LimitedIntVar."""
+            self._low = kwargs.get('low', self._low)
+            self._high = kwargs.get('high', self._high)
+            if self.get() < self._low:
+                self.set(self._low)
+            elif self.get() < self._high:
+                self.set(self._high)
 
         def set(self, value):
             """
