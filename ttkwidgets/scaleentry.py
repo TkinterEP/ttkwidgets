@@ -225,7 +225,7 @@ class ScaleEntry(ttk.Frame):
             self._high = kwargs.get('high', self._high)
             if self.get() < self._low:
                 self.set(self._low)
-            elif self.get() < self._high:
+            elif self.get() > self._high:
                 self.set(self._high)
 
         def set(self, value):
