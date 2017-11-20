@@ -90,6 +90,88 @@ class ScaleEntry(ttk.Frame):
         self._entry.delete(0, tk.END)
         self._entry.insert(0, str(self._variable.get()))
 
+    def __getitem__(self, key):
+        return self.cget(key)
+
+    def __setitem__(self, key, value):
+        return self.configure({key: value})
+
+    def keys(self):
+        keys = ttk.Frame.keys(self)
+        keys.extend(['scalewidth', 'entrywidth', 'from', 'to',
+                     'compound', 'entryscalepad'])
+        keys.sort()
+        return keys
+
+    def cget(self, key):
+        if key == 'scalewidth':
+            return self._scale.cget('length')
+        elif key == 'from':
+            return self._scale.cget('from')
+        elif key == 'to':
+            return self._scale.cget('to')
+        elif key == 'entrywidth':
+            return self._scale.cget('entrywidth')
+        elif key == 'entryscalepad':
+            return self.__entryscalepad
+        elif key == 'compound':
+            return self.__compound
+        else:
+            return ttk.Frame.cget(self, key)
+
+    def cget_entry(self, key):
+        """
+        Wrapper around the Entry widget's cget function for the user
+        """
+        return self._entry.cget(key)
+
+    def cget_scale(self, key):
+        """
+        Wrapper around the Scale widget's cget function for the user
+        """
+        return self._scale.cget(key)
+
+    def configure(self, cnf={}, **kw):
+        kw.update(cnf)
+        reinit = False
+        if 'scalewidth' in kw:
+            self._scale.configure(length=kw.pop('scalewidth'))
+        if 'from' in kw:
+            from_ = kw.pop('from')
+            self._scale.configure(from_=from_)
+            self._variable.configure(low=from_)
+        if 'from_' in kw:
+            from_ = kw.pop('from_')
+            self._scale.configure(from_=from_)
+            self._variable.configure(low=from_)
+        if 'to' in kw:
+            to = kw.pop('to')
+            self._scale.configure(to=to)
+            self._variable.configure(high=to)
+        if 'entrywidth' in kw:
+            self._entry.configure(width=kw.pop('entrywidth'))
+        if 'compound' in kw:
+            compound = kw.pop('compound')
+            if compound is not tk.RIGHT and compound is not tk.LEFT and \
+               compound is not tk.TOP and compound is not tk.BOTTOM:
+                raise ValueError("Invalid value for compound passed {0}".format(compound))
+            else:
+                self.__compound = compound
+                reinit = True
+        if 'entryscalepad' in kw:
+            entryscalepad = kw.pop('entryscalepad')
+            try:
+                self.__entryscalepad = int(entryscalepad)
+                reinit = True
+            except ValueError:
+                raise ValueError("Invalid value for entryscalepad passed {0}".format(entryscalepad))
+        ttk.Frame.configure(self, kw)
+        if reinit:
+            self._grid_widgets()
+
+    def config(self, cnf={}, **kw):
+        self.configure(self, cnf, **kw)
+
     def config_entry(self, cnf={}, **kwargs):
         """
         Wrapper around the Entry widget's config function for the user
