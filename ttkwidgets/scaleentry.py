@@ -28,7 +28,7 @@ class ScaleEntry(ttk.Frame):
         ttk.Frame.__init__(self, master, **kwargs)
         self.__limits = (from_, to)
         if compound is not tk.RIGHT and compound is not tk.LEFT and compound is not tk.TOP and \
-                        compound is not tk.BOTTOM:
+           compound is not tk.BOTTOM:
             raise ValueError("Invalid value for compound passed {0}".format(compound))
         self.__compound = compound
         self._variable = self.LimitedIntVar(from_, to)
@@ -58,7 +58,10 @@ class ScaleEntry(ttk.Frame):
         contents = self._entry.get()
         if contents == "":
             return
-        value = self._variable.set(int(contents))
+        try:
+            value = self._variable.set(int(contents))
+        except ValueError:
+            value = None
         if not value:
             self._on_scale(None)
 
