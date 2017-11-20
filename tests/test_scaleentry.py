@@ -39,12 +39,30 @@ class TestScaleEntry(BaseWidgetTest):
         scale.config_scale(length=100)
         self.window.update()
         self.assertEqual(scale.cget_scale('length'), 100)
-        print(scale._scale.grid_info())
-        print(scale._scale.grid_info()['sticky'])
-        self.assertEqual(str(scale._scale.grid_info()['sticky']), 'ew')
+        try:
+            info = scale._scale.grid_info()
+        except TypeError:
+            # bug in some tkinter versions
+            res = str(self.tk.call('grid info', scale._scale._w)).split("-")
+            info = {}
+            for i in res:
+                if i:
+                    key, val = i.strip().split()
+                    info[key] = val
+        self.assertEqual(info['sticky'], 'ew')
         scale.config_scale(orient='vertical')
         self.window.update()
-        self.assertEqual(str(scale._scale.grid_info()['sticky']), 'ns')
+        try:
+            info = scale._scale.grid_info()
+        except TypeError:
+            # bug in some tkinter versions
+            res = str(self.tk.call('grid info', scale._scale._w)).split("-")
+            info = {}
+            for i in res:
+                if i:
+                    key, val = i.strip().split()
+                    info[key] = val
+        self.assertEqual(info['sticky'], 'ns')
         scale._variable.set(20)
         scale._on_scale(None)
         self.assertEqual(scale._variable.get(), 20)
