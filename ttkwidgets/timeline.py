@@ -158,7 +158,7 @@ class TimeLine(ttk.Frame):
             canvas_width = width if width > canvas_width else canvas_width
             self._category_labels[category] = label
         self._canvas_categories.create_window(0, 0, window=self._frame_categories, anchor=tk.NW)
-        self._canvas_categories.config(width=canvas_width, height=self._height)
+        self._canvas_categories.config(width=canvas_width + 5, height=self._height)
         # Canvas widgets
         self._canvas_scroll = tk.Canvas(self, background=self._background, width=self._width, height=self._height)
         self._timeline = tk.Canvas(self._canvas_scroll, background=self._background, borderwidth=0)
@@ -167,6 +167,8 @@ class TimeLine(ttk.Frame):
         self._scrollbar_vertical = ttk.Scrollbar(self, command=self.set_scroll_v, orient=tk.VERTICAL)
         self._canvas_scroll.config(xscrollcommand=self._scrollbar_timeline.set,
                                    yscrollcommand=self._scrollbar_vertical.set)
+        self.bind("<MouseWheel>", self._mouse_scroll_v)
+        self.bind("<Shift-MouseWheel>", self._mouse_scroll_h)
         self._canvas_categories.config(yscrollcommand=self._scrollbar_vertical.set)
         # Event bindings
         self._timeline.bind("<Configure>", self.__configure_timeline)
@@ -209,7 +211,6 @@ class TimeLine(ttk.Frame):
         """
         # Configure the canvas
         self.clear_timeline()
-        self.create_scroll_regions()
         self.create_scroll_region()
         self._timeline.config(width=self.pixel_width)
         # Generate the Y-coordinates for each of the rows and create the lines indicating the rows
@@ -255,7 +256,9 @@ class TimeLine(ttk.Frame):
         for tick in ticks:
             string = TimeLine.get_time_string(tick, self._unit)
             x = self.get_time_position(tick)
-            self._canvas_ticks.create_text((x, 20), text=string, fill="black", font=("default", 10))
+            x_tick = x + 2 if x == 0 else (x - 2 if x == self.pixel_width else x)
+            x_text = x + 15 if x - 15 <= 0 else (x - 15 if x + 15 >= self.pixel_width else x)
+            self._canvas_ticks.create_text((x_text, 20), text=string, fill="black", font=("default", 10))
             self._canvas_ticks.create_line((x, 5, x, 15), fill="black")
         self._canvas_ticks.config(scrollregion="0 0 {0} {1}".format(self.pixel_width, 30))
 
@@ -422,6 +425,16 @@ class TimeLine(ttk.Frame):
         """
         return self._zoom_factor
 
+    def _mouse_scroll_h(self, event):
+        args = (int(-1 * (event.delta / 120)), "units")
+        self._canvas_scroll.xview_scroll(*args)
+        self._canvas_ticks.xview_scroll(*args)
+
+    def _mouse_scroll_v(self, event):
+        args = (int(-1 * (event.delta / 120)), "units")
+        self._canvas_scroll.yview_scroll(*args)
+        self._canvas_categories.yview_scroll(*args)
+
     def check_kwargs(self):
         """
         Checks the type and values of the keyword arguments that have been set to attributes in __init__.
@@ -476,7 +489,7 @@ class TimeLine(ttk.Frame):
         """
         supported_units = ["h", "m"]
         if unit not in supported_units:
-            return "{}".format(time)
+            return "{}".format(round(time, 2))
         hours, minutes = str(time).split(".")
         hours = int(hours)
         minutes = int(round(float(minutes) * 60))
@@ -491,4 +504,16 @@ class TimeLine(ttk.Frame):
         while value <= finish:
             yield value
             value += step
+
+
+if __name__ == '__main__':
+    window = tk.Tk()
+    timeline = TimeLine(
+        window,
+        categories={str(key): {"text": "Category {}".format(key)} for key in range(0, 10)},
+        height=100
+    )
+    timeline.create_marker("1", 1.0, 2.0, background="white", text="Hello World")
+    timeline.grid()
+    window.mainloop()
 
