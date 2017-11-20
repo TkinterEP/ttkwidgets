@@ -43,7 +43,7 @@ class TestScaleEntry(BaseWidgetTest):
             info = scale._scale.grid_info()
         except TypeError:
             # bug in some tkinter versions
-            res = str(scale.tk.call('grid info', scale._scale._w)).split("-")
+            res = str(scale.tk.call('grid', 'info', scale._scale._w)).split("-")
             info = {}
             for i in res:
                 if i:
@@ -56,7 +56,7 @@ class TestScaleEntry(BaseWidgetTest):
             info = scale._scale.grid_info()
         except TypeError:
             # bug in some tkinter versions
-            res = str(scale.tk.call('grid info', scale._scale._w)).split("-")
+            res = str(scale.tk.call('grid', 'info', scale._scale._w)).split("-")
             info = {}
             for i in res:
                 if i:
