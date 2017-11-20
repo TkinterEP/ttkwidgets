@@ -11,6 +11,7 @@ except ImportError:
     from tkinter import ttk
 from ttkwidgets.utilities import open_icon
 from collections import OrderedDict
+from math import floor
 
 
 class TimeLine(ttk.Frame):
@@ -133,7 +134,7 @@ class TimeLine(ttk.Frame):
         # Frames
         self._canvas_categories = tk.Canvas(self, background=self._background, height=self._height,
                                             borderwidth=0)
-        self._canvas_ticks = tk.Canvas(self, background=self._background, width=self._width, height=20,
+        self._canvas_ticks = tk.Canvas(self, background=self._background, width=self._width, height=30,
                                        borderwidth=0)
         self._frame_zoom = ttk.Frame(self, style=self._style)
         self._frame_categories = ttk.Frame(self._canvas_categories, style=self._style)
@@ -146,7 +147,7 @@ class TimeLine(ttk.Frame):
                                              state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
         # Category Labels
         self._category_labels = OrderedDict()
-        max_width = 0
+        canvas_width = 0
         for category, kwargs in (sorted(self._categories.items())
                                  if not isinstance(self._categories, OrderedDict)
                                  else self._categories):
@@ -154,10 +155,10 @@ class TimeLine(ttk.Frame):
             kwargs["justify"] = kwargs.get("justify", tk.LEFT)
             label = ttk.Label(self._frame_categories, **kwargs)
             width = label.winfo_reqwidth()
-            max_width = width if width > max_width else max_width
+            canvas_width = width if width > canvas_width else canvas_width
             self._category_labels[category] = label
         self._canvas_categories.create_window(0, 0, window=self._frame_categories, anchor=tk.NW)
-        self._canvas_categories.config(width=max_width, height=self._height)
+        self._canvas_categories.config(width=canvas_width, height=self._height)
         # Canvas widgets
         self._canvas_scroll = tk.Canvas(self, background=self._background, width=self._width, height=self._height)
         self._timeline = tk.Canvas(self._canvas_scroll, background=self._background, borderwidth=0)
@@ -190,31 +191,91 @@ class TimeLine(ttk.Frame):
         self._button_zoom_reset.grid(row=2, column=0, pady=(0, 5), sticky="nswe")
         # Frames
         self._canvas_categories.grid(column=0, row=0, padx=5, pady=5, sticky="nswe")
-        self._scrollbar_vertical.grid(column=2, row=0, pady=5, padx=(0, 5), sticky="ns", rowspan=2)
+        self._scrollbar_vertical.grid(column=2, row=0, pady=5, padx=(0, 5), sticky="ns")
         self._frame_zoom.grid(column=3, row=0, rowspan=2, padx=(0, 5), pady=5, sticky="nswe")
 
     # Canvas related functions
+
+    @property
+    def pixel_width(self):
+        """
+        The width of the whole TimeLine in pixels (so not just the visible part)
+        """
+        return self.zoom_factor * ((self._finish - self._start) / self._resolution)
 
     def generate_timeline_contents(self):
         """
         Generate all the contents of the Canvas, including time tick markers and all markers in the categories
         """
         # Configure the canvas
-        pixel_width = self._zoom_factor * ((self._finish - self._start) / self._resolution)
-        self._timeline.delete(tk.ALL)
-        self._timeline.config(width=pixel_width)
+        self.clear_timeline()
+        self.create_scroll_regions()
+        self._timeline.config(width=self.pixel_width)
         # Generate the Y-coordinates for each of the rows and create the lines indicating the rows
+        self.create_separating_lines()
+        # Create the markers on the timeline
+        self.create_markers(self.markers)
+        # Create the ticks in the _canvas_ticks
+        self.create_ticks()
+
+    def create_scroll_regions(self):
+        canvas_width = 0
+        canvas_height = 0
+        for label in self._category_labels.values():
+            width = label.winfo_reqwidth()
+            canvas_height += label.winfo_reqheight()
+            canvas_width = width if width > canvas_width else canvas_width
+        self._canvas_categories.config(scrollregion="0 0 {0} {1}".format(canvas_width, canvas_height))
+        scroll_region = "0 0 {0} 0".format(int(self._width))
+        self._canvas_ticks.config(scrollregion=scroll_region)
+
+    def get_time_position(self, time):
+        """
+        Get the location as a pixel coordinate (only the x-coordinate) of a certain time value
+        """
+        if time < self._start or time > self._finish:
+            raise ValueError("time argument out of bounds")
+        return (time - self._start) / (self._resolution / self._zoom_factor)
+
+    def clear_timeline(self):
+        """
+        Delete all items in the Canvas, does not modify the categories
+        """
+        self._timeline.delete(tk.ALL)
+        self._canvas_ticks.delete(tk.ALL)
+
+    def create_ticks(self):
+        """
+        Create the tick markers in the ticks canvas
+        """
+        self._canvas_ticks.create_line((0, 10, self._width, 10), fill="black")
+        ticks = list(TimeLine.range(self._start, self._finish, self._tick_resolution / self._zoom_factor))
+        for tick in ticks:
+            string = TimeLine.get_time_string(tick, self._unit)
+            x = self.get_time_position(tick)
+            self._canvas_ticks.create_text((x, 20), text=string, fill="black", font=("default", 10))
+
+    def create_separating_lines(self):
+        """
+        Create the lines separating the different category rows in the TimeLine's Canvas
+        """
         total = 0
         for category, label in self._category_labels.items():
             height = label.winfo_reqheight()
             self._rows[category] = (total, total + height)
             total += height
-            self._timeline.create_line((0, total, pixel_width, total))
+            self._timeline.create_line((0, total, self.pixel_width, total))
         pixel_height = total
         self._timeline.config(height=pixel_height)
-        for category, category_markers in self.markers.items():
+
+    def create_markers(self, markers):
+        """
+        Create all the markers in a given category dictionary, as in the markers property
+        """
+        for category, category_markers in markers.items():
             for marker in category_markers.values():
                 self.create_marker(category, marker["start"], marker["finish"], **marker)
+        return
 
     def create_marker(self, category_v, start_v, finish_v, **kwargs):
         """
@@ -402,4 +463,26 @@ class TimeLine(ttk.Frame):
         if not isinstance(self._marker_background, str) or not isinstance(self._marker_foreground, str):
             raise TypeError("marker_background and/or marker_foreground argument(s) not of str type")
         return
+
+    @staticmethod
+    def get_time_string(time, unit):
+        """
+        Return a properly formatted string for a given time value and unit.
+        """
+        supported_units = ["h", "m"]
+        if unit not in supported_units:
+            return "{}".format(time)
+        minutes = int(floor(time * 60 % 60))
+        hours = int(floor(time))
+        return "{:02d}:{:02d}".format(hours, minutes)
+
+    @staticmethod
+    def range(start, finish, step):
+        """
+        Like built-in range(), but with float support
+        """
+        value = start
+        while value <= finish:
+            yield value
+            value += step
 
