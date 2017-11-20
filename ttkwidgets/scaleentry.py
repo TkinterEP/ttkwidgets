@@ -26,7 +26,6 @@ class ScaleEntry(ttk.Frame):
         :param kwargs: keyword arguments passed on to Frame initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
-        self.__limits = (from_, to)
         if compound is not tk.RIGHT and compound is not tk.LEFT and compound is not tk.TOP and \
            compound is not tk.BOTTOM:
             raise ValueError("Invalid value for compound passed {0}".format(compound))
