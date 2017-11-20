@@ -16,7 +16,7 @@ class ScaleEntry(ttk.Frame):
     A simple combination of a Scale and an Entry widget suitable for use with int ranges.
     """
     def __init__(self, master=None, scalewidth=50, entrywidth=5, from_=0, to=50,
-                 compound=tk.RIGHT, entryscalepad=0, **kwargs):
+                 orient=tk.HORIZONTAL, compound=tk.RIGHT, entryscalepad=0, **kwargs):
         """
         :param master: master widget
         :param scalewidth: width of the Scale in pixels
@@ -38,7 +38,7 @@ class ScaleEntry(ttk.Frame):
             raise ValueError("Invalid value for entryscalepad passed {0}".format(entryscalepad))
         self._variable = self.LimitedIntVar(from_, to)
         self._scale = ttk.Scale(self, from_=from_, to=to, length=scalewidth,
-                                command=self._on_scale,
+                                orient=orient, command=self._on_scale,
                                 variable=self._variable)
         # Note that the textvariable keyword argument is not used to pass the LimitedIntVar
         self._entry = ttk.Entry(self, width=entrywidth)
@@ -51,19 +51,28 @@ class ScaleEntry(ttk.Frame):
         Puts the widgets in the correct position based on self.__compound
         :return: None
         """
-        self._scale.grid(row=2, column=1, sticky='ew',
+        orient = str(self._scale.cget('orient'))
+        self._scale.grid(row=2, column=2, sticky='ew' if orient == tk.HORIZONTAL else 'ns',
                          padx=(0, self.__entryscalepad) if self.__compound is tk.RIGHT else (self.__entryscalepad, 0) if self.__compound is tk.LEFT else 0,
                          pady=(0, self.__entryscalepad) if self.__compound is tk.BOTTOM else (self.__entryscalepad, 0) if self.__compound is tk.TOP else 0)
         self._entry.grid(row=1 if self.__compound is tk.TOP else 3 if self.__compound is tk.BOTTOM else 2,
-                         column=0 if self.__compound is tk.LEFT else 2 if self.__compound is tk.RIGHT else 1)
-        self.columnconfigure(1, weight=1)
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(4, weight=1)
+                         column=1 if self.__compound is tk.LEFT else 3 if self.__compound is tk.RIGHT else 2)
 
-        if self.__compound in [tk.LEFT, tk.RIGHT]:
-            self.rowconfigure(2, weight=1)
-        else:
+        if orient == tk.HORIZONTAL:
+            self.columnconfigure(0, weight=0)
+            self.columnconfigure(2, weight=1)
+            self.columnconfigure(4, weight=0)
+            self.rowconfigure(0, weight=1)
             self.rowconfigure(2, weight=0)
+            self.rowconfigure(4, weight=1)
+
+        else:
+            self.rowconfigure(0, weight=0)
+            self.rowconfigure(2, weight=1)
+            self.rowconfigure(4, weight=0)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(2, weight=0)
+            self.columnconfigure(4, weight=1)
 
     def _on_entry(self, event):
         """
@@ -99,7 +108,7 @@ class ScaleEntry(ttk.Frame):
     def keys(self):
         keys = ttk.Frame.keys(self)
         keys.extend(['scalewidth', 'entrywidth', 'from', 'to',
-                     'compound', 'entryscalepad'])
+                     'compound', 'entryscalepad', 'orient'])
         keys.sort()
         return keys
 
@@ -116,6 +125,8 @@ class ScaleEntry(ttk.Frame):
             return self.__entryscalepad
         elif key == 'compound':
             return self.__compound
+        elif key == 'orient':
+            return str(self._scale.cget('orient'))
         else:
             return ttk.Frame.cget(self, key)
 
@@ -158,6 +169,9 @@ class ScaleEntry(ttk.Frame):
             else:
                 self.__compound = compound
                 reinit = True
+        if 'orient' in kw:
+            self._scale.configure(orient=kw.pop('orient'))
+            reinit = True
         if 'entryscalepad' in kw:
             entryscalepad = kw.pop('entryscalepad')
             try:
@@ -186,6 +200,8 @@ class ScaleEntry(ttk.Frame):
         # udpate self._variable limits in case the ones of the scale have changed
         self._variable.configure(high=self._scale['to'],
                                  low=self._scale['from'])
+        if 'orient' in cnf or 'orient' in kwargs:
+            self._grid_widgets()
 
     @property
     def value(self):
@@ -227,3 +243,13 @@ class ScaleEntry(ttk.Frame):
             tk.IntVar.set(self, limited_value)
             # Return False if the value had to be limited
             return limited_value is value
+
+
+if __name__ == '__main__':
+#    import tkinter as tk
+#    import ttkwidgets
+    root = tk.Tk()
+#    s = ScaleEntry(root, scalewidth=50, entrywidth=5, from_=0, to=50, compound=tk.TOP)
+#    s.pack(fill='both', expand=True)
+    s2 = ScaleEntry(root, scalewidth=50, entrywidth=5, from_=0, to=50, compound=tk.LEFT)
+    s2.pack(fill='both', expand=True)
