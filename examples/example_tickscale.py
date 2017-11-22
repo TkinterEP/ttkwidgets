@@ -13,7 +13,7 @@ except ImportError:
 
 root = tk.Tk()
 style = ttk.Style(root)
-#style.theme_use('clam')
+style.theme_use('clam')
 style.configure('my.Vertical.TScale', sliderlength=50, background='white',
                 foreground='red')
 style.configure('my.Horizontal.TScale', sliderlength=10,

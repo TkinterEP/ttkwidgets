@@ -115,7 +115,7 @@ class TickScale(ttk.Frame):
         self._style_name = self.scale.cget('style')
         if not self._style_name:
             self._style_name = '%s.TScale' % (str(self.scale.cget('orient')).capitalize())
-        self._update_slider_length()
+        self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
         self._extent = self.scale.cget('to') - self.scale.cget('from')
         self._start = self.scale.cget('from')
         self._var.set(self._start)
@@ -305,8 +305,44 @@ class TickScale(ttk.Frame):
         percent = ((value - self._start) / self._extent)
         return percent * (self.get_scale_length() - self._sliderlength) + self._sliderlength / 2
 
-    def _update_slider_length(self):
-        self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
+    def _update_slider_length_horizontal(self):
+        """Measure the length of the slider and update the value of self._sliderlength."""
+        if not self.scale.identify(2, 2):
+            # to soon, wait for the scale to be properly displayed
+            # binding to <Map> event does not work, it can still be to soon to
+            # get any result from identify
+            self.after(10, self._update_slider_length_horizontal)
+        else:
+            w = self.scale.winfo_width()
+            i = 0
+            while i < w and 'slider' not in self.scale.identify(i, 2):
+                i += 1
+            j = i
+            while j < w and 'slider' in self.scale.identify(j, 2):
+                j += 1
+            if j - i == 0:
+                self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
+            else:
+                self._sliderlength = j - i
+            self._update_display()
+
+    def _update_slider_length_vertical(self):
+        """Measure the length of the slider and update the value of self._sliderlength."""
+        if not self.scale.identify(2, 2):
+            self.after(10, self._update_slider_length_vertical)
+        else:
+            h = self.scale.winfo_height()
+            i = 0
+            while i < h and 'slider' not in self.scale.identify(1, i):
+                i += 1
+            j = i
+            while j < h and 'slider' in self.scale.identify(1, j):
+                j += 1
+            if j - i == 0:
+                self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
+            else:
+                self._sliderlength = j - i
+            self._update_display()
 
     def _apply_style(self):
         """Apply the scale style to the frame and labels."""
@@ -344,11 +380,13 @@ class TickScale(ttk.Frame):
         if str(self.scale.cget('orient')) == "horizontal":
             self.get_scale_length = self.scale.winfo_width
             self.display_value = self._display_value_horizontal
+            self._update_slider_length = self._update_slider_length_horizontal
             self.place_ticks = self._place_ticks_horizontal
             self._init_horizontal()
         else:
             self.get_scale_length = self.scale.winfo_height
             self.display_value = self._display_value_vertical
+            self._update_slider_length = self._update_slider_length_vertical
             self.place_ticks = self._place_ticks_vertical
             self._init_vertical()
         self.scale.lift()
@@ -359,11 +397,11 @@ class TickScale(ttk.Frame):
             # backward compatibility
             self._var.trace_vdelete('w', self._trace)
             self._trace = self._var.trace('w', self._increment)
+        self._update_slider_length()
 
     def _init_vertical(self):
         """Create and grid the widgets for a vertical orientation."""
         self.scale.grid(row=0, sticky='ns')
-        self.update_idletasks()
         # showvalue
         padx1, padx2 = 0, 0
         pady1, pady2 = 0, 0
@@ -411,9 +449,6 @@ class TickScale(ttk.Frame):
                             padx2 = padx
                     else:
                         padx1, padx2 = padx, padx
-
-            self._display_value_vertical(self.scale.get())
-
         # ticks
         padx1_2, padx2_2 = 0, 0
         if self._tickinterval:
@@ -443,8 +478,6 @@ class TickScale(ttk.Frame):
                                              anchor='w')
                     self.update_idletasks()
                     padx2_2 = max(self.ticklabels[i].winfo_width(), padx2_2)
-            self.update_idletasks()
-            self._place_ticks_vertical()
         self.scale.grid_configure(padx=(padx1 + padx1_2 + 1, padx2 + padx2_2 + 1),
                                   pady=(pady1, pady2))
 
@@ -493,8 +526,6 @@ class TickScale(ttk.Frame):
                     else:
                         pady1, pady2 = pady, pady
 
-            self._display_value_horizontal(self.scale.get())
-
         # ticks
         pady1_2, pady2_2 = 0, 0
         if self._tickinterval:
@@ -521,7 +552,6 @@ class TickScale(ttk.Frame):
                                              x=0, y=-1 - pady1, anchor='s')
                 pady1_2 = self.ticklabels[-1].winfo_reqheight()
             self.update_idletasks()
-            self._place_ticks_horizontal()
         self.scale.grid_configure(pady=(pady1 + pady1_2, pady2 + pady2_2),
                                   padx=(padx1, padx2))
 
@@ -589,14 +619,9 @@ class TickScale(ttk.Frame):
     def _style_change(self, event=None):
         """Apply style and update widgets position."""
         self._apply_style()
-        self.update_idletasks()
-        self._update_slider_length()
-        self.update_idletasks()
         self._init()
-        self.update_idletasks()
-        self._update_slider_length()
 
-    def _update_display(self, event):
+    def _update_display(self, event=None):
         """Redisplay the ticks and the label so that they adapt to the new size of the scale."""
         try:
             if self._showvalue:
