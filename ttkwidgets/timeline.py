@@ -256,10 +256,10 @@ class TimeLine(ttk.Frame):
         for tick in ticks:
             string = TimeLine.get_time_string(tick, self._unit)
             x = self.get_time_position(tick)
-            x_tick = x + 2 if x == 0 else (x - 2 if x == self.pixel_width else x)
+            x_tick = x + 1 if x == 0 else (x - 1 if x == self.pixel_width else x)
             x_text = x + 15 if x - 15 <= 0 else (x - 15 if x + 15 >= self.pixel_width else x)
             self._canvas_ticks.create_text((x_text, 20), text=string, fill="black", font=("default", 10))
-            self._canvas_ticks.create_line((x, 5, x, 15), fill="black")
+            self._canvas_ticks.create_line((x_tick, 5, x_tick, 15), fill="black")
         self._canvas_ticks.config(scrollregion="0 0 {0} {1}".format(self.pixel_width, 30))
 
     def create_separating_lines(self):
