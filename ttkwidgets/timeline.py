@@ -182,7 +182,7 @@ class TimeLine(ttk.Frame):
         """
         # Categories
         for index, label in enumerate(self._category_labels.values()):
-            label.grid(column=0, row=index, padx=5, sticky="nw")
+            label.grid(column=0, row=index, padx=5, sticky="nw", pady=(1, 0) if index == 0 else 0)
         # Canvas widgets
         self._canvas_scroll.grid(column=1, row=0, padx=(0, 5), pady=5, sticky="nswe")
         self._canvas_ticks.grid(column=1, row=1, padx=(0, 5), pady=(0, 5), sticky="nswe")
@@ -266,10 +266,11 @@ class TimeLine(ttk.Frame):
         """
         Create the lines separating the different category rows in the TimeLine's Canvas
         """
-        total = 0
-        for category, label in self._category_labels.items():
+        total = 1
+        self._timeline.create_line((0, 1, self.pixel_width, 1))
+        for index, (category, label) in enumerate(self._category_labels.items()):
             height = label.winfo_reqheight()
-            self._rows[category] = (total, total + height)
+            self._rows[category] = (total, total + height )
             total += height
             self._timeline.create_line((0, total, self.pixel_width, total))
         pixel_height = total
@@ -371,7 +372,7 @@ class TimeLine(ttk.Frame):
         """
         # Resize the canvas scrollregion to fit the entire frame
         (size_x, size_y) = (self._timeline.winfo_reqwidth(), self._timeline.winfo_reqheight())
-        self._canvas_scroll.config(scrollregion="0 0 {0} {1}".format(size_x, size_y))
+        self._canvas_scroll.config(scrollregion="0 0 {0} {1}".format(size_x, size_y - 5))
 
     # Zoom button functions
 
@@ -510,7 +511,7 @@ if __name__ == '__main__':
     window = tk.Tk()
     timeline = TimeLine(
         window,
-        categories={str(key): {"text": "Category {}".format(key)} for key in range(0, 10)},
+        categories={str(key): {"text": "Category {}".format(key)} for key in range(0, 40)},
         height=100
     )
     timeline.create_marker("1", 1.0, 2.0, background="white", text="Hello World")
