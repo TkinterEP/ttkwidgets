@@ -150,6 +150,11 @@ class TimeLine(ttk.Frame):
         self._after_id = None
         self._active = None
 
+        # Time pop-up frame
+        self._time_label = None
+        self._time_window = None
+        self._time_visible = False
+
         # Create the child widgets
 
         # Frames
@@ -221,6 +226,7 @@ class TimeLine(ttk.Frame):
         self._timeline.tag_bind("marker", "<Enter>", self.enter_handler)
         self._timeline.tag_bind("marker", "<Leave>", self.leave_handler)
         self._canvas_ticks.bind("<B1-Motion>", self.time_marker_move)
+        self._canvas_ticks.bind("<ButtonRelease-1>", self.time_marker_release)
 
     # Canvas related functions
 
@@ -750,6 +756,35 @@ class TimeLine(ttk.Frame):
         _, y = self._canvas_ticks.coords(self._time_marker_image)
         self._canvas_ticks.coords(self._time_marker_image, x, y)
         self._timeline.coords(self._time_marker_line, x, 0, x, self._timeline.winfo_height())
+        self.time_show(None)
+
+    def time_marker_release(self, event):
+        if not self._time_visible:
+            return
+        self._time_label.destroy()
+        self._time_window.destroy()
+        self._time_label = None
+        self._time_window = None
+        self._time_visible = False
+
+    def time_show(self, event):
+        if not self._time_visible:
+            self._time_visible = True
+            self._time_window = tk.Toplevel(self)
+            self._time_window.attributes("-topmost", True)
+            self._time_window.overrideredirect(True)
+            self._time_label = ttk.Label(self._time_window)
+            self._time_label.grid()
+            self._time_window.lift()
+        x, y = self.master.winfo_pointerxy()
+        geometry = "{0}x{1}+{2}+{3}".format(
+            self._time_label.winfo_width(),
+            self._time_label.winfo_height(),
+            x - 15,
+            self._canvas_ticks.winfo_rooty() - 10
+        )
+        self._time_window.wm_geometry(geometry)
+        self._time_label.config(text=TimeLine.get_time_string(self.time, self._unit))
 
     def configure(self, cnf={}, **kwargs):
         pass
