@@ -125,7 +125,7 @@ class TickScale(ttk.Frame):
 
         try:
             self._trace = self._var.trace_add('write', self._increment)
-        except Exception:
+        except AttributeError:
             # backward compatibility
             self._trace = self._var.trace('w', self._increment)
 
@@ -262,7 +262,7 @@ class TickScale(ttk.Frame):
                 kw['variable'] = self._var
             try:
                 self._var.trace_add('write', self._increment)
-            except Exception:
+            except AttributeError:
                 # backward compatibility
                 self._var.trace('w', self._increment)
 
@@ -428,7 +428,7 @@ class TickScale(ttk.Frame):
         try:
             self._var.trace_remove('write', self._trace)
             self._trace = self._var.trace_add('write', self._increment)
-        except Exception:
+        except AttributeError:
             # backward compatibility
             self._var.trace_vdelete('w', self._trace)
             self._trace = self._var.trace('w', self._increment)
@@ -663,6 +663,7 @@ class TickScale(ttk.Frame):
                 self.display_value(self.scale.get())
             if self._tickinterval:
                 self.place_ticks()
-        except Exception:
-            # happens when configure is called during a configuration change
+        except IndexError:
+            # happens when configure is called during a orientation change
+            # because self.ticks is empty
             pass
