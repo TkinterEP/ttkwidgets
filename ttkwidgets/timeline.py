@@ -122,7 +122,7 @@ class TimeLine(ttk.Frame):
 
         # Create necessary attributes
         self._zoom_factor = self._zoom_factors[0]
-        self._markers = {category: {} for category in self._categories.keys()}
+        self._markers = {}
         self._canvas_markers = {}  # Canvas ID: (category, marker_iid)
         self._markers_canvas = {}  # marker_iid: (canvas_rectangle_id, canvas_text_id)
         self._iid = 0
@@ -193,6 +193,10 @@ class TimeLine(ttk.Frame):
         for widget in [self, self._canvas_scroll, self._timeline, self._canvas_categories]:
             widget.bind("<MouseWheel>", self._mouse_scroll_v)
             widget.bind("<Shift-MouseWheel>", self._mouse_scroll_h)
+        # Callback bindings
+        self._timeline.bind("<ButtonPress-1>", self.left_click)
+        self._timeline.bind("<B1-Motion>", self.left_motion)
+        self._timeline.bind("<ButtonPress-3>", self.right_click)
 
     # Canvas related functions
 
@@ -298,10 +302,10 @@ class TimeLine(ttk.Frame):
         """
         Create all the markers in a given category dictionary, as in the markers property
         """
-        for category, category_markers in markers.items():
-            for marker in category_markers.values():
-                self.create_marker(category, marker["start"], marker["finish"], **marker)
-        return
+        self._canvas_markers.clear()
+        self._markers_canvas.clear()
+        for marker in self._markers.values():
+            self.create_marker(marker["category"], marker["start"], marker["finish"], **marker)
 
     def create_marker(self, category_v, start_v, finish_v, **kwargs):
         """
@@ -313,7 +317,7 @@ class TimeLine(ttk.Frame):
         :param category_v: Category identifier (not text!)
         :param start_v: Start time for the marker
         :param finish_v: Finish time for the marker
-        :return: rectangle id, text id (the latter is None when text is None)
+        :return: marker iid
         :raise ValueError: One of the specified arguments is invalid
 
         Keyword Arguments:
@@ -353,8 +357,15 @@ class TimeLine(ttk.Frame):
             self._timeline.coords(text_id, (x, y))
         else:
             text_id = None
+        # Check the tags
+        for tag in tags:
+            if tag not in self._tags:
+                raise ValueError("Unknown tag given in tags tuple: {}".format(tag))
+        # Check category
+        if category_v not in self._categories:
+            raise ValueError("Unknown category given as argument: {}".format(category_v))
         # Save the marker
-        self._markers[category_v][iid] = {
+        self._markers[iid] = {
             "text": text,
             "foreground": foreground,
             "background": background,
@@ -368,14 +379,84 @@ class TimeLine(ttk.Frame):
             "start": start_v,
             "finish": finish_v
         }
+        self._markers_canvas[iid] = {
+            "rectangle": rectangle,
+            "text": text
+        }
+        self._canvas_markers[rectangle] = iid
+        self._canvas_markers[text_id] = iid
 
         self._iid += 1
+        return iid
 
-    def tag_configure(self):
-        pass
+    def update_marker(self, iid, **kwargs):
+        """
+        Change the options for a certain marker and redraw the marker
+        :param iid: iid for the marker to change
+        :param kwargs: options for create marker
+                       Note that `start` and `finish` are both *keyword arguments*
+        :return: result of create_marker
+        """
+        if iid not in self._markers:
+            raise ValueError("Unkown iid passed as argument: {}".format(iid))
+        options = self._markers[iid]
+        options.update(kwargs)
+        self.delete_marker(iid)
+        return self.create_marker(options["category"], options["start"], options["finish"], **options)
 
-    def set_zoom_factor(self):
-        pass
+    def delete_marker(self, iid):
+        """
+        Delete a marker from the timeline based on its iid
+        """
+        options = self._markers[iid]
+        rectangle_id, text_id = options["rectangle_id"], options["text_id"]
+        del self._canvas_markers[rectangle_id]
+        del self._canvas_markers[text_id]
+        del self._markers[iid]
+        del self._markers_canvas[iid]
+        self._timeline.delete(rectangle_id, text_id)
+
+    def tag_configure(self, tag_name, **kwargs):
+        """
+        Configure a marker tag. Tags are processed in the order in which they are added to a marker
+
+        :param tag_name:
+
+        Keyword Arguments
+            Callbacks
+            * callable move_callback: Callback to be called upon moving             None
+                a marker. The callback is called with the following
+                arguments:
+                iid, (old_start, old_finish), new_start, new_finish)
+            * callable left_callback: Callback to be called upon left               None
+                clicking a marker. The callback is called with the
+                following arguments:
+                iid, x_coordinate, y_coordinate
+            * callable right_callback: Callback to be called upon right             None
+                clicking a marker. The callback is called with the
+                following arguments:
+                iid, x_coordinate, y_coordinate
+            Other options
+            * tk.Menu menu: a Menu widget to show upon right click, can             None
+                be used with the right_callback option simultaneously
+            All options for create_marker, except tuple tags
+        """
+        callbacks = [
+            kwargs.get("move_callback", None),
+            kwargs.get("left_callback", None),
+            kwargs.get("right_callback", None)
+        ]
+        for callback in callbacks:
+            if callback is not None and not callable(callback):
+                raise ValueError("One or more callbacks is not a callable object")
+        self._tags[tag_name] = kwargs
+
+    def set_zoom_factor(self, factor):
+        """
+        Function to manually set the zoom factor
+        """
+        self._zoom_factor = factor
+        self.generate_timeline_contents()
 
     def set_scroll(self, *args):
         """
@@ -445,11 +526,17 @@ class TimeLine(ttk.Frame):
         return self._zoom_factor
 
     def _mouse_scroll_h(self, event):
+        """
+        Callback for <Shift-MouseWheel> event for horizontal scrolling
+        """
         args = (int(-1 * (event.delta / 120)), "units")
         self._canvas_scroll.xview_scroll(*args)
         self._canvas_ticks.xview_scroll(*args)
 
     def _mouse_scroll_v(self, event):
+        """
+        Callback for <MouseWheel> event for vertical scrolling
+        """
         args = (int(-1 * (event.delta / 120)), "units")
         self._canvas_scroll.yview_scroll(*args)
         self._canvas_categories.yview_scroll(*args)
@@ -524,6 +611,83 @@ class TimeLine(ttk.Frame):
             yield value
             value += step
 
+    def right_click(self, event):
+        """
+        Event bound function for a right click on the _timeline Canvas
+        """
+        iid = self.current_iid
+        if iid is None:
+            return
+        args = (iid, (event.x_root, event.y_root))
+        self.call_callbacks(iid, "right_callback", args)
+        tags = list(self.marker_tags(iid))
+        if len(tags) == 0:
+            return
+        menu = self._tags[tags[-1]].get("menu", None)
+        if menu is None or not isinstance(menu, tk.Menu):
+            return
+        menu.post(event.x_root, event.y_root)
+
+    def left_click(self, event):
+        """
+        Event bound function for a left click on the _timeline Canvas
+        """
+        iid = self.current_iid
+        if iid is None:
+            return
+        args = (iid, event.x_root, event.y_root)
+        print("Left click for {} with args {}".format(iid, args))
+        self.call_callbacks(iid, "left_callback", args)
+
+    def left_motion(self, event):
+        """
+        Event bound function for a left click and movement on the _timeline Canvas
+        """
+        pass
+
+    @property
+    def current(self):
+        """
+        Currently active item on the _timeline Canvas
+        """
+        results = self._timeline.find_withtag(tk.CURRENT)
+        print(results)
+        return results[0] if len(results) != 0 else None
+
+    @property
+    def current_iid(self):
+        """
+        Currently active item's iid
+        """
+        current = self.current
+        if current is None or current not in self._canvas_markers:
+            return None
+        return self._canvas_markers[current]
+
+    def marker_tags(self, iid):
+        """
+        Generator for all the tags of a certain marker
+        """
+        tags = self._markers[iid]["tags"]
+        for tag in tags:
+            yield tag
+
+    def call_callbacks(self, iid, type, args):
+        """
+        Call the available callbacks for a certain marker
+        :param iid: iid of the marker
+        :param type: type of callback (key in tag dictionary)
+        :param args: arguments for the callback
+        :return: amount of callbacks called
+        """
+        amount = 0
+        for tag in self.marker_tags(iid):
+            callback = self._tags[tag].get(type, None)
+            if callback is not None:
+                amount += 1
+                callback(*args)
+        return amount
+
 
 if __name__ == '__main__':
     window = tk.Tk()
@@ -532,7 +696,11 @@ if __name__ == '__main__':
         categories={str(key): {"text": "Category {}".format(key)} for key in range(0, 40)},
         height=100
     )
-    timeline.create_marker("1", 1.0, 2.0, background="white", text="Hello World")
+    menu = tk.Menu(window, tearoff=False)
+    menu.add_command(label="Something")
+    timeline.tag_configure("1", right_callback=lambda *args: print(args), menu=menu)
+    timeline.create_marker("1", 1.0, 2.0, background="white", text="Hello World", tags=("1",), iid="1")
     timeline.grid()
+    window.after(5000, lambda: timeline.update_marker("1", background="red"))
     window.mainloop()
 
