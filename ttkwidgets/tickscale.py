@@ -276,7 +276,6 @@ class TickScale(ttk.Frame):
             self._style_name = kw['style']
             if not self._style_name:
                 self._style_name = '%s.TScale' % (str(self.scale.cget('orient')).capitalize())
-            self._style_change()
         if 'orient' in kw:
             if kw['orient'] == 'vertical':
                 self._style_name = self._style_name.replace('Horizontal', 'Vertical')
@@ -290,6 +289,9 @@ class TickScale(ttk.Frame):
             reinit = True
         if reinit:
             self._init()
+        if 'orient' in kw:
+            # needed after the reinitialization in case of orientation change
+            self._apply_style()
 
     def config(self, cnf={}, **kw):
         self.configure(cnf=cnf, **kw)
