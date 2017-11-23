@@ -591,6 +591,7 @@ class TickScale(ttk.Frame):
                                   padx=(padx1, padx2))
 
     def _display_value_horizontal(self, value):
+        """Display the current value and update the label position."""
         if self._showvalue:
             self.label.configure(text=self._formatter.format(float(value)))
             self.update_idletasks()
@@ -606,10 +607,7 @@ class TickScale(ttk.Frame):
                 self.label.place_configure(x=x)
 
     def _display_value_vertical(self, value):
-        """
-        Display the current value and update the label position.
-        Return the pady necessary to display the label.
-        """
+        """Display the current value and update the label position."""
         if self._showvalue:
             self.label.configure(text=self._formatter.format(float(value)))
             if self._labelpos in ['e', 'w']:
@@ -617,6 +615,7 @@ class TickScale(ttk.Frame):
                 self.label.place_configure(y=y)
 
     def _place_ticks_horizontal(self):
+        """Display the ticks for a horizontal scale."""
         # first tick
         tick = self.ticks[0]
         label = self.ticklabels[0]
@@ -639,6 +638,7 @@ class TickScale(ttk.Frame):
         label.place_configure(x=x)
 
     def _place_ticks_vertical(self):
+        """Display the ticks for a vertical slider."""
         for tick, label in zip(self.ticks, self.ticklabels):
             y = self.convert_to_pixels(tick)
             label.place_configure(y=y)
