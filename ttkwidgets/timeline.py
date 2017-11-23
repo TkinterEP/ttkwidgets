@@ -55,6 +55,12 @@ class TimeLine(ttk.Frame):
     Labels. This should be fixed by the user by modifying the TimeLine.T(Widget) style.
     """
 
+    # TODO: Automatic break-off of marker text if it's too long to fit inside the marker
+    # TODO: Snap to ticks option
+    # TODO: Implement configure
+    # TODO: Implement cget
+    # TODO: Add option to change category by moving
+
     def __init__(self, master=None, **kwargs):
         """
         Create a TimeLine widget
@@ -63,6 +69,7 @@ class TimeLine(ttk.Frame):
             TimeLine options:
             * int width: width of the timeline in pixels                                    400
             * int height: height of the timeline in pixels                                  200
+            * bool extend: whether to extend when an item is moved out of range             False
             * float start: value to start at                                                0.0
             * float finish: value to finish at                                              10.0
             * float resolution: amount of time per pixel                                    0.01
@@ -84,6 +91,10 @@ class TimeLine(ttk.Frame):
                 for the markers
             * str marker_foreground: Tkinter-compatible default foreground color            "black"
                 for the markers
+            * str marker_outline: Tkinter-compatible default outline color for the          "black"
+                markers
+            * int marker_border: number of pixels border width                              0
+            * bool marker_move: whether it is allowed to move markers                       True
 
         The style of the buttons can be modified by using the "TimeLine.TButton" style.
         The style of the surrounding Frame can be modified by using the "TimeLine.TFrame" style, or by specifying
@@ -103,10 +114,14 @@ class TimeLine(ttk.Frame):
         self._categories = kwargs.pop("categories", {})
         self._background = kwargs.pop("background", "gray90")
         self._style = kwargs.get("style", "TimeLine.TFrame")
+        self._extend = kwargs.pop("extend", False)
         kwargs["style"] = self._style
         self._marker_font = kwargs.pop("marker_font", ("default", 10))
         self._marker_background = kwargs.pop("marker_background", "lightblue")
         self._marker_foreground = kwargs.pop("marker_foreground", "black")
+        self._marker_outline = kwargs.pop("marker_outline", "black")
+        self._marker_border = kwargs.pop("marker_border", 0)
+        self._marker_move = kwargs.pop("marker_move", True)
         # Check the arguments
         self.check_kwargs()
         # Set up the style
@@ -128,6 +143,8 @@ class TimeLine(ttk.Frame):
         self._iid = 0
         self._tags = {}
         self._rows = {}
+        self._after_id = None
+        self._active = None
 
         # Create the child widgets
 
@@ -197,6 +214,8 @@ class TimeLine(ttk.Frame):
         self._timeline.bind("<ButtonPress-1>", self.left_click)
         self._timeline.bind("<B1-Motion>", self.left_motion)
         self._timeline.bind("<ButtonPress-3>", self.right_click)
+        self._timeline.tag_bind("marker", "<Enter>", self.enter_handler)
+        self._timeline.tag_bind("marker", "<Leave>", self.leave_handler)
 
     # Canvas related functions
 
@@ -262,6 +281,12 @@ class TimeLine(ttk.Frame):
             raise ValueError("time argument out of bounds")
         return (time - self._start) / (self._resolution / self._zoom_factor)
 
+    def get_position_time(self, position):
+        """
+        Get the time for a pixel coordinate
+        """
+        return self._start + position * (self._resolution / self._zoom_factor)
+
     def clear_timeline(self):
         """
         Delete all items in the Canvas, does not modify the categories
@@ -321,46 +346,70 @@ class TimeLine(ttk.Frame):
         :raise ValueError: One of the specified arguments is invalid
 
         Keyword Arguments:
+            Normal state options
             * str text: a text label to show in the marker, may not be displayed fully if the zoom level does not allow
                 it. Updates when resizing.
             * str background: Tkinter-compatible background color for the marker
             * str foreground: Tkinter-compatible text color for the marker
             * str outline: Tkinter-compatible outline color for the marker
+            * int border: The width of the border (with color outline)
             * tuple font: Tkinter-compatible font tuple to set for the text of the marker
             * str iid: unique marker identifier used by the internal code
             * tuple tags: set of tags to apply to this marker, allowing callbacks to be set and other properties
+            * bool move: whether the marker is allowed to be moved
+            Active state options
+            * str active_background
+            * str active_foreground
+            * str active_outline
+            * int active_border
+            Hover state options:
+            * str hover_background
+            * str hover_foreground
+            * str hover_outline
+            * str hover_border
         """
         if category_v not in self._categories:
             raise ValueError("category argument not a valid category: {}".format(category_v))
         if start_v < self._start or finish_v > self._finish:
             raise ValueError("time out of bounds")
+        # Update the options based on the tags. The last tag always takes precedence over the ones before it, and the
+        # marker specific options take precedence over tag options
+        tags = kwargs.get("tags", ())
+        options = kwargs.copy()
+        # Check the tags
+        for tag in tags:
+            if tag not in self._tags:
+                raise ValueError("Unknown tag given in tags tuple: {}".format(tag))
+            # Update the options
+            kwargs.update(self._tags[tag])
+        # Update with the specific marker options
+        kwargs.update(options)
+        # Process the other options
         iid = kwargs.pop("iid", self._iid)
         background = kwargs.get("background", self._marker_background)
         foreground = kwargs.get("foreground", self._marker_foreground)
-        outline = kwargs.get("outline", "black")
+        outline = kwargs.get("outline", self._marker_outline)
         font = kwargs.get("font", self._marker_font)
-        tags = kwargs.get("tags", ())
+        border = kwargs.get("border", self._marker_border)
+        move = kwargs.get("move", self._marker_move)
         # Calculate pixel positions
         start_pixel = start_v / self._resolution * self._zoom_factor
         finish_pixel = finish_v / self._resolution * self._zoom_factor
         y_start_pixel, y_finish_pixel = self._rows[category_v]
         # Create the rectangle
         rectangle = self._timeline.create_rectangle(
-            (start_pixel, y_start_pixel, finish_pixel, y_finish_pixel), fill=background, outline=outline
+            (start_pixel, y_start_pixel, finish_pixel, y_finish_pixel), fill=background, outline=outline,
+            tags=("marker",)
         )
         # Create the text
         text = kwargs.get("text", None)
         if text is not None:
-            text_id = self._timeline.create_text((0, 0), text=text, fill=foreground, font=font)
+            text_id = self._timeline.create_text((0, 0), text=text, fill=foreground, font=font, tags=("marker",))
             x = start_pixel - (start_pixel - finish_pixel) / 2
             y = y_start_pixel - (y_start_pixel - y_finish_pixel) / 2
             self._timeline.coords(text_id, (x, y))
         else:
             text_id = None
-        # Check the tags
-        for tag in tags:
-            if tag not in self._tags:
-                raise ValueError("Unknown tag given in tags tuple: {}".format(tag))
         # Check category
         if category_v not in self._categories:
             raise ValueError("Unknown category given as argument: {}".format(category_v))
@@ -377,8 +426,14 @@ class TimeLine(ttk.Frame):
             "text_id": text_id,
             "category": category_v,
             "start": start_v,
-            "finish": finish_v
+            "finish": finish_v,
+            "border": border,
+            "move": move
         }
+        active_options = ["active_foreground", "active_background", "active_outline", "active_border"]
+        hover_options = ["hover_foreground", "hover_background", "hover_outline", "hover_border"]
+        for option in active_options + hover_options:
+            self._markers[iid].update({option: kwargs.get(option, self._markers[iid][option.split("_")[1]])})
         self._markers_canvas[iid] = {
             "rectangle": rectangle,
             "text": text
@@ -398,7 +453,7 @@ class TimeLine(ttk.Frame):
         :return: result of create_marker
         """
         if iid not in self._markers:
-            raise ValueError("Unkown iid passed as argument: {}".format(iid))
+            raise ValueError("Unknown iid passed as argument: {}".format(iid))
         options = self._markers[iid]
         options.update(kwargs)
         self.delete_marker(iid)
@@ -632,18 +687,129 @@ class TimeLine(ttk.Frame):
         """
         Event bound function for a left click on the _timeline Canvas
         """
+        self.update_active()
         iid = self.current_iid
         if iid is None:
             return
         args = (iid, event.x_root, event.y_root)
-        print("Left click for {} with args {}".format(iid, args))
         self.call_callbacks(iid, "left_callback", args)
 
     def left_motion(self, event):
         """
         Event bound function for a left click and movement on the _timeline Canvas
         """
+        iid = self.current_iid
+        if iid is None:
+            return
+        marker = self._markers[iid]
+        if marker["move"] is False:
+            return
+        self.config(cursor="exchange")
+        delta = marker["finish"] - marker["start"]
+        # Limit x to 0
+        x = max(self._timeline.canvasx(event.x), 0)
+        # Check if the timeline needs to be extended
+        limit = self.get_time_position(self._finish - delta)
+        if self._extend is False:
+            x = min(x, limit)
+        elif x > limit:  # self._extend is True
+            self.configure(finish=self.get_position_time(x))
+        # Get the new start value
+        start = self.get_position_time(x)
+        finish = start + (marker["finish"] - marker["start"])
+        rectangle_id, text_id = marker["rectangle_id"], marker["text_id"]
+        x1, y1, x2, y2 = self._timeline.coords(rectangle_id)
+        rectangle_coords = (x, y1, x2 + (x - x1), y2)
+        self._timeline.coords(rectangle_id, *rectangle_coords)
+        text_x = x + (rectangle_coords[2] - x) / 2
+        text_y = y1 + (rectangle_coords[3] - y1) / 2
+        self._timeline.coords(text_id, text_x, text_y)
+        if self._after_id is not None:
+            self.after_cancel(self._after_id)
+        args = (iid, (marker["start"], marker["finish"]), (start, finish))
+        self._after_id = self.after(10, self.after_handler(iid, "move_callback", args))
+        marker["start"] = start
+        marker["finish"] = finish
+
+    def configure(self, cnf={}, **kwargs):
         pass
+
+    def config(self, cnf={}, **kwargs):
+        self.configure(cnf=cnf, **kwargs)
+
+    def cget(self, item):
+        pass
+
+    def __getitem__(self, item):
+        return self.cget(item)
+
+    def __setitem__(self, key, value):
+        return self.configure(key=value)
+
+    def enter_handler(self, event):
+        """
+        Callback for the <Enter> event on a marker, to set the hover options
+        """
+        iid = self.current_iid
+        if iid is None or iid == self.active:
+            return
+        self.update_state(iid, "hover")
+
+    def leave_handler(self, event):
+        """
+        Callback for the <Leave> event on a marker, to set the normal options
+        """
+        iid = self.current_iid
+        if iid is None or self.active == iid:
+            return
+        self.update_state(iid, "normal")
+
+    def update_state(self, iid, state):
+        """
+        Update the state of a marker (normal, hover, active)
+        """
+        if state not in ["normal", "hover", "active"]:
+            raise ValueError("Invalid state: {}".format(state))
+        if iid == self.current_iid and state == "normal":
+            return
+        marker = self._markers[iid]
+        rectangle_id, text_id = marker["rectangle_id"], marker["text_id"]
+        state = "" if state == "normal" else state + "_"
+        self._timeline.itemconfigure(rectangle_id, fill=marker[state + "background"], width=marker[state + "border"],
+                                     outline=marker[state + "outline"])
+        self._timeline.itemconfigure(text_id, fill=marker[state + "foreground"])
+
+    def itemconfigure(self, iid, rectangle_options, text_options):
+        """
+        Option to give full control to the user over the markers. Any option of a Canvas item can be used. Use at your
+        own risk. No error handling is provided. Please note that all changes done here are erased after redrawing
+        the TimeLine contents.
+        """
+        rectangle_id, text_id = self._markers[iid]["rectangle_id"], self._markers[iid]["text_id"]
+        self._timeline.itemconfigure(rectangle_id, **rectangle_options)
+        self._timeline.itemconfigure(text_id, **text_options)
+
+    def update_active(self):
+        """
+        Update the state of the previously active item, and set the newly active item
+        """
+        if self.active is not None:
+            self.update_state(self.active, "normal")
+        if self.current_iid == self.active:
+            self._active = None
+            return
+        self._active = self.current_iid
+        if self.active is not None:
+            self.update_state(self.active, "active")
+
+    def after_handler(self, iid, callback, args):
+        """
+        Proxy function to call the function specified with the arguments and reset the after_id attribute
+        """
+        self._after_id = None
+        self.update_state(iid, "normal")
+        self.config(cursor="")
+        self.call_callbacks(iid, callback, args)
 
     @property
     def current(self):
@@ -651,7 +817,6 @@ class TimeLine(ttk.Frame):
         Currently active item on the _timeline Canvas
         """
         results = self._timeline.find_withtag(tk.CURRENT)
-        print(results)
         return results[0] if len(results) != 0 else None
 
     @property
@@ -663,6 +828,10 @@ class TimeLine(ttk.Frame):
         if current is None or current not in self._canvas_markers:
             return None
         return self._canvas_markers[current]
+
+    @property
+    def active(self):
+        return self._active
 
     def marker_tags(self, iid):
         """
@@ -698,7 +867,8 @@ if __name__ == '__main__':
     )
     menu = tk.Menu(window, tearoff=False)
     menu.add_command(label="Something")
-    timeline.tag_configure("1", right_callback=lambda *args: print(args), menu=menu)
+    timeline.tag_configure("1", right_callback=lambda *args: print(args), menu=menu, foreground="green",
+                           active_background="yellow", hover_border=2, move_callback=lambda *args: print(args))
     timeline.create_marker("1", 1.0, 2.0, background="white", text="Hello World", tags=("1",), iid="1")
     timeline.grid()
     window.after(5000, lambda: timeline.update_marker("1", background="red"))
