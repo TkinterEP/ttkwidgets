@@ -306,42 +306,77 @@ class TickScale(ttk.Frame):
         return percent * (self.get_scale_length() - self._sliderlength) + self._sliderlength / 2
 
     def _update_slider_length_horizontal(self):
-        """Measure the length of the slider and update the value of self._sliderlength."""
+        """
+        Measure the length of the slider and update the value of self._sliderlength.
+
+        self.scale.identify(x, y) is used to find the first and last pixels of
+        the slider. Indeed, self.scale.identify(x, y) returns the element
+        of the ttk.Scale to which the pixel (x, y) belongs. So, the length of
+        the slider is determined by scanning horizontally the pixels of the scale.
+        """
         if not self.scale.identify(2, 2):
-            # to soon, wait for the scale to be properly displayed
+            # if self.scale.identify(2, 2) is an empty string it means that the scale
+            # is not displayed yet so we cannot measure the length of the slider,
+            # so wait for the scale to be properly displayed.
             # binding to <Map> event does not work, it can still be to soon to
             # get any result from identify
             self.after(10, self._update_slider_length_horizontal)
         else:
             w = self.scale.winfo_width()
             i = 0
+            # find the first pixel of the slider
             while i < w and 'slider' not in self.scale.identify(i, 2):
+                # increment i until the pixel (i, 2) belongs to the slider
                 i += 1
             j = i
+            # find the last pixel of the slider
             while j < w and 'slider' in self.scale.identify(j, 2):
+                # increment j until the pixel (2, j) no longer belongs to the slider
                 j += 1
             if j == i:
+                # the length of the slider was not determined properly,
+                # so the value of the sliderlength from the style is used
                 self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
             else:
+                # update ticks and label placement
                 self._sliderlength = j - i
             self._update_display()
 
     def _update_slider_length_vertical(self):
-        """Measure the length of the slider and update the value of self._sliderlength."""
+        """
+        Measure the length of the slider and update the value of self._sliderlength.
+
+        self.scale.identify(x, y) is used to find the first and last pixels of
+        the slider. Indeed, self.scale.identify(x, y) returns the element
+        of the ttk.Scale to which the pixel (x, y) belongs. So, the length of
+        the slider is determined by scanning vertically the pixels of the scale.
+        """
         if not self.scale.identify(2, 2):
+            # if self.scale.identify(2, 2) is an empty string it means that the scale
+            # is not displayed yet so we cannot measure the length of the slider,
+            # so wait for the scale to be properly displayed.
+            # binding to <Map> event does not work, it can still be to soon to
+            # get any result from identify
             self.after(10, self._update_slider_length_vertical)
         else:
             h = self.scale.winfo_height()
             i = 0
-            while i < h and 'slider' not in self.scale.identify(1, i):
+            # find the first pixel of the slider
+            while i < h and 'slider' not in self.scale.identify(2, i):
+                # increment i until the pixel (2, i) belongs to the slider
                 i += 1
             j = i
-            while j < h and 'slider' in self.scale.identify(1, j):
+            # find the last pixel of the slider
+            while j < h and 'slider' in self.scale.identify(2, j):
+                # increment j until the pixel (2, j) no longer belongs to the slider
                 j += 1
             if j == i:
+                # the length of the slider was not determined properly,
+                # so the value of the sliderlength from the style is used
                 self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
             else:
                 self._sliderlength = j - i
+            # update ticks and label placement
             self._update_display()
 
     def _apply_style(self):
