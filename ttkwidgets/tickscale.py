@@ -182,6 +182,17 @@ class TickScale(ttk.Frame):
     def configure(self, cnf={}, **kw):
         kw.update(cnf)
         reinit = False
+        if 'orient' in kw:
+            if kw['orient'] == 'vertical':
+                self._style_name = self._style_name.replace('Horizontal', 'Vertical')
+                if 'tickpos' not in kw:
+                    self._tickpos = 'w'
+            else:
+                self._style_name = self._style_name.replace('Vertical', 'Horizontal')
+                if 'tickpos' not in kw:
+                    self._tickpos = 's'
+            self.scale.configure(style=self._style_name)
+            reinit = True
         if 'showvalue' in kw:
             self._showvalue = bool(kw.pop('showvalue'))
             reinit = True
@@ -276,17 +287,6 @@ class TickScale(ttk.Frame):
             self._style_name = kw['style']
             if not self._style_name:
                 self._style_name = '%s.TScale' % (str(self.scale.cget('orient')).capitalize())
-        if 'orient' in kw:
-            if kw['orient'] == 'vertical':
-                self._style_name = self._style_name.replace('Horizontal', 'Vertical')
-                if 'tickpos' not in kw:
-                    self._tickpos = 'w'
-            else:
-                self._style_name = self._style_name.replace('Vertical', 'Horizontal')
-                if 'tickpos' not in kw:
-                    self._tickpos = 's'
-            self.scale.configure(style=self._style_name)
-            reinit = True
         if reinit:
             self._init()
         if 'orient' in kw:
