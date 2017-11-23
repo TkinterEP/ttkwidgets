@@ -320,7 +320,7 @@ class TickScale(ttk.Frame):
             j = i
             while j < w and 'slider' in self.scale.identify(j, 2):
                 j += 1
-            if j - i == 0:
+            if j == i:
                 self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
             else:
                 self._sliderlength = j - i
@@ -338,7 +338,7 @@ class TickScale(ttk.Frame):
             j = i
             while j < h and 'slider' in self.scale.identify(1, j):
                 j += 1
-            if j - i == 0:
+            if j == i:
                 self._sliderlength = self.style.lookup(self._style_name, 'sliderlength', default=30)
             else:
                 self._sliderlength = j - i
