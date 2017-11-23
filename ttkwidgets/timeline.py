@@ -60,6 +60,7 @@ class TimeLine(ttk.Frame):
     # TODO: Implement configure
     # TODO: Implement cget
     # TODO: Add option to change category by moving
+    # TODO: Add frame to indicate time when moving time marker
 
     def __init__(self, master=None, **kwargs):
         """
@@ -134,6 +135,9 @@ class TimeLine(ttk.Frame):
         self._image_zoom_in = open_icon("zoom_in.png")
         self._image_zoom_out = open_icon("zoom_out.png")
         self._image_zoom_reset = open_icon("zoom_reset.png")
+        self._time_marker = open_icon("marker.png")
+        self._time_marker_image = None
+        self._time_marker_line = None
 
         # Create necessary attributes
         self._zoom_factor = self._zoom_factors[0]
@@ -216,6 +220,7 @@ class TimeLine(ttk.Frame):
         self._timeline.bind("<ButtonPress-3>", self.right_click)
         self._timeline.tag_bind("marker", "<Enter>", self.enter_handler)
         self._timeline.tag_bind("marker", "<Leave>", self.leave_handler)
+        self._canvas_ticks.bind("<B1-Motion>", self.time_marker_move)
 
     # Canvas related functions
 
@@ -240,6 +245,13 @@ class TimeLine(ttk.Frame):
         self.create_markers(self.markers)
         # Create the ticks in the _canvas_ticks
         self.create_ticks()
+        self.create_time_marker()
+
+    def create_time_marker(self):
+        self._time_marker_image = self._canvas_ticks.create_image((2, 16), image=self._time_marker)
+        self._time_marker_line = self._timeline.create_line((2, 0, 2, self._timeline.winfo_height()), fill="#016dc9")
+        self._timeline.lift(self._time_marker_line)
+        self._timeline.tag_lower("marker")
 
     def create_categories(self):
         """
@@ -731,6 +743,14 @@ class TimeLine(ttk.Frame):
         marker["start"] = start
         marker["finish"] = finish
 
+    def time_marker_move(self, event):
+        limit = self.pixel_width
+        x = self._canvas_ticks.canvasx(event.x)
+        x = min(max(x, 0), limit)
+        _, y = self._canvas_ticks.coords(self._time_marker_image)
+        self._canvas_ticks.coords(self._time_marker_image, x, y)
+        self._timeline.coords(self._time_marker_line, x, 0, x, self._timeline.winfo_height())
+
     def configure(self, cnf={}, **kwargs):
         pass
 
@@ -830,6 +850,11 @@ class TimeLine(ttk.Frame):
         return self._canvas_markers[current]
 
     @property
+    def time(self):
+        x, _, = self._canvas_ticks.coords(self._time_marker_image)
+        return self.get_position_time(x)
+
+    @property
     def active(self):
         return self._active
 
@@ -872,5 +897,6 @@ if __name__ == '__main__':
     timeline.create_marker("1", 1.0, 2.0, background="white", text="Hello World", tags=("1",), iid="1")
     timeline.grid()
     window.after(5000, lambda: timeline.update_marker("1", background="red"))
+    window.after(5000, lambda: print(timeline.time))
     window.mainloop()
 
