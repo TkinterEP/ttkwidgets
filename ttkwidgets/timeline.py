@@ -147,18 +147,7 @@ class TimeLine(ttk.Frame):
                                              state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
         # Category Labels
         self._category_labels = OrderedDict()
-        canvas_width = 0
-        for category, kwargs in (sorted(self._categories.items())
-                                 if not isinstance(self._categories, OrderedDict)
-                                 else self._categories):
-            kwargs["background"] = kwargs.get("background", self._background)
-            kwargs["justify"] = kwargs.get("justify", tk.LEFT)
-            label = ttk.Label(self._frame_categories, **kwargs)
-            width = label.winfo_reqwidth()
-            canvas_width = width if width > canvas_width else canvas_width
-            self._category_labels[category] = label
-        self._canvas_categories.create_window(0, 0, window=self._frame_categories, anchor=tk.NW)
-        self._canvas_categories.config(width=canvas_width + 5, height=self._height)
+        self.create_categories()
         # Canvas widgets
         self._canvas_scroll = tk.Canvas(self, background=self._background, width=self._width, height=self._height)
         self._timeline = tk.Canvas(self._canvas_scroll, background=self._background, borderwidth=0)
@@ -167,11 +156,9 @@ class TimeLine(ttk.Frame):
         self._scrollbar_vertical = ttk.Scrollbar(self, command=self.set_scroll_v, orient=tk.VERTICAL)
         self._canvas_scroll.config(xscrollcommand=self._scrollbar_timeline.set,
                                    yscrollcommand=self._scrollbar_vertical.set)
-        self.bind("<MouseWheel>", self._mouse_scroll_v)
-        self.bind("<Shift-MouseWheel>", self._mouse_scroll_h)
         self._canvas_categories.config(yscrollcommand=self._scrollbar_vertical.set)
-        # Event bindings
-        self._timeline.bind("<Configure>", self.__configure_timeline)
+
+        self._setup_bindings()
 
         self.generate_timeline_contents()
         self.grid_widgets()
@@ -196,6 +183,17 @@ class TimeLine(ttk.Frame):
         self._scrollbar_vertical.grid(column=2, row=0, pady=5, padx=(0, 5), sticky="ns")
         self._frame_zoom.grid(column=3, row=0, rowspan=2, padx=(0, 5), pady=5, sticky="nswe")
 
+    def _setup_bindings(self):
+        """
+        Setup the event bindings for the widgets:
+        Configure for _timeline
+        Horizontal and Vertical scrolling for all widgets
+        """
+        self._timeline.bind("<Configure>", self.__configure_timeline)
+        for widget in [self, self._canvas_scroll, self._timeline, self._canvas_categories]:
+            widget.bind("<MouseWheel>", self._mouse_scroll_v)
+            widget.bind("<Shift-MouseWheel>", self._mouse_scroll_h)
+
     # Canvas related functions
 
     @property
@@ -219,6 +217,26 @@ class TimeLine(ttk.Frame):
         self.create_markers(self.markers)
         # Create the ticks in the _canvas_ticks
         self.create_ticks()
+
+    def create_categories(self):
+        """
+        Create the appropriate category labels and update the size of the _canvas_categories
+        """
+        for label in self._category_labels.values():
+            label.destroy()
+        self._category_labels.clear()
+        canvas_width = 0
+        for category, kwargs in (sorted(self._categories.items())
+                                 if not isinstance(self._categories, OrderedDict)
+                                 else self._categories):
+            kwargs["background"] = kwargs.get("background", self._background)
+            kwargs["justify"] = kwargs.get("justify", tk.LEFT)
+            label = ttk.Label(self._frame_categories, **kwargs)
+            width = label.winfo_reqwidth()
+            canvas_width = width if width > canvas_width else canvas_width
+            self._category_labels[category] = label
+        self._canvas_categories.create_window(0, 0, window=self._frame_categories, anchor=tk.NW)
+        self._canvas_categories.config(width=canvas_width + 5, height=self._height)
 
     def create_scroll_region(self):
         """
