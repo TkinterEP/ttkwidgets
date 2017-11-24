@@ -59,8 +59,7 @@ class TimeLine(ttk.Frame):
     # TODO: Snap to ticks option
     # TODO: Implement configure
     # TODO: Implement cget
-    # TODO: Add option to change category by moving
-    # TODO: Add frame to indicate time when moving time marker
+    # TODO: Implement option to allow overlapping (or not)
 
     def __init__(self, master=None, **kwargs):
         """
@@ -96,6 +95,8 @@ class TimeLine(ttk.Frame):
                 markers
             * int marker_border: number of pixels border width                              0
             * bool marker_move: whether it is allowed to move markers                       True
+            * bool marker_change_category: whether the markers are allowed to change        False
+                category by moving them vertically
 
         The style of the buttons can be modified by using the "TimeLine.TButton" style.
         The style of the surrounding Frame can be modified by using the "TimeLine.TFrame" style, or by specifying
@@ -123,6 +124,7 @@ class TimeLine(ttk.Frame):
         self._marker_outline = kwargs.pop("marker_outline", "black")
         self._marker_border = kwargs.pop("marker_border", 0)
         self._marker_move = kwargs.pop("marker_move", True)
+        self._marker_change_category = kwargs.pop("marker_change_category", False)
         # Check the arguments
         self.check_kwargs()
         # Set up the style
@@ -335,7 +337,7 @@ class TimeLine(ttk.Frame):
         self._timeline.create_line((0, 1, self.pixel_width, 1))
         for index, (category, label) in enumerate(self._category_labels.items()):
             height = label.winfo_reqheight()
-            self._rows[category] = (total, total + height )
+            self._rows[category] = (total, total + height)
             total += height
             self._timeline.create_line((0, total, self.pixel_width, total))
         pixel_height = total
@@ -410,10 +412,12 @@ class TimeLine(ttk.Frame):
         font = kwargs.get("font", self._marker_font)
         border = kwargs.get("border", self._marker_border)
         move = kwargs.get("move", self._marker_move)
+        change_category = kwargs.get("change_category", self._marker_change_category)
         # Calculate pixel positions
         start_pixel = start_v / self._resolution * self._zoom_factor
         finish_pixel = finish_v / self._resolution * self._zoom_factor
         y_start_pixel, y_finish_pixel = self._rows[category_v]
+        print(y_start_pixel, y_finish_pixel)
         # Create the rectangle
         rectangle = self._timeline.create_rectangle(
             (start_pixel, y_start_pixel, finish_pixel, y_finish_pixel), fill=background, outline=outline,
@@ -423,8 +427,7 @@ class TimeLine(ttk.Frame):
         text = kwargs.get("text", None)
         if text is not None:
             text_id = self._timeline.create_text((0, 0), text=text, fill=foreground, font=font, tags=("marker",))
-            x = start_pixel - (start_pixel - finish_pixel) / 2
-            y = y_start_pixel - (y_start_pixel - y_finish_pixel) / 2
+            x, y = TimeLine.calculate_text_coords((start_pixel, y_start_pixel, finish_pixel, y_finish_pixel))
             self._timeline.coords(text_id, (x, y))
         else:
             text_id = None
@@ -446,7 +449,8 @@ class TimeLine(ttk.Frame):
             "start": start_v,
             "finish": finish_v,
             "border": border,
-            "move": move
+            "move": move,
+            "change_category": change_category
         }
         active_options = ["active_foreground", "active_background", "active_outline", "active_border"]
         hover_options = ["hover_foreground", "hover_background", "hover_outline", "hover_border"]
@@ -458,7 +462,7 @@ class TimeLine(ttk.Frame):
         }
         self._canvas_markers[rectangle] = iid
         self._canvas_markers[text_id] = iid
-
+        self._timeline.tag_lower("marker")
         self._iid += 1
         return iid
 
@@ -737,10 +741,14 @@ class TimeLine(ttk.Frame):
         finish = start + (marker["finish"] - marker["start"])
         rectangle_id, text_id = marker["rectangle_id"], marker["text_id"]
         x1, y1, x2, y2 = self._timeline.coords(rectangle_id)
+        if marker["change_category"] is True:
+            y = max(self._timeline.canvasy(event.y), 0)
+            category = min(self._rows.keys(), key=lambda category: abs(self._rows[category][0] - y))
+            marker["category"] = category
+            y1, y2 = self._rows[category]
         rectangle_coords = (x, y1, x2 + (x - x1), y2)
         self._timeline.coords(rectangle_id, *rectangle_coords)
-        text_x = x + (rectangle_coords[2] - x) / 2
-        text_y = y1 + (rectangle_coords[3] - y1) / 2
+        text_x, text_y = TimeLine.calculate_text_coords(rectangle_coords)
         self._timeline.coords(text_id, text_x, text_y)
         if self._after_id is not None:
             self.after_cancel(self._after_id)
@@ -748,6 +756,11 @@ class TimeLine(ttk.Frame):
         self._after_id = self.after(10, self.after_handler(iid, "move_callback", args))
         marker["start"] = start
         marker["finish"] = finish
+
+    @staticmethod
+    def calculate_text_coords(rectangle_coords):
+        return (rectangle_coords[0] + (rectangle_coords[2] - rectangle_coords[0]) / 2,
+                rectangle_coords[1] + (rectangle_coords[3] - rectangle_coords[1]) / 2)
 
     def time_marker_move(self, event):
         limit = self.pixel_width
@@ -922,7 +935,7 @@ if __name__ == '__main__':
     window = tk.Tk()
     timeline = TimeLine(
         window,
-        categories={str(key): {"text": "Category {}".format(key)} for key in range(0, 40)},
+        categories={str(key): {"text": "Category {}".format(key)} for key in range(0, 5)},
         height=100
     )
     menu = tk.Menu(window, tearoff=False)
@@ -930,8 +943,12 @@ if __name__ == '__main__':
     timeline.tag_configure("1", right_callback=lambda *args: print(args), menu=menu, foreground="green",
                            active_background="yellow", hover_border=2, move_callback=lambda *args: print(args))
     timeline.create_marker("1", 1.0, 2.0, background="white", text="Hello World", tags=("1",), iid="1")
+    timeline.create_marker("2", 2.0, 3.0, background="green", text="Something", foreground="white", iid="2",
+                           change_category=True)
+    timeline.create_marker("3", 1.0, 2.0, text="Something")
+    timeline.create_marker("4", 4.0, 5.0, text="Hello Train")
+    timeline.generate_timeline_contents()
     timeline.grid()
     window.after(5000, lambda: timeline.update_marker("1", background="red"))
     window.after(5000, lambda: print(timeline.time))
     window.mainloop()
-
