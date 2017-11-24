@@ -59,7 +59,6 @@ class TimeLine(ttk.Frame):
     # TODO: Snap to ticks option
     # TODO: Implement configure
     # TODO: Implement cget
-    # TODO: Implement option to allow overlapping (or not)
 
     def __init__(self, master=None, **kwargs):
         """
@@ -97,6 +96,11 @@ class TimeLine(ttk.Frame):
             * bool marker_move: whether it is allowed to move markers                       True
             * bool marker_change_category: whether the markers are allowed to change        False
                 category by moving them vertically
+            * bool marker_allow_overlap: whether the markers are allowed to overlap         False
+                this setting is only enforced on the marker being moved. This means
+                that when inserting markers, no errors will be raised, even with
+                overlaps, and an overlap-allowing marker is moved over a non-overlap
+                allowing marker, then an overlap will still occur.
 
         The style of the buttons can be modified by using the "TimeLine.TButton" style.
         The style of the surrounding Frame can be modified by using the "TimeLine.TFrame" style, or by specifying
@@ -125,6 +129,7 @@ class TimeLine(ttk.Frame):
         self._marker_border = kwargs.pop("marker_border", 0)
         self._marker_move = kwargs.pop("marker_move", True)
         self._marker_change_category = kwargs.pop("marker_change_category", False)
+        self._marker_allow_overlap = kwargs.pop("marker_allow_overlap", False)
         # Check the arguments
         self.check_kwargs()
         # Set up the style
@@ -413,6 +418,7 @@ class TimeLine(ttk.Frame):
         border = kwargs.get("border", self._marker_border)
         move = kwargs.get("move", self._marker_move)
         change_category = kwargs.get("change_category", self._marker_change_category)
+        allow_overlap = kwargs.get("allow_overlap", self._marker_allow_overlap)
         # Calculate pixel positions
         start_pixel = start_v / self._resolution * self._zoom_factor
         finish_pixel = finish_v / self._resolution * self._zoom_factor
@@ -450,7 +456,8 @@ class TimeLine(ttk.Frame):
             "finish": finish_v,
             "border": border,
             "move": move,
-            "change_category": change_category
+            "change_category": change_category,
+            "allow_overlap": allow_overlap
         }
         active_options = ["active_foreground", "active_background", "active_outline", "active_border"]
         hover_options = ["hover_foreground", "hover_background", "hover_outline", "hover_border"]
@@ -741,6 +748,24 @@ class TimeLine(ttk.Frame):
         finish = start + (marker["finish"] - marker["start"])
         rectangle_id, text_id = marker["rectangle_id"], marker["text_id"]
         x1, y1, x2, y2 = self._timeline.coords(rectangle_id)
+        # Overlap protection
+        if marker["allow_overlap"] is False:
+            for marker_dict in self.markers.values():
+                if marker_dict["allow_overlap"] is True:
+                    continue
+                if marker["iid"] != marker_dict["iid"] and marker["category"] == marker_dict["category"]:
+                    if marker_dict["start"] < start < marker_dict["finish"]:
+                        start = marker_dict["finish"] if start < marker_dict["finish"] else marker_dict["start"]
+                        finish = start + (marker["finish"] - marker["start"])
+                        x = self.get_time_position(start)
+                        break
+                    elif marker_dict["start"] < finish < marker_dict["finish"]:
+                        finish = marker_dict["finish"] if finish > marker_dict["finish"] else marker_dict["start"]
+                        start = finish - (marker_dict["finish"] - marker_dict["start"])
+                        x = self.get_time_position(start)
+                        break
+                    else:
+                        continue
         if marker["change_category"] is True:
             y = max(self._timeline.canvasy(event.y), 0)
             category = min(self._rows.keys(), key=lambda category: abs(self._rows[category][0] - y))
