@@ -254,6 +254,7 @@ class TimeLine(ttk.Frame):
         self.clear_timeline()
         self.create_scroll_region()
         self._timeline.config(width=self.pixel_width)
+        self._canvas_scroll.config(width=self._width, height=self._height)
         # Generate the Y-coordinates for each of the rows and create the lines indicating the rows
         self.create_separating_lines()
         # Create the markers on the timeline
@@ -416,27 +417,35 @@ class TimeLine(ttk.Frame):
         kwargs.update(options)
         # Process the other options
         iid = kwargs.pop("iid", str(self._iid))
-        background = kwargs.get("background", self._marker_background)
-        foreground = kwargs.get("foreground", self._marker_foreground)
-        outline = kwargs.get("outline", self._marker_outline)
-        font = kwargs.get("font", self._marker_font)
-        border = kwargs.get("border", self._marker_border)
-        move = kwargs.get("move", self._marker_move)
-        change_category = kwargs.get("change_category", self._marker_change_category)
-        allow_overlap = kwargs.get("allow_overlap", self._marker_allow_overlap)
+        background = kwargs.get("background", "default")
+        foreground = kwargs.get("foreground", "default")
+        outline = kwargs.get("outline", "default")
+        font = kwargs.get("font", "default")
+        border = kwargs.get("border", "default")
+        move = kwargs.get("move", "default")
+        change_category = kwargs.get("change_category", "default")
+        allow_overlap = kwargs.get("allow_overlap", "default")
         # Calculate pixel positions
         start_pixel = start_v / self._resolution * self._zoom_factor
         finish_pixel = finish_v / self._resolution * self._zoom_factor
         y_start_pixel, y_finish_pixel = self._rows[category_v]
         # Create the rectangle
         rectangle = self._timeline.create_rectangle(
-            (start_pixel, y_start_pixel, finish_pixel, y_finish_pixel), fill=background, outline=outline,
-            tags=("marker",)
+            (start_pixel, y_start_pixel, finish_pixel, y_finish_pixel),
+            fill=background if background != "default" else self._marker_background,
+            outline=outline if outline != "default" else self._marker_outline,
+            tags=("marker",),
+            width=border if border != "default" else self._marker_border
         )
         # Create the text
         text = kwargs.get("text", None)
         if text is not None:
-            text_id = self._timeline.create_text((0, 0), text=text, fill=foreground, font=font, tags=("marker",))
+            text_id = self._timeline.create_text(
+                (0, 0), text=text,
+                fill=foreground if foreground != "default" else self._marker_foreground,
+                font=font if font != "default" else self._marker_font,
+                tags=("marker",)
+            )
             x, y = TimeLine.calculate_text_coords((start_pixel, y_start_pixel, finish_pixel, y_finish_pixel))
             self._timeline.coords(text_id, (x, y))
         else:
@@ -930,18 +939,38 @@ class TimeLine(ttk.Frame):
         """
         return self.zoom_factor * ((self._finish - self._start) / self._resolution)
 
+    @property
+    def options(self):
+        return [
+            "width", "height", "extend", "start", "finish", "resolution", "tick_resolution", "unit", "zoom_enabled",
+            "categories", "background", "style", "zoom_factors", "zoom_default", "marker_font", "marker_background",
+            "marker_foreground", "marker_outline", "marker_border", "marker_move", "marker_change_category",
+            "marker_allow_overlap"
+        ]
+
     """
     Tkinter functions
     """
 
     def configure(self, cnf={}, **kwargs):
-        pass
+        """
+        Update an option of the TimeLine. New marker options are only applied to new markers.
+        """
+        kwargs.update(cnf)
+        TimeLine.check_kwargs(kwargs)
+        for option in self.options:
+            attribute = "_" + option
+            setattr(self, attribute, kwargs.pop(option, getattr(self, attribute)))
+        self.generate_timeline_contents()
 
     def config(self, cnf={}, **kwargs):
         self.configure(cnf=cnf, **kwargs)
 
     def cget(self, item):
-        pass
+        """
+        Return the value of an option
+        """
+        return getattr(self, "_" + item) if item in self.options else ttk.Frame.cget(self, item)
 
     def __getitem__(self, item):
         return self.cget(item)
@@ -1083,13 +1112,17 @@ class TimeLine(ttk.Frame):
         for color in (item for item in (prefix + color for prefix in ["active_", "hover_", ""]
                                         for color in ["background", "foreground", "outline"])):
             value = kwargs.get(color, "")
+            if value == "default":
+                continue
             if not isinstance(value, str):
                 raise TypeError("{} argument not of str type".format(color))
         font = kwargs.get("font", ("default", 10))
-        if not isinstance(font, tuple) or not len(font) > 0 or not isinstance(font[0], str):
+        if (not isinstance(font, tuple) or not len(font) > 0 or not isinstance(font[0], str)) and font != "default":
             raise ValueError("font argument is not a valid font tuple")
         for border in (prefix + "border" for prefix in ["active_", "hover_", ""]):
             border_v = kwargs.get(border, 0)
+            if border_v == "default":
+                continue
             if not isinstance(border_v, int) or border_v < 0:
                 raise ValueError("{} argument is not of int type or smaller than zero".format(border))
         iid = kwargs.get("iid", "-1")
@@ -1099,6 +1132,8 @@ class TimeLine(ttk.Frame):
             raise ValueError("iid argument empty string")
         for boolean_arg in ["move", "category_change", "allow_overlap"]:
             value = kwargs.get(boolean_arg, False)
+            if value == "default":
+                continue
             if not isinstance(value, bool):
                 raise TypeError("{} argument is not of bool type".format(boolean_arg))
         tags = kwargs.get("tags", ())
