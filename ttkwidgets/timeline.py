@@ -836,9 +836,14 @@ class TimeLine(ttk.Frame):
         marker = self._markers[iid]
         rectangle_id, text_id = marker["rectangle_id"], marker["text_id"]
         state = "" if state == "normal" else state + "_"
-        self._timeline.itemconfigure(rectangle_id, fill=marker[state + "background"], width=marker[state + "border"],
-                                     outline=marker[state + "outline"])
-        self._timeline.itemconfigure(text_id, fill=marker[state + "foreground"])
+        colors = {}
+        for color_type in ["background", "foreground", "outline", "border"]:
+            value = marker[state + color_type]
+            attribute = "_marker_{}".format(color_type)
+            colors[color_type] = getattr(self, attribute) if value == "default" else value
+        self._timeline.itemconfigure(rectangle_id, fill=colors["background"], width=colors["border"],
+                                     outline=colors["outline"])
+        self._timeline.itemconfigure(text_id, fill=colors["foreground"])
 
     def update_active(self):
         """
