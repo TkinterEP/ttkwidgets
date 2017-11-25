@@ -389,16 +389,8 @@ class TimeLine(ttk.Frame):
                 problems such as missing markers may occur. Please use something truly unique.
             * tuple tags: set of tags to apply to this marker, allowing callbacks to be set and other properties
             * bool move: whether the marker is allowed to be moved
-            Active state options
-            * str active_background
-            * str active_foreground
-            * str active_outline
-            * int active_border
-            Hover state options:
-            * str hover_background
-            * str hover_foreground
-            * str hover_outline
-            * str hover_border
+            Active state options: str active_background, str active_foreground, str active_outline, int active_border
+            Hover state options: str hover_background, str hover_foreground, str hover_outline, int hover_border
         """
         if category_v not in self._categories:
             raise ValueError("category argument not a valid category: {}".format(category_v))
@@ -453,6 +445,9 @@ class TimeLine(ttk.Frame):
         # Check category
         if category_v not in self._categories:
             raise ValueError("Unknown category given as argument: {}".format(category_v))
+        # If an entry exists, then delete it
+        if iid in self._markers:
+            del self._markers[iid]
         # Save the marker
         self._markers[iid] = {
             "text": text,
@@ -759,7 +754,6 @@ class TimeLine(ttk.Frame):
         marker = self._markers[iid]
         if marker["move"] is False:
             return
-        self.config(cursor="exchange")
         delta = marker["finish"] - marker["start"]
         # Limit x to 0
         x = max(self._timeline.canvasx(event.x), 0)
@@ -773,9 +767,13 @@ class TimeLine(ttk.Frame):
         start = self.get_position_time(x)
         finish = start + (marker["finish"] - marker["start"])
         rectangle_id, text_id = marker["rectangle_id"], marker["text_id"]
+        if rectangle_id not in self._timeline.find_all():
+            return
         x1, y1, x2, y2 = self._timeline.coords(rectangle_id)
         # Overlap protection
-        if marker["allow_overlap"] is False:
+        allow_overlap = marker["allow_overlap"]
+        allow_overlap = self._marker_allow_overlap if allow_overlap == "default" else allow_overlap
+        if allow_overlap is False:
             for marker_dict in self.markers.values():
                 if marker_dict["allow_overlap"] is True:
                     continue
@@ -785,13 +783,11 @@ class TimeLine(ttk.Frame):
                         finish = start + (marker["finish"] - marker["start"])
                         x = self.get_time_position(start)
                         break
-                    elif marker_dict["start"] < finish < marker_dict["finish"]:
+                    if marker_dict["start"] < finish < marker_dict["finish"]:
                         finish = marker_dict["finish"] if finish > marker_dict["finish"] else marker_dict["start"]
                         start = finish - (marker_dict["finish"] - marker_dict["start"])
                         x = self.get_time_position(start)
                         break
-                    else:
-                        continue
         # Vertical movement
         if marker["change_category"] is True:
             y = max(self._timeline.canvasy(event.y), 0)
@@ -864,7 +860,6 @@ class TimeLine(ttk.Frame):
         """
         self._after_id = None
         self.update_state(iid, "normal")
-        self.config(cursor="")
         self.call_callbacks(iid, callback, args)
 
     def call_callbacks(self, iid, type, args):
@@ -961,6 +956,7 @@ class TimeLine(ttk.Frame):
         """
         Update an option of the TimeLine. New marker options are only applied to new markers.
         """
+        print("Configure called with: {}, {}".format(cnf, kwargs))
         kwargs.update(cnf)
         TimeLine.check_kwargs(kwargs)
         for option in self.options:
