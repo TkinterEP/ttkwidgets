@@ -384,7 +384,8 @@ class TimeLine(ttk.Frame):
             * str outline: Tkinter-compatible outline color for the marker
             * int border: The width of the border (with color outline)
             * tuple font: Tkinter-compatible font tuple to set for the text of the marker
-            * str iid: unique marker identifier used by the internal code
+            * str iid: unique marker identifier used by the internal code. If this is not a unique value, then weird
+                problems such as missing markers may occur. Please use something truly unique.
             * tuple tags: set of tags to apply to this marker, allowing callbacks to be set and other properties
             * bool move: whether the marker is allowed to be moved
             Active state options
@@ -402,20 +403,19 @@ class TimeLine(ttk.Frame):
             raise ValueError("category argument not a valid category: {}".format(category_v))
         if start_v < self._start or finish_v > self._finish:
             raise ValueError("time out of bounds")
+        self.check_marker_kwargs(kwargs)
         # Update the options based on the tags. The last tag always takes precedence over the ones before it, and the
         # marker specific options take precedence over tag options
         tags = kwargs.get("tags", ())
         options = kwargs.copy()
         # Check the tags
         for tag in tags:
-            if tag not in self._tags:
-                raise ValueError("Unknown tag given in tags tuple: {}".format(tag))
             # Update the options
             kwargs.update(self._tags[tag])
         # Update with the specific marker options
         kwargs.update(options)
         # Process the other options
-        iid = kwargs.pop("iid", self._iid)
+        iid = kwargs.pop("iid", str(self._iid))
         background = kwargs.get("background", self._marker_background)
         foreground = kwargs.get("foreground", self._marker_foreground)
         outline = kwargs.get("outline", self._marker_outline)
@@ -428,7 +428,6 @@ class TimeLine(ttk.Frame):
         start_pixel = start_v / self._resolution * self._zoom_factor
         finish_pixel = finish_v / self._resolution * self._zoom_factor
         y_start_pixel, y_finish_pixel = self._rows[category_v]
-        print(y_start_pixel, y_finish_pixel)
         # Create the rectangle
         rectangle = self._timeline.create_rectangle(
             (start_pixel, y_start_pixel, finish_pixel, y_finish_pixel), fill=background, outline=outline,
@@ -464,10 +463,14 @@ class TimeLine(ttk.Frame):
             "change_category": change_category,
             "allow_overlap": allow_overlap
         }
+        # Add the color options
         active_options = ["active_foreground", "active_background", "active_outline", "active_border"]
         hover_options = ["hover_foreground", "hover_background", "hover_outline", "hover_border"]
-        for option in active_options + hover_options:
-            self._markers[iid].update({option: kwargs.get(option, self._markers[iid][option.split("_")[1]])})
+        self._markers[iid].update(
+            {option: kwargs.get(option, self._markers[iid][option.split("_")[1]])
+             for option in active_options + hover_options}
+        )
+        # Save the marker
         self._markers_canvas[iid] = {
             "rectangle": rectangle,
             "text": text
@@ -475,7 +478,9 @@ class TimeLine(ttk.Frame):
         self._canvas_markers[rectangle] = iid
         self._canvas_markers[text_id] = iid
         self._timeline.tag_lower("marker")
-        self._iid += 1
+        # Attempt to prevent duplicate iids
+        while str(self._iid) in self.markers:
+            self._iid += 1
         return iid
 
     def update_marker(self, iid, **kwargs):
@@ -488,6 +493,7 @@ class TimeLine(ttk.Frame):
         """
         if iid not in self._markers:
             raise ValueError("Unknown iid passed as argument: {}".format(iid))
+        self.check_kwargs(kwargs)
         options = self._markers[iid]
         options.update(kwargs)
         self.delete_marker(iid)
@@ -818,8 +824,6 @@ class TimeLine(ttk.Frame):
         """
         if state not in ["normal", "hover", "active"]:
             raise ValueError("Invalid state: {}".format(state))
-        if iid == self.current_iid and state == "normal":
-            return
         marker = self._markers[iid]
         rectangle_id, text_id = marker["rectangle_id"], marker["text_id"]
         state = "" if state == "normal" else state + "_"
@@ -1069,7 +1073,39 @@ class TimeLine(ttk.Frame):
             raise TypeError("marker_allow_overlap argument is not of bool type")
         return
 
-    @staticmethod
-    def check_marker_kwargs(**kwargs):
-        pass
-
+    def check_marker_kwargs(self, kwargs):
+        """
+        Check the types of the keyword arguments for marker creation
+        """
+        text = kwargs.get("text", "")
+        if not isinstance(text, str):
+            raise TypeError("text argument is not of str type")
+        for color in (item for item in (prefix + color for prefix in ["active_", "hover_", ""]
+                                        for color in ["background", "foreground", "outline"])):
+            value = kwargs.get(color, "")
+            if not isinstance(value, str):
+                raise TypeError("{} argument not of str type".format(color))
+        font = kwargs.get("font", ("default", 10))
+        if not isinstance(font, tuple) or not len(font) > 0 or not isinstance(font[0], str):
+            raise ValueError("font argument is not a valid font tuple")
+        for border in (prefix + "border" for prefix in ["active_", "hover_", ""]):
+            border_v = kwargs.get(border, 0)
+            if not isinstance(border_v, int) or border_v < 0:
+                raise ValueError("{} argument is not of int type or smaller than zero".format(border))
+        iid = kwargs.get("iid", "-1")
+        if not isinstance(iid, str):
+            raise TypeError("iid argument not of str type")
+        if iid == "":
+            raise ValueError("iid argument empty string")
+        for boolean_arg in ["move", "category_change", "allow_overlap"]:
+            value = kwargs.get(boolean_arg, False)
+            if not isinstance(value, bool):
+                raise TypeError("{} argument is not of bool type".format(boolean_arg))
+        tags = kwargs.get("tags", ())
+        if not isinstance(tags, tuple):
+            raise TypeError("tags argument is not of tuple type")
+        for tag in tags:
+            if not isinstance(tag, str):
+                raise TypeError("one or more values in tags argument is not of str type")
+            if tag not in self._tags:
+                raise ValueError("unknown tag in tags argument")
