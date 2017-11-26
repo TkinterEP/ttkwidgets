@@ -154,6 +154,20 @@ class TestTimeLine(BaseWidgetTest):
         color = timeline._timeline.itemcget(rectangle_id, "fill")
         self.assertEqual(color, "cyan")
 
+    def test_update_state(self):
+        timeline = TimeLine(self.window, categories=("category",))
+        iid = timeline.create_marker("category", 1.0, 2.0, hover_background="yellow")
+        timeline.update_state(iid, "hover")
+        rectangle_id = timeline.markers[iid]["rectangle_id"]
+        color = timeline._timeline.itemcget(rectangle_id, "fill")
+        self.assertEqual(color, "yellow")
+
+    def test_unit_formatting(self):
+        for unit in ["m", "h"]:
+            self.assertEqual(TimeLine.get_time_string(1.0, unit), "01:00")
+            self.assertEqual(TimeLine.get_time_string(1.5, unit), "01:30")
+            self.assertEqual(TimeLine.get_time_string(3.25, unit), "03:15")
+
 
 class MockEvent(object):
     def __init__(self, x, y):
