@@ -11,7 +11,6 @@ except ImportError:
     from tkinter import ttk
 from ttkwidgets.utilities import open_icon
 from collections import OrderedDict
-from math import floor
 
 
 class TimeLine(ttk.Frame):
@@ -55,11 +54,6 @@ class TimeLine(ttk.Frame):
     Labels. This should be fixed by the user by modifying the TimeLine.T(Widget) style.
     """
 
-    # TODO: Automatic break-off of marker text if it's too long to fit inside the marker
-    # TODO: Snap to ticks option
-    # TODO: Implement configure
-    # TODO: Implement cget
-
     def __init__(self, master=None, **kwargs):
         """
         Create a TimeLine widget
@@ -84,6 +78,8 @@ class TimeLine(ttk.Frame):
             * tuple float zoom_factors: tuple of zoom levels, for example (1, 2, 5)         (1, 2, 5)
                 means zoom levels of 1x, 2x and 5x are supported
             * float zoom_default: default zoom value                                        zoom_factors[0]
+            * int snap_margin: amount of pixels between start and or finish of a            15
+                marker and a tick before the marker is snapped into place
             Marker options:
             * tuple marker_font: font tuple to specify the default font for the             ("default", 10)
                 markers
@@ -102,6 +98,8 @@ class TimeLine(ttk.Frame):
                 that when inserting markers, no errors will be raised, even with
                 overlaps, and an overlap-allowing marker is moved over a non-overlap
                 allowing marker, then an overlap will still occur.
+            * bool marker_snap_to_ticks: whether the markers should snap to the ticks       True
+                when close automatically
 
         The style of the buttons can be modified by using the "TimeLine.TButton" style.
         The style of the surrounding Frame can be modified by using the "TimeLine.TFrame" style, or by specifying
@@ -124,6 +122,7 @@ class TimeLine(ttk.Frame):
         self._background = kwargs.pop("background", "gray90")
         self._style = kwargs.get("style", "TimeLine.TFrame")
         self._extend = kwargs.pop("extend", False)
+        self._snap_margin = kwargs.pop("snap_margin", 10)
         kwargs["style"] = self._style
         self._marker_font = kwargs.pop("marker_font", ("default", 10))
         self._marker_background = kwargs.pop("marker_background", "lightblue")
@@ -133,6 +132,7 @@ class TimeLine(ttk.Frame):
         self._marker_move = kwargs.pop("marker_move", True)
         self._marker_change_category = kwargs.pop("marker_change_category", False)
         self._marker_allow_overlap = kwargs.pop("marker_allow_overlap", False)
+        self._marker_snap_to_ticks = kwargs.pop("marker_snap_to_ticks", True)
         # Set up the style
         self.style = ttk.Style()
         self.style.configure(self._style, background=self._background)
@@ -151,12 +151,12 @@ class TimeLine(ttk.Frame):
         self._zoom_factor = self._zoom_factors[0]
         self._markers = {}
         self._canvas_markers = {}  # Canvas ID: (category, marker_iid)
-        self._markers_canvas = {}  # marker_iid: (canvas_rectangle_id, canvas_text_id)
         self._iid = 0
         self._tags = {}
         self._rows = {}
         self._after_id = None
         self._active = None
+        self._ticks = ()
 
         # Time pop-up frame
         self._time_label = None
@@ -268,7 +268,9 @@ class TimeLine(ttk.Frame):
         Create the time marker and the line in the appropriate canvases
         """
         self._time_marker_image = self._canvas_ticks.create_image((2, 16), image=self._time_marker)
-        self._time_marker_line = self._timeline.create_line((2, 0, 2, self._timeline.winfo_height()), fill="#016dc9")
+        self._time_marker_line = self._timeline.create_line(
+            (2, 0, 2, self._timeline.winfo_height()), fill="#016dc9", width=2
+        )
         self._timeline.lift(self._time_marker_line)
         self._timeline.tag_lower("marker")
 
@@ -316,8 +318,8 @@ class TimeLine(ttk.Frame):
         Create the tick markers in the ticks canvas
         """
         self._canvas_ticks.create_line((0, 10, self.pixel_width, 10), fill="black")
-        ticks = list(TimeLine.range(self._start, self._finish, self._tick_resolution / self._zoom_factor))
-        for tick in ticks:
+        self._ticks = list(TimeLine.range(self._start, self._finish, self._tick_resolution / self._zoom_factor))
+        for tick in self._ticks:
             string = TimeLine.get_time_string(tick, self._unit)
             x = self.get_time_position(tick)
             x_tick = x + 1 if x == 0 else (x - 1 if x == self.pixel_width else x)
@@ -345,9 +347,8 @@ class TimeLine(ttk.Frame):
         Create all the markers in a given category dictionary, as in the markers property
         """
         self._canvas_markers.clear()
-        self._markers_canvas.clear()
         for marker in self._markers.values():
-            self.create_marker(marker["category"], marker["start"], marker["finish"], **marker)
+            self.create_marker(marker["category"], marker["start"], marker["finish"], marker)
 
     def __configure_timeline(self, *args):
         """
@@ -363,16 +364,17 @@ class TimeLine(ttk.Frame):
     Functions to add new markers to the TimeLine, as well as edit and remove them
     """
 
-    def create_marker(self, category_v, start_v, finish_v, **kwargs):
+    def create_marker(self, category, start, finish, marker=None, **kwargs):
         """
         Create a new marker in the TimeLine with the specified properties
 
         For the *args, _v appendixes are used in order not to conflict with a marker dictionary as found in
         self._markers
 
-        :param category_v: Category identifier (not text!)
-        :param start_v: Start time for the marker
-        :param finish_v: Finish time for the marker
+        :param category: Category identifier (not text!)
+        :param start: Start time for the marker
+        :param finish: Finish time for the marker
+        :param marker: marker dictionary (replaces kwargs)
         :return: marker iid
         :raise ValueError: One of the specified arguments is invalid
 
@@ -389,12 +391,14 @@ class TimeLine(ttk.Frame):
                 problems such as missing markers may occur. Please use something truly unique.
             * tuple tags: set of tags to apply to this marker, allowing callbacks to be set and other properties
             * bool move: whether the marker is allowed to be moved
+            Additionally, all options with the marker prefix from __init__, but without the prefix
             Active state options: str active_background, str active_foreground, str active_outline, int active_border
             Hover state options: str hover_background, str hover_foreground, str hover_outline, int hover_border
         """
-        if category_v not in self._categories:
-            raise ValueError("category argument not a valid category: {}".format(category_v))
-        if start_v < self._start or finish_v > self._finish:
+        kwargs = kwargs if marker is None else marker
+        if category not in self._categories:
+            raise ValueError("category argument not a valid category: {}".format(category))
+        if start < self._start or finish > self._finish:
             raise ValueError("time out of bounds")
         self.check_marker_kwargs(kwargs)
         # Update the options based on the tags. The last tag always takes precedence over the ones before it, and the
@@ -417,13 +421,14 @@ class TimeLine(ttk.Frame):
         move = kwargs.get("move", "default")
         change_category = kwargs.get("change_category", "default")
         allow_overlap = kwargs.get("allow_overlap", "default")
+        snap_to_ticks = kwargs.get("snap_to_ticks", "default")
         # Calculate pixel positions
-        start_pixel = start_v / self._resolution * self._zoom_factor
-        finish_pixel = finish_v / self._resolution * self._zoom_factor
-        y_start_pixel, y_finish_pixel = self._rows[category_v]
+        x1 = start / self._resolution * self._zoom_factor
+        x2 = finish / self._resolution * self._zoom_factor
+        y1, y2 = self._rows[category]
         # Create the rectangle
-        rectangle = self._timeline.create_rectangle(
-            (start_pixel, y_start_pixel, finish_pixel, y_finish_pixel),
+        rectangle_id = self._timeline.create_rectangle(
+            (x1, y1, x2, y2),
             fill=background if background != "default" else self._marker_background,
             outline=outline if outline != "default" else self._marker_outline,
             tags=("marker",),
@@ -431,61 +436,47 @@ class TimeLine(ttk.Frame):
         )
         # Create the text
         text = kwargs.get("text", None)
-        if text is not None:
-            text_id = self._timeline.create_text(
-                (0, 0), text=text,
-                fill=foreground if foreground != "default" else self._marker_foreground,
-                font=font if font != "default" else self._marker_font,
-                tags=("marker",)
-            )
-            x, y = TimeLine.calculate_text_coords((start_pixel, y_start_pixel, finish_pixel, y_finish_pixel))
-            self._timeline.coords(text_id, (x, y))
-        else:
-            text_id = None
-        # Check category
-        if category_v not in self._categories:
-            raise ValueError("Unknown category given as argument: {}".format(category_v))
-        # If an entry exists, then delete it
-        if iid in self._markers:
-            del self._markers[iid]
+        text_id = self.create_text((x1, y1, x2, y2), text, foreground, font) if text is not None else None
         # Save the marker
+        locals_ = locals()
         self._markers[iid] = {
-            "text": text,
-            "foreground": foreground,
-            "background": background,
-            "outline": outline,
-            "font": font,
-            "iid": iid,
-            "tags": tags,
-            "rectangle_id": rectangle,
-            "text_id": text_id,
-            "category": category_v,
-            "start": start_v,
-            "finish": finish_v,
-            "border": border,
-            "move": move,
-            "change_category": change_category,
-            "allow_overlap": allow_overlap
+            key: (
+                locals_[key.replace("hover_", "").replace("active_", "")] if key in (
+                    prefix + color for prefix in ["", "hover_", "active_"]
+                    for color in ["background", "foreground", "outline", "border"]
+                ) and key not in kwargs else (locals_[key] if key in locals_ else kwargs[key])
+            ) for key in self.marker_options
         }
-        # Add the color options
-        active_options = ["active_foreground", "active_background", "active_outline", "active_border"]
-        hover_options = ["hover_foreground", "hover_background", "hover_outline", "hover_border"]
-        self._markers[iid].update(
-            {option: kwargs.get(option, self._markers[iid][option.split("_")[1]])
-             for option in active_options + hover_options}
-        )
-        # Save the marker
-        self._markers_canvas[iid] = {
-            "rectangle": rectangle,
-            "text": text
-        }
-        self._canvas_markers[rectangle] = iid
+        # Save the marker's Canvas IDs
+        self._canvas_markers[rectangle_id] = iid
         self._canvas_markers[text_id] = iid
         self._timeline.tag_lower("marker")
         # Attempt to prevent duplicate iids
         while str(self._iid) in self.markers:
             self._iid += 1
         return iid
+
+    def create_text(self, coords, text, foreground, font):
+        """
+        Draw the text and shorten it if required
+        """
+        if text is None:
+            return None
+        x1_r, _, x2_r, _ = coords
+        while True:
+            text_id = self._timeline.create_text(
+                (0, 0), text=text,
+                fill=foreground if foreground != "default" else self._marker_foreground,
+                font=font if font != "default" else self._marker_font,
+                tags=("marker",)
+            )
+            x1_t, _, x2_t, _ = self._timeline.bbox(text_id)
+            if (x2_t - x1_t) < (x2_r - x1_r):
+                break
+            text = text[:-4] + "..."
+        x, y = TimeLine.calculate_text_coords(coords)
+        self._timeline.coords(text_id, (x, y))
+        return text_id
 
     def update_marker(self, iid, **kwargs):
         """
@@ -498,10 +489,10 @@ class TimeLine(ttk.Frame):
         if iid not in self._markers:
             raise ValueError("Unknown iid passed as argument: {}".format(iid))
         self.check_kwargs(kwargs)
-        options = self._markers[iid]
-        options.update(kwargs)
+        marker = self._markers[iid]
+        marker.update(kwargs)
         self.delete_marker(iid)
-        return self.create_marker(options["category"], options["start"], options["finish"], **options)
+        return self.create_marker(marker["category"], marker["start"], marker["finish"], marker)
 
     def delete_marker(self, iid):
         """
@@ -512,7 +503,6 @@ class TimeLine(ttk.Frame):
         del self._canvas_markers[rectangle_id]
         del self._canvas_markers[text_id]
         del self._markers[iid]
-        del self._markers_canvas[iid]
         self._timeline.delete(rectangle_id, text_id)
 
     """
@@ -774,7 +764,7 @@ class TimeLine(ttk.Frame):
         if self._extend is False:
             x = min(x, limit)
         elif x > limit:  # self._extend is True
-            self.configure(finish=self.get_position_time(x))
+            self.configure(finish=(self.get_position_time(x) + (marker["finish"] - marker["start"])) * 1.1)
         # Get the new start value
         start = self.get_position_time(x)
         finish = start + (marker["finish"] - marker["start"])
@@ -801,15 +791,31 @@ class TimeLine(ttk.Frame):
                         x = self.get_time_position(start)
                         break
         # Vertical movement
-        if marker["change_category"] is True:
+        if marker["change_category"] is True or \
+                (marker["change_category"] == "default" and self._marker_change_category):
             y = max(self._timeline.canvasy(event.y), 0)
             category = min(self._rows.keys(), key=lambda category: abs(self._rows[category][0] - y))
             marker["category"] = category
             y1, y2 = self._rows[category]
+        # Snapping to ticks
+        if marker["snap_to_ticks"] is True or (marker["snap_to_ticks"] == "default" and self._marker_snap_to_ticks):
+            # Start is prioritized over finish
+            for tick in self._ticks:
+                tick = self.get_time_position(tick)
+                # Start
+                if abs(x - tick) < self._snap_margin:
+                    x = tick
+                    break
+                # Finish
+                delta = self.get_time_position(marker["finish"] - marker["start"])
+                x_finish = x + delta
+                if abs(x_finish - tick) < self._snap_margin:
+                    x = tick - delta
         rectangle_coords = (x, y1, x2 + (x - x1), y2)
         self._timeline.coords(rectangle_id, *rectangle_coords)
-        text_x, text_y = TimeLine.calculate_text_coords(rectangle_coords)
-        self._timeline.coords(text_id, text_x, text_y)
+        if text_id is not None:
+            text_x, text_y = TimeLine.calculate_text_coords(rectangle_coords)
+            self._timeline.coords(text_id, text_x, text_y)
         if self._after_id is not None:
             self.after_cancel(self._after_id)
         args = (iid, (marker["start"], marker["finish"]), (start, finish))
@@ -890,7 +896,6 @@ class TimeLine(ttk.Frame):
                 callback(*args)
         return amount
 
-
     """
     Properties
     
@@ -957,8 +962,15 @@ class TimeLine(ttk.Frame):
             "width", "height", "extend", "start", "finish", "resolution", "tick_resolution", "unit", "zoom_enabled",
             "categories", "background", "style", "zoom_factors", "zoom_default", "marker_font", "marker_background",
             "marker_foreground", "marker_outline", "marker_border", "marker_move", "marker_change_category",
-            "marker_allow_overlap"
+            "marker_allow_overlap", "marker_snap_to_ticks"
         ]
+
+    @property
+    def marker_options(self):
+        return ["category", "start", "finish", "text", "font", "iid", "tags", "move", "rectangle_id", "text_id",
+                "allow_overlap", "change_category", "snap_to_ticks"] + \
+               [prefix + item for prefix in ["hover_", "active_", ""]
+                for item in ["background", "foreground", "outline", "border"]]
 
     """
     Tkinter functions
@@ -968,12 +980,12 @@ class TimeLine(ttk.Frame):
         """
         Update an option of the TimeLine. New marker options are only applied to new markers.
         """
-        print("Configure called with: {}, {}".format(cnf, kwargs))
         kwargs.update(cnf)
         TimeLine.check_kwargs(kwargs)
         for option in self.options:
             attribute = "_" + option
             setattr(self, attribute, kwargs.pop(option, getattr(self, attribute)))
+        ttk.Frame.configure(self, **kwargs)
         self.generate_timeline_contents()
 
     def config(self, cnf={}, **kwargs):
@@ -1010,8 +1022,8 @@ class TimeLine(ttk.Frame):
         """
         Calculate the correct coordinates for text based on the rectangle coordinates
         """
-        return (rectangle_coords[0] + (rectangle_coords[2] - rectangle_coords[0]) / 2,
-                rectangle_coords[1] + (rectangle_coords[3] - rectangle_coords[1]) / 2)
+        return (int(rectangle_coords[0] + (rectangle_coords[2] - rectangle_coords[0]) / 2),
+                int(rectangle_coords[1] + (rectangle_coords[3] - rectangle_coords[1]) / 2))
 
     @staticmethod
     def range(start, finish, step):
@@ -1088,6 +1100,9 @@ class TimeLine(ttk.Frame):
         extend = kwargs.get("extend", False)
         if not isinstance(extend, bool):
             raise TypeError("extend argument is not of bool type")
+        snap_margin = kwargs.get("snap_margin", 10)
+        if not isinstance(snap_margin, int):
+            raise TypeError("snap_margin argument is not of int type")
         # marker options
         marker_font = kwargs.get("marker_font", ("default", 10))
         marker_background = kwargs.get("marker_background", "lightblue")
@@ -1097,6 +1112,7 @@ class TimeLine(ttk.Frame):
         marker_move = kwargs.get("marker_move", True)
         marker_change_category = kwargs.get("marker_change_category", False)
         marker_allow_overlap = kwargs.get("marker_allow_overlap", False)
+        marker_snap_to_ticks = kwargs.get("marker_snap_to_ticks", True)
         if not isinstance(marker_font, tuple) or len(marker_font) == 0:
             raise ValueError("marker_font argument not a valid font tuple")
         if not isinstance(marker_background, str) or not isinstance(marker_foreground, str):
@@ -1113,6 +1129,8 @@ class TimeLine(ttk.Frame):
             raise TypeError("marker_change_category argument is not of bool type")
         if not isinstance(marker_allow_overlap, bool):
             raise TypeError("marker_allow_overlap argument is not of bool type")
+        if not isinstance(marker_snap_to_ticks, bool):
+            raise TypeError("marker_snap_to_ticks argument is not of bool type")
         return
 
     def check_marker_kwargs(self, kwargs):
@@ -1143,7 +1161,7 @@ class TimeLine(ttk.Frame):
             raise TypeError("iid argument not of str type")
         if iid == "":
             raise ValueError("iid argument empty string")
-        for boolean_arg in ["move", "category_change", "allow_overlap"]:
+        for boolean_arg in ["move", "category_change", "allow_overlap", "snap_to_ticks"]:
             value = kwargs.get(boolean_arg, False)
             if value == "default":
                 continue
