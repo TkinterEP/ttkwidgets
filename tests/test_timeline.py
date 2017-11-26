@@ -20,7 +20,7 @@ class TestTimeLine(BaseWidgetTest):
             "categories": ("category_a", "category_b"),
         }
         for key, value in alternates.items():
-            TimeLine(self.window, **{key: value})
+            TimeLine(self.window, **{key: value}).configure({key: value})
 
     def test_kwargs_errors(self):
         timeline = TimeLine(self.window)
