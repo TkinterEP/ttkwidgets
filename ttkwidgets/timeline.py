@@ -1018,8 +1018,10 @@ class TimeLine(ttk.Frame):
         the TimeLine contents.
         """
         rectangle_id, text_id = self._markers[iid]["rectangle_id"], self._markers[iid]["text_id"]
-        self._timeline.itemconfigure(rectangle_id, **rectangle_options)
-        self._timeline.itemconfigure(text_id, **text_options)
+        if len(rectangle_options) != 0:
+            self._timeline.itemconfigure(rectangle_id, **rectangle_options)
+        if len(text_options) != 0:
+            self._timeline.itemconfigure(text_id, **text_options)
 
     """
     Miscellaneous
