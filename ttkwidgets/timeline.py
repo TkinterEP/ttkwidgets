@@ -477,6 +477,7 @@ class TimeLine(ttk.Frame):
             x1_t, _, x2_t, _ = self._timeline.bbox(text_id)
             if (x2_t - x1_t) < (x2_r - x1_r):
                 break
+            self._timeline.delete(text_id)
             text = text[:-4] + "..."
         x, y = TimeLine.calculate_text_coords(coords)
         self._timeline.coords(text_id, (x, y))
