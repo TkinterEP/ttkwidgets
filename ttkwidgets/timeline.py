@@ -80,6 +80,8 @@ class TimeLine(ttk.Frame):
             * float zoom_default: default zoom value                                        zoom_factors[0]
             * int snap_margin: amount of pixels between start and or finish of a            15
                 marker and a tick before the marker is snapped into place
+            * tk.Menu menu: Menu to show when a right-click is performed somewhere          None
+                on the timeline without a marker being active
             Marker options:
             * tuple marker_font: font tuple to specify the default font for the             ("default", 10)
                 markers
@@ -123,6 +125,7 @@ class TimeLine(ttk.Frame):
         self._style = kwargs.get("style", "TimeLine.TFrame")
         self._extend = kwargs.pop("extend", False)
         self._snap_margin = kwargs.pop("snap_margin", 10)
+        self._menu = kwargs.pop("menu", None)
         kwargs["style"] = self._style
         self._marker_font = kwargs.pop("marker_font", ("default", 10))
         self._marker_background = kwargs.pop("marker_background", "lightblue")
@@ -725,6 +728,8 @@ class TimeLine(ttk.Frame):
         """
         iid = self.current_iid
         if iid is None:
+            if self._menu is not None:
+                self._menu.post(event.x, event.y)
             return
         args = (iid, (event.x_root, event.y_root))
         self.call_callbacks(iid, "right_callback", args)
@@ -960,10 +965,12 @@ class TimeLine(ttk.Frame):
     @property
     def options(self):
         return [
+            # TimeLine options
             "width", "height", "extend", "start", "finish", "resolution", "tick_resolution", "unit", "zoom_enabled",
-            "categories", "background", "style", "zoom_factors", "zoom_default", "marker_font", "marker_background",
-            "marker_foreground", "marker_outline", "marker_border", "marker_move", "marker_change_category",
-            "marker_allow_overlap", "marker_snap_to_ticks"
+            "categories", "background", "style", "zoom_factors", "zoom_default", "extend", "menu", "snap_margin",
+            # Marker options
+            "marker_font", "marker_background", "marker_foreground", "marker_outline", "marker_border", "marker_move",
+            "marker_change_category", "marker_allow_overlap", "marker_snap_to_ticks"
         ]
 
     @property
@@ -1101,6 +1108,9 @@ class TimeLine(ttk.Frame):
         snap_margin = kwargs.get("snap_margin", 10)
         if not isinstance(snap_margin, int):
             raise TypeError("snap_margin argument is not of int type")
+        menu = kwargs.get("menu", None)
+        if menu is not None and not isinstance(menu, tk.Menu):
+            raise TypeError("menu argument is not a tk.Menu widget")
         # marker options
         marker_font = kwargs.get("marker_font", ("default", 10))
         marker_background = kwargs.get("marker_background", "lightblue")
@@ -1136,7 +1146,7 @@ class TimeLine(ttk.Frame):
         Check the types of the keyword arguments for marker creation
         """
         text = kwargs.get("text", "")
-        if not isinstance(text, str):
+        if not isinstance(text, str) and text is not None:
             raise TypeError("text argument is not of str type")
         for color in (item for item in (prefix + color for prefix in ["active_", "hover_", ""]
                                         for color in ["background", "foreground", "outline"])):
