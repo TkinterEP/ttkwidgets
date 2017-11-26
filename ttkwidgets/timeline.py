@@ -713,7 +713,7 @@ class TimeLine(ttk.Frame):
             return "{}".format(round(time, 2))
         hours, minutes = str(time).split(".")
         hours = int(hours)
-        minutes = int(round(float(minutes) * 60))
+        minutes = int(round(float("0.{}".format(minutes)) * 60))
         return "{:02d}:{:02d}".format(hours, minutes)
 
     """
