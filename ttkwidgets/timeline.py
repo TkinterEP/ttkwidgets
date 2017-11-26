@@ -528,6 +528,9 @@ class TimeLine(ttk.Frame):
             # Already zoomed in all the way
             return
         self._zoom_factor = self._zoom_factors[index + 1]
+        if self._zoom_factors.index(self.zoom_factor) + 1 == len(self._zoom_factors):
+            self._button_zoom_in.config(state=tk.DISABLED)
+        self._button_zoom_out.config(state=tk.NORMAL)
         self.generate_timeline_contents()
 
     def zoom_out(self):
@@ -539,6 +542,9 @@ class TimeLine(ttk.Frame):
             # Already zoomed out all the way
             return
         self._zoom_factor = self._zoom_factors[index - 1]
+        if self._zoom_factors.index(self._zoom_factor) == 0:
+            self._button_zoom_out.config(state=tk.DISABLED)
+        self._button_zoom_in.config(state=tk.NORMAL)
         self.generate_timeline_contents()
 
     def zoom_reset(self):
@@ -546,6 +552,12 @@ class TimeLine(ttk.Frame):
         Callback for the _button_zoom_reset, to reset the zoom level to its initial value, and then redraw the Canvas
         """
         self._zoom_factor = self._zoom_factors[0] if self._zoom_default == 0 else self._zoom_default
+        if self._zoom_factors.index(self._zoom_factor) == 0:
+            self._button_zoom_out.config(state=tk.DISABLED)
+            self._button_zoom_in.config(state=tk.NORMAL)
+        elif self._zoom_factors.index(self.zoom_factor) + 1 == len(self._zoom_factors):
+            self._button_zoom_out.config(state=tk.NORMAL)
+            self._button_zoom_in.config(state=tk.DISABLED)
         self.generate_timeline_contents()
 
     def set_zoom_factor(self, factor):
