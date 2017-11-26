@@ -168,6 +168,11 @@ class TestTimeLine(BaseWidgetTest):
             self.assertEqual(TimeLine.get_time_string(1.5, unit), "01:30")
             self.assertEqual(TimeLine.get_time_string(3.25, unit), "03:15")
 
+    def test_set_time(self):
+        timeline = TimeLine(self.window)
+        timeline.set_time(2.0)
+        self.assertEqual(timeline.time, 2.0)
+
 
 class MockEvent(object):
     def __init__(self, x, y):
