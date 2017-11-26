@@ -282,9 +282,10 @@ class TimeLine(ttk.Frame):
             label.destroy()
         self._category_labels.clear()
         canvas_width = 0
-        for category, kwargs in (sorted(self._categories.items())
+        for category in (sorted(self._categories.keys() if isinstance(self._categories, dict) else self._categories)
                                  if not isinstance(self._categories, OrderedDict)
                                  else self._categories):
+            kwargs = self._categories[category] if isinstance(self._categories, dict) else {"text": category}
             kwargs["background"] = kwargs.get("background", self._background)
             kwargs["justify"] = kwargs.get("justify", tk.LEFT)
             label = ttk.Label(self._frame_categories, **kwargs)
@@ -1083,11 +1084,8 @@ class TimeLine(ttk.Frame):
             raise ValueError("zoom_default argument does not have a valid value")
         # categories
         categories = kwargs.get("categories", {})
-        if not isinstance(categories, dict):
-            raise TypeError("categories argument not of dict type")
-        if (sum(1 for cat, val in categories.items() if isinstance(cat, str) and isinstance(val, dict)) !=
-                len(categories)):
-            raise ValueError("one or more keys not str type or values not dict type in categories argument")
+        if not isinstance(categories, (dict, tuple)):
+            raise TypeError("categories argument not of dict or tuple type")
         # background
         background = kwargs.get("background", "gray90")
         if not isinstance(background, str):
