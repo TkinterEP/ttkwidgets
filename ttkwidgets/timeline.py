@@ -73,7 +73,7 @@ class TimeLine(ttk.Frame):
             * bool zoom_enabled: whether to allow zooming with the buttons                  True
             * dict categories: a dictionary with the names of the categories as             {}
                 the keys and keyword argument dictionaries as the values
-            * str background: Tkinter-compatible background color for the Canvas            "white"
+            * str background: Tkinter-compatible background color for the Canvas            "gray90"
             * str style: Style for the Frame widget                                         "TimeLine.TFrame"
             * tuple float zoom_factors: tuple of zoom levels, for example (1, 2, 5)         (1, 2, 5)
                 means zoom levels of 1x, 2x and 5x are supported
@@ -477,6 +477,7 @@ class TimeLine(ttk.Frame):
             x1_t, _, x2_t, _ = self._timeline.bbox(text_id)
             if (x2_t - x1_t) < (x2_r - x1_r):
                 break
+            self._timeline.delete(text_id)
             text = text[:-4] + "..."
         x, y = TimeLine.calculate_text_coords(coords)
         self._timeline.coords(text_id, (x, y))
@@ -567,7 +568,19 @@ class TimeLine(ttk.Frame):
     Functions to show the small time frame
     """
 
+    def set_time(self, time):
+        """
+        Allow the user to set the position of the time marker
+        """
+        x = self.get_time_position(time)
+        _, y = self._canvas_ticks.coords(self._time_marker_image)
+        self._canvas_ticks.coords(self._time_marker_image, x, y)
+        self._timeline.coords(self._time_marker_line, x, 0, x, self._timeline.winfo_height())
+
     def time_marker_move(self, event):
+        """
+        Function bound to <B1-Motion> to allow the user to move the time marker
+        """
         limit = self.pixel_width
         x = self._canvas_ticks.canvasx(event.x)
         x = min(max(x, 0), limit)
@@ -577,6 +590,10 @@ class TimeLine(ttk.Frame):
         self.time_show(None)
 
     def time_marker_release(self, event):
+        """
+        Function bound to <B1-Release> to make the time marker window disappear when the movement of the time marker
+        is stopped.
+        """
         if not self._time_visible:
             return
         self._time_label.destroy()
@@ -586,6 +603,9 @@ class TimeLine(ttk.Frame):
         self._time_visible = False
 
     def time_show(self, event):
+        """
+        This function makes the time marker window appear
+        """
         if not self._time_visible:
             self._time_visible = True
             self._time_window = tk.Toplevel(self)

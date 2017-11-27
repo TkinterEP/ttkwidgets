@@ -19,5 +19,6 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `AutocompleteCombobox`, found [here](https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html)
 - [Juliette Monsel](https://www.github.com/j4321)
   * `CheckboxTreeview`
+  * `TickScale`
   * `AutoHideScrollbar` based on an idea by [Fredrik Lundh](effbot.org/zone/tkinter-autoscrollbar.htm)
-  * All color widgets: `askcolor`, `ColorPicker`, `GradientBar` and `ColorSquare`, `LimitVar`, `SpinBox`, `AlphaBar` and supporting functions in `functions.py`. 
+  * All color widgets: `askcolor`, `ColorPicker`, `GradientBar` and `ColorSquare`, `LimitVar`, `SpinBox`, `AlphaBar` and supporting functions in `functions.py`.

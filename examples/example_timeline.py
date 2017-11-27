@@ -13,7 +13,7 @@ timeline = TimeLine(
     height=100, extend=True
 )
 menu = tk.Menu(window, tearoff=False)
-menu.add_command(label="Something")
+menu.add_command(label="Some Action", command=lambda: print("Command Executed"))
 timeline.tag_configure("1", right_callback=lambda *args: print(args), menu=menu, foreground="green",
                        active_background="yellow", hover_border=2, move_callback=lambda *args: print(args))
 timeline.create_marker("1", 1.0, 2.0, background="white", text="Change Color", tags=("1",), iid="1")
