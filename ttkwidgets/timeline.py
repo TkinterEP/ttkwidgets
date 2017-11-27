@@ -813,10 +813,11 @@ class TimeLine(ttk.Frame):
                     x = tick
                     break
                 # Finish
-                delta = self.get_time_position(marker["finish"] - marker["start"])
                 x_finish = x + delta
                 if abs(x_finish - tick) < self._snap_margin:
+                    delta = self.get_time_position(marker["finish"] - marker["start"])
                     x = tick - delta
+                    break
         rectangle_coords = (x, y1, x2 + (x - x1), y2)
         self._timeline.coords(rectangle_id, *rectangle_coords)
         if text_id is not None:
