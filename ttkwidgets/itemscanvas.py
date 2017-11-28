@@ -108,21 +108,21 @@ class ItemsCanvas(ttk.Frame):
         xc, yc = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         dx, dy = xc - self.current_coords[0], yc - self.current_coords[1]
         self.current_coords = xc, yc
-#        x = self._max_x if x > self._max_x else x
-#        y = self._max_y if y > self._max_y else y
-#        x = 0 if x < 0 else x
-#        y = 0 if y < 0 else y
+        # x = self._max_x if x > self._max_x else x
+        # y = self._max_y if y > self._max_y else y
+        # x = 0 if x < 0 else x
+        # y = 0 if y < 0 else y
         self.canvas.move(item, dx, dy)
         self.canvas.move(rectangle, dx, dy)
-#        x1, y1, x2, y2 = self.canvas.coords(rectangle)
-#        if x1 < 0:
-#            x1, x2 = 0, x2 - x1
-#        if y1 < 0:
-#            y1, y2 = 0, y2 - y1
-#        if x2 > self._canvaswidth:
-#            x1, x2 = self._canvaswidth - (x2 - x1), self._canvaswidth
-#        if y2 > self._canvaswidth:
-#            y1, y2 = self._canvaswidth - (y2 - y1), self._canvaswidth
+        # x1, y1, x2, y2 = self.canvas.coords(rectangle)
+        # if x1 < 0:
+        #     x1, x2 = 0, x2 - x1
+        # if y1 < 0:
+        #     y1, y2 = 0, y2 - y1
+        # if x2 > self._canvaswidth:
+        #     x1, x2 = self._canvaswidth - (x2 - x1), self._canvaswidth
+        # if y2 > self._canvaswidth:
+        #     y1, y2 = self._canvaswidth - (y2 - y1), self._canvaswidth
         x, y = self.canvas.coords(item)
         x = self._max_x if x > self._max_x else x
         y = self._max_y if y > self._max_y else y
