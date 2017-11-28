@@ -31,6 +31,7 @@ class ItemsCanvas(ttk.Frame):
         """
         # Setup Frame
         self.current = None
+        self.current_coords = 0, 0
         self.items = {}
         self.item_colors = {}
         # kwarg processing
@@ -69,6 +70,7 @@ class ItemsCanvas(ttk.Frame):
         :param event:
         :return:
         """
+        self.current_coords = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         self.set_current()
         if self.current:
             self.canvas.itemconfigure(self.current, fill=self.item_colors[self.current][1])
@@ -85,7 +87,7 @@ class ItemsCanvas(ttk.Frame):
         Callback for the release of the left button
         """
         self.config(cursor="")
-        if len(self.canvas.find_withtag("current")) != 0:
+        if len(self.canvas.find_withtag("current")) != 0 and self.current is not None:
             self.canvas.itemconfigure(tk.CURRENT, fill=self.item_colors[self.current][1])
 
     def left_motion(self, event):
@@ -103,11 +105,13 @@ class ItemsCanvas(ttk.Frame):
         rectangle = self.items[item]
         self.config(cursor="exchange")
         self.canvas.itemconfigure(item, fill="blue")
-        x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
-        x = self._max_x if x > self._max_x else x
-        y = self._max_y if y > self._max_y else y
-        x = 0 if x < 0 else x
-        y = 0 if y < 0 else y
+        xc, yc = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
+        dx, dy = xc - self.current_coords[0], yc - self.current_coords[1]
+        self.current_coords = xc, yc
+        self.canvas.move(item, dx, dy)
+        # check whether the new position of the item respects the boundaries
+        x, y = self.canvas.coords(item)
+        x, y = max(min(x, self._max_x), 0), max(min(y, self._max_y), 0)
         self.canvas.coords(item, x, y)
         self.canvas.coords(rectangle, self.canvas.bbox(item))
 
