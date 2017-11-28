@@ -110,6 +110,7 @@ class ItemsCanvas(ttk.Frame):
         self.current_coords = xc, yc
         self.canvas.move(item, dx, dy)
         self.canvas.move(rectangle, dx, dy)
+        # check whether the new position of the item respects the boundaries
         x, y = self.canvas.coords(item)
         x = self._max_x if x > self._max_x else x
         y = self._max_y if y > self._max_y else y
