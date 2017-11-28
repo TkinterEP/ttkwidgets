@@ -87,7 +87,7 @@ class ItemsCanvas(ttk.Frame):
         Callback for the release of the left button
         """
         self.config(cursor="")
-        if len(self.canvas.find_withtag("current")) != 0:
+        if len(self.canvas.find_withtag("current")) != 0 and self.current is not None:
             self.canvas.itemconfigure(tk.CURRENT, fill=self.item_colors[self.current][1])
 
     def left_motion(self, event):
