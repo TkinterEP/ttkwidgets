@@ -245,7 +245,7 @@ class TimeLine(ttk.Frame):
 
     """
     Generating TimeLine contents
-    
+
     These functions all play a role in creating items in the canvases
     """
 
@@ -286,8 +286,8 @@ class TimeLine(ttk.Frame):
         self._category_labels.clear()
         canvas_width = 0
         for category in (sorted(self._categories.keys() if isinstance(self._categories, dict) else self._categories)
-                                 if not isinstance(self._categories, OrderedDict)
-                                 else self._categories):
+                         if not isinstance(self._categories, OrderedDict)
+                         else self._categories):
             kwargs = self._categories[category] if isinstance(self._categories, dict) else {"text": category}
             kwargs["background"] = kwargs.get("background", self._background)
             kwargs["justify"] = kwargs.get("justify", tk.LEFT)
@@ -564,7 +564,7 @@ class TimeLine(ttk.Frame):
 
     """
     Time marker functions
-    
+
     Functions to show the small time frame
     """
 
@@ -738,7 +738,7 @@ class TimeLine(ttk.Frame):
 
     """
     Marker manipulation
-    
+
     These functions are bound to Tkinter events and manipulate the markers in some form or another
     """
 
@@ -925,7 +925,7 @@ class TimeLine(ttk.Frame):
 
     """
     Properties
-    
+
     These properties offer up-to-date information about the state of the TimeLine
     """
 
