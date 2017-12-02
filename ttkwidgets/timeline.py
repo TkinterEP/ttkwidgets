@@ -503,6 +503,10 @@ class TimeLine(ttk.Frame):
         """
         Delete a marker from the timeline based on its iid
         """
+        if iid == tk.ALL:
+            for iid in self.markers.keys():
+                self.delete_marker(iid)
+            return
         options = self._markers[iid]
         rectangle_id, text_id = options["rectangle_id"], options["text_id"]
         del self._canvas_markers[rectangle_id]
