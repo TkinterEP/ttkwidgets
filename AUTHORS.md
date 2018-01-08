@@ -8,10 +8,8 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `ScrolledListbox`
   * `FontChooser`, based on an idea by [Nelson Brochado](https://www.github.com/nbro)
   * `FontSelectFrame`
-  * `ScaleEntry`
   * `Balloon`
   * `ItemsCanvas`
-
 - The Python Team
   * `Calendar`, found [here](http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py)
 - Mitja Martini
@@ -21,4 +19,6 @@ This file contains a list of all the authors of widgets in this repository. Plea
 - [Juliette Monsel](https://www.github.com/j4321)
   * `CheckboxTreeview`
   * `AutoHideScrollbar` based on an idea by [Fredrik Lundh](effbot.org/zone/tkinter-autoscrollbar.htm)
-  * All color widgets: `askcolor`, `ColorPicker`, `GradientBar` and `ColorSquare`, `LimitVar`, `SpinBox`, `AlphaBar` and supporting functions in `functions.py`. 
+  * All color widgets: `askcolor`, `ColorPicker`, `GradientBar` and `ColorSquare`, `LimitVar`, `SpinBox`, `AlphaBar` and supporting functions in `functions.py`.
+- Multiple authors:
+  * `ScaleEntry` (RedFantom and Juliette Monsel) 

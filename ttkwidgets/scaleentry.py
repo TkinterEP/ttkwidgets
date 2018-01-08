@@ -1,5 +1,5 @@
 """
-Author: RedFantom
+Author: RedFantom and Juliette Monsel
 License: GNU GPLv3
 Source: This repository
 """
