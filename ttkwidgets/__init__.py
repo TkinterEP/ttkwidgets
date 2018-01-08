@@ -8,3 +8,4 @@ from ttkwidgets.debugwindow import DebugWindow
 from ttkwidgets.checkboxtreeview import CheckboxTreeview
 from ttkwidgets.itemscanvas import ItemsCanvas
 from ttkwidgets.scaleentry import ScaleEntry
+from ttkwidgets.tickscale import TickScale
