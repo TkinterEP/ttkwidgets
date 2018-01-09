@@ -33,10 +33,9 @@ class ScaleEntry(ttk.Frame):
            compound is not tk.BOTTOM:
             raise ValueError("Invalid value for compound passed {0}".format(compound))
         self.__compound = compound
-        try:
-            self.__entryscalepad = int(entryscalepad)
-        except ValueError:
-            raise ValueError("Invalid value for entryscalepad passed {0}".format(entryscalepad))
+        if not isinstance(entryscalepad, int):
+            raise TypeError("entryscalepad not of int type")
+        self.__entryscalepad = entryscalepad
         self._variable = self.LimitedIntVar(from_, to)
         self._scale = ttk.Scale(self, from_=from_, to=to, length=scalewidth,
                                 orient=orient, command=self._on_scale,
@@ -50,12 +49,13 @@ class ScaleEntry(ttk.Frame):
     def _grid_widgets(self):
         """
         Puts the widgets in the correct position based on self.__compound
-        :return: None
         """
         orient = str(self._scale.cget('orient'))
         self._scale.grid(row=2, column=2, sticky='ew' if orient == tk.HORIZONTAL else 'ns',
-                         padx=(0, self.__entryscalepad) if self.__compound is tk.RIGHT else (self.__entryscalepad, 0) if self.__compound is tk.LEFT else 0,
-                         pady=(0, self.__entryscalepad) if self.__compound is tk.BOTTOM else (self.__entryscalepad, 0) if self.__compound is tk.TOP else 0)
+                         padx=(0, self.__entryscalepad) if self.__compound is tk.RIGHT else
+                              (self.__entryscalepad, 0) if self.__compound is tk.LEFT else 0,
+                         pady=(0, self.__entryscalepad) if self.__compound is tk.BOTTOM else
+                              (self.__entryscalepad, 0) if self.__compound is tk.TOP else 0)
         self._entry.grid(row=1 if self.__compound is tk.TOP else 3 if self.__compound is tk.BOTTOM else 2,
                          column=1 if self.__compound is tk.LEFT else 3 if self.__compound is tk.RIGHT else 2)
 
@@ -236,10 +236,7 @@ class ScaleEntry(ttk.Frame):
             the maximum). Both str and int are supported as value types, as long as the str contains an int.
             """
             if not isinstance(value, int):
-                try:
-                    value = int(value)
-                except ValueError:
-                    raise ValueError("value argument passed is not int and cannot be converted to int")
+                raise TypeError("value can only be of int type")
             limited_value = max(min(self._high, value), self._low)
             tk.IntVar.set(self, limited_value)
             # Return False if the value had to be limited
