@@ -80,9 +80,7 @@ class TestScaleEntry(BaseWidgetTest):
         var.configure(high=20)
         self.assertEqual(var._high, 20)
         self.assertEqual(var.get(), 20)
-
-        with self.assertRaises(ValueError):
-            var.set('a')
+        self.assertRaises(TypeError, lambda: var.set('a'))
 
     def test_scaleentry_property(self):
         scale = ScaleEntry(from_=50)
@@ -131,10 +129,7 @@ class TestScaleEntry(BaseWidgetTest):
         with self.assertRaises(ValueError):
             scale['entryscalepad'] = 'a'
 
-
     def test_scaleentry_kwargs(self):
         self.assertRaises(ValueError, lambda: ScaleEntry(compound="something!"))
-
-        with self.assertRaises(ValueError):
-            ScaleEntry(self.window, entryscalepad='a')
+        self.assertRaises(TypeError, lambda: ScaleEntry(self.window, entryscalepad='a'))
 
