@@ -14,5 +14,5 @@ A short description of this particular widget.
 - [ ] Included an example file in `/examples`
 - [ ] Widget is covered by unitttests in `/tests`
 - [ ] Widget includes required assets files
-- [ ] Widget is properly installed using the most up-to-date versions of `pip` and `setuptools`
+- [ ] Reference to widget in `AUTHORS.md`
 
