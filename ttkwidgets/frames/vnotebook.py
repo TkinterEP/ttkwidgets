@@ -131,6 +131,8 @@ class VNotebook(ttk.Frame):
         for button in self._tab_buttons.values():
             button.grid_forget()
         for index, tab_id in enumerate(self._tab_ids):
+            if tab_id in self._hidden and self._hidden[tab_id] is True:
+                continue
             horizontal = self._compound in (tk.BOTTOM, tk.TOP)
             row = index if horizontal is False else 0
             column = index if horizontal is True else 0
@@ -163,11 +165,12 @@ class VNotebook(ttk.Frame):
         else:
             self._tab_ids.insert(where, tab_id)
         self.tab(tab_id, **kwargs)
+        return tab_id
 
     def insert(self, where, child, **kwargs):
         """add() alias with non-optional where argument"""
         kwargs.update({"where": where})
-        self.add(child, **kwargs)
+        return self.add(child, **kwargs)
 
     def enable_traversal(self, enable=True):
         """Setup keybinds for CTRL-TAB to switch tabs"""
@@ -192,7 +195,9 @@ class VNotebook(ttk.Frame):
 
     def hide(self, child, hide=True):
         """Hide or unhide a Tab"""
-        pass
+        tab_id = self.get_id_for_tab(child)
+        self._hidden[tab_id] = hide
+        self.grid_widgets()
 
     def index(self, child):
         """Return zero-indexed index value of a child OR tab_id"""
@@ -316,6 +321,8 @@ if __name__ == '__main__':
     notebook = VNotebook(root, compound=tk.RIGHT)
     notebook.add(ttk.Scale(notebook), text="Scale")
     notebook.add(ttk.Button(notebook, text="Destroy", command=root.destroy), text="Button")
+    id = notebook.add(ttk.Frame(notebook), text="Hidden")
+    notebook.hide(id)
     notebook.enable_traversal()
     notebook.grid(row=1)
     root.mainloop()
