@@ -2,7 +2,7 @@
 
 # Copyright (c) Juliette Monsel 2017
 # For license see LICENSE
-from ttkwidgets import TickScale
+from ttkwidgets.scales import TickScale
 try:
     import Tkinter as tk
     import ttk
