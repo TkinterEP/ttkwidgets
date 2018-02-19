@@ -111,3 +111,28 @@ class AutocompleteEntry(ttk.Entry):
         """
         self.icursor(tk.END)
         self.selection_clear()
+
+    def config(self, **kwargs):
+        """Alias for configure"""
+        self.configure(**kwargs)
+
+    def configure(self, **kwargs):
+        """
+        Configure widget specific keyword arguments in addition to
+        Combobox keyword arguments.
+        """
+        if "completevalues" in kwargs:
+            self.set_completion_list(kwargs.pop("completevalues"))
+        return ttk.Entry.configure(self, **kwargs)
+
+    def cget(self, key):
+        """Return value for widget specific keyword arguments"""
+        if key == "completevalues":
+            return self._completion_list
+        return ttk.Entry.cget(self, key)
+
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
+
+    def __getitem__(self, item):
+        return self.cget(item)

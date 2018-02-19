@@ -35,11 +35,13 @@ class AutocompleteCombobox(ttk.Combobox):
 
     def set_completion_list(self, completion_list):
         """
-        Use our completion list as our drop down selection menu, arrows move through menu.
+        Use our completion list as our drop down selection menu, arrows
+        move through menu.
         :param completion_list: list of values
         :return: None
         """
         self._completion_list = sorted(completion_list, key=str.lower)  # Work with a sorted list
+        self.configure(values=completion_list)
         self._hits = []
         self._hit_index = 0
         self.position = 0
@@ -48,7 +50,8 @@ class AutocompleteCombobox(ttk.Combobox):
 
     def autocomplete(self, delta=0):
         """
-        Autocomplete the Combobox, delta may be 0/1/-1 to cycle through possible hits
+        Autocomplete the Combobox, delta may be 0/1/-1 to cycle through
+        possible hits
         :param delta: int
         :return: None
         """
@@ -101,9 +104,35 @@ class AutocompleteCombobox(ttk.Combobox):
 
     def handle_return(self, event):
         """
-        Function to bind to the Enter/Return key so if Enter is pressed the selection is cleared
+        Function to bind to the Enter/Return key so if Enter is pressed
+        the selection is cleared
         :param event: Tkinter event
         :return: None
         """
         self.icursor(tk.END)
         self.selection_clear()
+
+    def config(self, **kwargs):
+        """Alias for configure"""
+        self.configure(**kwargs)
+
+    def configure(self, **kwargs):
+        """
+        Configure widget specific keyword arguments in addition to
+        Combobox keyword arguments.
+        """
+        if "completevalues" in kwargs:
+            self.set_completion_list(kwargs.pop("completevalues"))
+        return ttk.Combobox.configure(self, **kwargs)
+
+    def cget(self, key):
+        """Return value for widget specific keyword arguments"""
+        if key == "completevalues":
+            return self._completion_list
+        return ttk.Combobox.cget(self, key)
+
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
+
+    def __getitem__(self, item):
+        return self.cget(item)
