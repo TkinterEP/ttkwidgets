@@ -7,6 +7,7 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `LinkLabel`, based on an idea by [Nelson Brochado](https://www.github.com/nbro)
   * `ScrolledListbox`
   * `FontChooser`, based on an idea by [Nelson Brochado](https://www.github.com/nbro)
+  * `Console`, based on pytkcon by [Samy Zafrany](https://github.com/samyzaf/pytkcon/blob/master/pytkcon.py)
   * `FontSelectFrame`
   * `Balloon`
   * `ItemsCanvas`
