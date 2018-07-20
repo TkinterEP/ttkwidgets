@@ -6,8 +6,12 @@ Created on Thu Jul 19 14:38:49 2018
 @author: juliette
 """
 
-import tkinter as tk
-from tkinter import ttk
+try:
+    import tkinter as tk
+    from tkinter import ttk
+except ImportError:
+    import Tkinter as tk
+    import ttk
 from PIL import ImageTk, Image
 from ttkwidgets.utilities import get_assets_directory, os
 
