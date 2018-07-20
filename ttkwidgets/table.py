@@ -24,8 +24,8 @@ class Table(ttk.Treeview):
 
     __initialized = False  # to kwnow whether class bindings and Table layout have been created yet
 
-    def __init__(self, master=None, show='headings', drag_cols=True, sortable=True,
-                 class_='Table', **kwargs):
+    def __init__(self, master=None, show='headings', drag_cols=True, drag_rows=True,
+                 sortable=True, class_='Table', **kwargs):
         """
         Construct a Table with parent master.
 
@@ -33,6 +33,7 @@ class Table(ttk.Treeview):
 
             master: parent window
             drag_cols: boolean to set whether columns are draggable
+            drag_rows: boolean to set whether rows are draggable
             sortable: boolean to set whether columns are sortable by clicking on
                       their headings (the type of data (str, float ...) can be
                       set with the column method)
@@ -45,6 +46,7 @@ class Table(ttk.Treeview):
         self._visual_drag = ttk.Treeview(self, show=show, **kwargs)
 
         # specific options
+        self._drag_rows = bool(drag_rows)
         self._drag_cols = bool(drag_cols)
         self._im_draggable = Image.open(IM_DRAG)
         self._im_not_draggable = Image.new('RGBA', self._im_draggable.size)
@@ -71,10 +73,15 @@ class Table(ttk.Treeview):
         # distance between cursor and column left border
         # (needed to drag around self._visual_drag)
         self._dx = 0
+        self._dy = 0
+        self._dragged_row = None  # row being dragged
         self._dragged_col = None  # column being dragged
-        self._dragged_col_width = 0  # column being dragged
+        self._dragged_col_width = 0
+        self._dragged_row_height = 0
         self._dragged_col_x = 0  # x coordinate of the dragged column upper left corner
+        self._dragged_row_y = 0  # y coordinate of the dragged column upper left corner
         self._dragged_col_neighbor_widths = (None, None)
+        self._dragged_row_neighbor_heights = (None, None)
         self._dragged_col_index = None
 
         self.config = self.configure
@@ -102,7 +109,7 @@ class Table(ttk.Treeview):
     def __getitem__(self, key):
         return self.cget(key)
 
-    def _swap(self, side):
+    def _swap_columns(self, side):
         """Swap dragged column with its side (=left/right) neighbor."""
         displayed_cols = list(self["displaycolumns"])
         if displayed_cols[0] == "#all":
@@ -130,10 +137,29 @@ class Table(ttk.Treeview):
             self._dragged_col_index = i2
             self._dragged_col_neighbor_widths = (left, right)
 
+    def _swap_rows(self, side):
+        """Swap dragged row with its side (=above/below) neighbor."""
+        if side == 'above':
+            prev_it = self.prev(self._dragged_row)
+            if prev_it:
+                self.move(self._dragged_row, '', self.index(prev_it))
+        else:
+            next_it = self.next(self._dragged_row)
+            if next_it:
+                self.move(self._dragged_row, '', self.index(next_it))
+        self.see(self._dragged_row)
+        bbox = self.bbox(self._dragged_row)
+        if bbox:
+            self._dragged_row_y = bbox[1]
+            self._dragged_row_height = bbox[3]
+        self._visual_drag.see(self._dragged_row)
+
     def _on_press(self, event):
         """Start dragging column on left click."""
-        if self._drag_cols and 'disabled' not in self.state():
-            if self.identify_region(event.x, event.y) == 'heading':
+        if 'disabled' not in self.state():
+            region = self.identify_region(event.x, event.y)
+            # --- column dragging
+            if self._drag_cols and region == 'heading':
                 col = self.identify_column(event.x)
                 self._dragged_col = ttk.Treeview.column(self, col, 'id')
                 # get column width
@@ -168,33 +194,81 @@ class Table(ttk.Treeview):
                     self._dx = x - event.x
                     self._visual_drag.column(self._dragged_col, width=w)
                     self._visual_drag.configure(displaycolumns=[self._dragged_col])
+                    if 'headings' in tuple(str(p) for p in self['show']):
+                        self._visual_drag.configure(show='headings')
+                    else:
+                        self._visual_drag.configure(show='')
                     self._visual_drag.place(in_=self, x=x, y=0, anchor='nw',
                                             width=w + 2, relheight=1)
                     self._visual_drag.state(('active', ))
                     self._visual_drag.yview_moveto(self.yview()[0])
                 else:
                     self._dragged_col = None
-            else:
-                self._dragged_col = None
+            # --- row dragging
+            elif self._drag_rows and region == 'cell':
+                self._dragged_row = self.identify_row(event.y)
+                self._visual_drag.configure(displaycolumns=self['displaycolumns'],
+                                            height=1)
+                if 'tree' in tuple(str(p) for p in self['show']):
+                    self._visual_drag.configure(show='tree')
+                else:
+                    self._visual_drag.configure(show='')
+                bbox = self.bbox(self._dragged_row)
+                self._dy = bbox[1] - event.y
+                self._dragged_row_y = bbox[1]
+                self._dragged_row_height = bbox[3]
+                prev_it = self.prev(self._dragged_row)
+                if prev_it != '':
+                    above = self.bbox(prev_it)[3]
+                else:
+                    above = None
+                next_it =  self.next(self._dragged_row)
+                if next_it != '':
+                    below = self.bbox(next_it)[3]
+                else:
+                    below = None
+                self._dragged_row_neighbor_heights = (above, below)
+                self._visual_drag.place(in_=self, x=0, y=bbox[1],
+                                        height=self._visual_drag.winfo_reqheight() + 2,
+                                        anchor='nw', relwidth=1)
+                self._visual_drag.selection_add(self._dragged_row)
+                self.selection_remove(self._dragged_row)
+                self._visual_drag.update_idletasks()
+                self._visual_drag.see(self._dragged_row)
 
     def _on_release(self, event):
         """Stop dragging."""
-        if self._drag_cols:
+        if self._drag_cols or self._drag_rows:
             self._visual_drag.place_forget()
+            self._dragged_col = None
+            self._dragged_row = None
 
     def _on_motion(self, event):
         """Drag around label if visible."""
-        if self._drag_cols and self._visual_drag.winfo_ismapped():
-            x = self._dx + event.x
-            self._visual_drag.place_configure(x=x)
-            # if one border of the dragged column is beyon the middle of the
-            # neighboring column, swap them
-            if (self._dragged_col_neighbor_widths[0] is not None and
-               x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
-                self._swap('left')
-            elif (self._dragged_col_neighbor_widths[1] is not None and
-                  x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
-                self._swap('right')
+        if self._visual_drag.winfo_ismapped():
+            # --- column dragging
+            if self._drag_cols and self._dragged_col is not None:
+                x = self._dx + event.x
+                self._visual_drag.place_configure(x=x)
+                # if one border of the dragged column is beyon the middle of the
+                # neighboring column, swap them
+                if (self._dragged_col_neighbor_widths[0] is not None and
+                   x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
+                    self._swap_columns('left')
+                elif (self._dragged_col_neighbor_widths[1] is not None and
+                      x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
+                    self._swap_columns('right')
+            # --- row dragging
+            elif self._drag_rows and self._dragged_row is not None:
+                y = self._dy + event.y
+                self._visual_drag.place_configure(y=y)
+                if (self._dragged_row_neighbor_heights[0] is not None and
+                   y < self._dragged_row_y - self._dragged_row_neighbor_heights[0] / 2):
+                    self._swap_rows('above')
+                elif (self._dragged_row_neighbor_heights[1] is not None and
+                      y > self._dragged_row_y + self._dragged_row_neighbor_heights[1] / 2):
+                    self._swap_rows('below')
+                self.selection_remove(self._dragged_row)
 
     def _sort_column(self, column, reverse):
         """Sort column."""
@@ -368,4 +442,4 @@ if __name__ == '__main__':
 
     ttk.Button(root, text='toggle sort', command=toggle_sort).grid()
     ttk.Button(root, text='toggle drag', command=toggle_drag).grid()
-#    root.mainloop()
+    root.mainloop()
