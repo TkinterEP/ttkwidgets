@@ -10,3 +10,4 @@ from ttkwidgets.itemscanvas import ItemsCanvas
 from ttkwidgets.scaleentry import ScaleEntry
 from ttkwidgets.timeline import TimeLine
 from ttkwidgets.tickscale import TickScale
+from ttkwidgets.table import Table
