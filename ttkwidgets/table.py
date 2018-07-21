@@ -1,10 +1,12 @@
-#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jul 19 14:38:49 2018
+Author: Juliette Monsel
+License: GNU GPLv3
+Source: This repository
 
-@author: juliette
+Table made out of a Treeview with possibility to drag rows and columns and to sort columns.
 """
+# TODO: there are some small glitches about the dragged column content the first time\
 
 try:
     import tkinter as tk
@@ -21,9 +23,11 @@ IM_DRAG = os.path.join(get_assets_directory(), "drag.png")
 
 class Table(ttk.Treeview):
     """
-    Table widget displays a table with optionally draggable and/or sortable columns.
+    Table widget displays a table with options to drag rows and columns and
+    to sort columns.
 
-    This widget is based on the ttk.Treeview and shares many options and methods with it.
+    This widget is based on the ttk.Treeview and shares many options and methods
+    with it.
     """
 
     __initialized = False  # to kwnow whether class bindings and Table layout have been created yet
@@ -213,6 +217,8 @@ class Table(ttk.Treeview):
                 self._dragged_row = self.identify_row(event.y)
                 self._visual_drag.configure(displaycolumns=self['displaycolumns'],
                                             height=1)
+                for col in self['columns']:
+                    self._visual_drag.column(col, width=self.column(col, 'width'))
                 if 'tree' in tuple(str(p) for p in self['show']):
                     self._visual_drag.configure(show='tree')
                 else:
@@ -223,12 +229,20 @@ class Table(ttk.Treeview):
                 self._dragged_row_height = bbox[3]
                 prev_it = self.prev(self._dragged_row)
                 if prev_it != '':
-                    above = self.bbox(prev_it)[3]
+                    bbox_prev = self.bbox(prev_it)
+                    if not bbox_prev:
+                        above = None
+                    else:
+                        above = self.bbox(prev_it)[3]
                 else:
                     above = None
                 next_it = self.next(self._dragged_row)
                 if next_it != '':
-                    below = self.bbox(next_it)[3]
+                    bbox_next = self.bbox(next_it)
+                    if not bbox_next:
+                        below = None
+                    else:
+                        below = bbox_next[3]
                 else:
                     below = None
                 self._dragged_row_neighbor_heights = (above, below)
@@ -256,21 +270,17 @@ class Table(ttk.Treeview):
                 self._visual_drag.place_configure(x=x)
                 # if one border of the dragged column is beyon the middle of the
                 # neighboring column, swap them
-                if (self._dragged_col_neighbor_widths[0] is not None and
-                   x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
+                if (self._dragged_col_neighbor_widths[0] is not None and x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
                     self._swap_columns('left')
-                elif (self._dragged_col_neighbor_widths[1] is not None and
-                      x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
+                elif (self._dragged_col_neighbor_widths[1] is not None and x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
                     self._swap_columns('right')
             # --- row dragging
             elif self._drag_rows and self._dragged_row is not None:
                 y = self._dy + event.y
                 self._visual_drag.place_configure(y=y)
-                if (self._dragged_row_neighbor_heights[0] is not None and
-                   y < self._dragged_row_y - self._dragged_row_neighbor_heights[0] / 2):
+                if (self._dragged_row_neighbor_heights[0] is not None and y < self._dragged_row_y - self._dragged_row_neighbor_heights[0] / 2):
                     self._swap_rows('above')
-                elif (self._dragged_row_neighbor_heights[1] is not None and
-                      y > self._dragged_row_y + self._dragged_row_neighbor_heights[1] / 2):
+                elif (self._dragged_row_neighbor_heights[1] is not None and y > self._dragged_row_y + self._dragged_row_neighbor_heights[1] / 2):
                     self._swap_rows('below')
                 self.selection_remove(self._dragged_row)
 
@@ -362,10 +372,12 @@ class Table(ttk.Treeview):
             kw2 = kw.copy()
             kw2.pop('displaycolumns', None)
             kw2.pop('xscrollcommand', None)
+            kw2.pop('yscrollcommand', None)
             if isinstance(cnf, dict):
                 cnf2 = cnf.copy()
                 cnf2.pop('displaycolumns', None)
                 cnf2.pop('xscrollcommand', None)
+                cnf2.pop('yscrollcommand', None)
             else:
                 cnf2 = cnf
             self._visual_drag.configure(cnf2, **kw2)
@@ -416,44 +428,3 @@ class Table(ttk.Treeview):
     def set_children(self, item, *newchildren):
         self._visual_drag.set_children(item, *newchildren)
         ttk.Treeview.set_children(self, item, *newchildren)
-
-
-if __name__ == '__main__':
-
-    root = tk.Tk()
-    root.columnconfigure(0, weight=1)
-    root.rowconfigure(0, weight=1)
-    sortable = tk.BooleanVar(root, False)
-    drag_row = tk.BooleanVar(root, False)
-    drag_col = tk.BooleanVar(root, False)
-    columns = ["A", "B", "C", "D", "E", "F", "G"]
-    tree = Table(root, columns=columns, sortable=sortable.get(), drag_cols=drag_col.get(),
-                 drag_rows=drag_row.get())
-    tree.column('A', type=int)
-    for col in columns:
-        tree.heading(col, text=col)
-
-    for i in range(20):
-        tree.insert('', 'end', iid=i,
-                    values=tuple(i + 0 * 10 for j in range(7)))
-
-    sx = ttk.Scrollbar(root, orient='horizontal', command=tree.xview)
-    sy = ttk.Scrollbar(root, orient='vertical', command=tree.yview)
-    tree.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
-    tree.grid(sticky='ewns')
-    sx.grid(row=1, column=0, sticky='ew')
-    sy.grid(row=0, column=1, sticky='ns')
-
-    def toggle_sort():
-        tree.config(sortable=sortable.get())
-
-    def toggle_drag_col():
-        tree.config(drag_cols=drag_col.get())
-
-    def toggle_drag_row():
-        tree.config(drag_rows=drag_row.get())
-
-    tk.Checkbutton(root, text='sortable', variable=sortable, command=toggle_sort, indicatoron=False).grid()
-    tk.Checkbutton(root, text='drag columns', variable=drag_col, command=toggle_drag_col, indicatoron=False).grid()
-    tk.Checkbutton(root, text='drag rows', variable=drag_row, command=toggle_drag_row, indicatoron=False).grid()
-    root.mainloop()

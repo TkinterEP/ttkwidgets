@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Juliette Monsel 2017
+# Copyright (c) Juliette Monsel 2018
 # For license see LICENSE
 
 from ttkwidgets import Table
