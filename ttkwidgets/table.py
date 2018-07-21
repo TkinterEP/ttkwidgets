@@ -31,8 +31,8 @@ class Table(ttk.Treeview):
     This widget is based on the ttk.Treeview and shares many options and methods
     with it.
     """
-
-    __initialized = False  # to kwnow whether class bindings and Table layout have been created yet
+    _init = False
+    _initialized = False  # to kwnow whether class bindings and Table layout have been created yet
 
     def __init__(self, master=None, show='headings', drag_cols=True, drag_rows=True,
                  sortable=True, class_='Table', **kwargs):
@@ -71,10 +71,15 @@ class Table(ttk.Treeview):
         self._column_types = {col: str for col in self['columns']}
 
         # style and class bindings initialization
-        if not self.__initialized:
-            self.__initialize_style()
+        if not Table._initialized:
+            self._initialize_style()
             for seq in self.bind_class('Treeview'):
                 self.bind_class('Table', seq, self.bind_class('Treeview', seq))
+                print(seq)
+            Table._initialized = True
+
+        if not self['style']:
+            self['style'] = 'Table'
 
         self.bind("<ButtonPress-1>", self._on_press)
         self.bind("<ButtonRelease-1>", self._on_release)
@@ -96,7 +101,7 @@ class Table(ttk.Treeview):
 
         self.config = self.configure
 
-    def __initialize_style(self):
+    def _initialize_style(self):
         style = ttk.Style(self)
         style.layout('Table', style.layout('Treeview'))
         style.layout('Table.Heading',
@@ -129,9 +134,6 @@ class Table(ttk.Treeview):
         style_map_heading = style.map('Treeview.Heading')
         background = style_map_heading.get('background', [])
         style.map('Table.Heading', **style_map_heading)
-
-        if not self['style']:
-            self['style'] = 'Table'
 
     def __setitem__(self, key, value):
         self.configure(**{key: value})

@@ -43,7 +43,7 @@ table.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
 table.grid(sticky='ewns')
 sx.grid(row=1, column=0, sticky='ew')
 sy.grid(row=0, column=1, sticky='ns')
-
+root.update_idletasks()
 
 # toggle table properties
 def toggle_sort():
