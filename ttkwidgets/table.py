@@ -287,6 +287,8 @@ class Table(ttk.Treeview):
             return self._sortable
         elif key == 'drag_cols':
             return self._drag_cols
+        elif key == 'drag_rows':
+            return self._drag_rows
         else:
             return ttk.Treeview.cget(self, key)
 
@@ -318,6 +320,8 @@ class Table(ttk.Treeview):
     def configure(self, cnf=None, **kw):
         if cnf == 'drag_cols':
             return ('drag_cols', self._drag_cols)
+        elif cnf == 'drag_rows':
+            return ('drag_rows', self._drag_rows)
         elif cnf == 'sortable':
             return ('sortable', self._sortable)
         else:
@@ -343,6 +347,9 @@ class Table(ttk.Treeview):
                         self._im_drag.paste(self._im_not_draggable)
                     self.focus_set()
                     self.update_idletasks()
+            if 'drag_rows' in kw:
+                config = True
+                self._drag_rows = bool(kw.pop('drag_rows'))
             if 'columns' in kw:
                 for col in list(self._column_types.keys()):
                     if col not in kw['columns']:
@@ -415,10 +422,12 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
-    sortable = False
-    drag = False
+    sortable = tk.BooleanVar(root, False)
+    drag_row =  tk.BooleanVar(root, False)
+    drag_col =  tk.BooleanVar(root, False)
     columns = ["A", "B", "C", "D", "E", "F", "G"]
-    tree = Table(root, columns=columns, sortable=sortable, drag_cols=drag)
+    tree = Table(root, columns=columns, sortable=sortable.get(), drag_cols=drag_col.get(),
+                 drag_rows=drag_row.get())
     tree.column('A', type=int)
     for col in columns:
         tree.heading(col, text=col)
@@ -435,15 +444,18 @@ if __name__ == '__main__':
     sy.grid(row=0, column=1, sticky='ns')
 
     def toggle_sort():
-        global sortable
-        sortable = not sortable
-        tree.config(sortable=sortable)
+#        sortable.set(not sortable.get())
+        tree.config(sortable=sortable.get())
 
-    def toggle_drag():
-        global drag
-        drag = not drag
-        tree.config(drag_cols=drag)
+    def toggle_drag_col():
+#        drag_col.set(not drag_col.get())
+        tree.config(drag_cols=drag_col.get())
 
-    ttk.Button(root, text='toggle sort', command=toggle_sort).grid()
-    ttk.Button(root, text='toggle drag', command=toggle_drag).grid()
-    root.mainloop()
+    def toggle_drag_row():
+#        drag_row.set(not drag_row.get())
+        tree.config(drag_rows=drag_row.get())
+
+    tk.Checkbutton(root, text='sortable', variable=sortable, command=toggle_sort, indicatoron=False).grid()
+    tk.Checkbutton(root, text='drag columns', variable=drag_col, command=toggle_drag_col, indicatoron=False).grid()
+    tk.Checkbutton(root, text='drag rows', variable=drag_row, command=toggle_drag_row, indicatoron=False).grid()
+#    root.mainloop()
