@@ -226,7 +226,7 @@ class Table(ttk.Treeview):
                     above = self.bbox(prev_it)[3]
                 else:
                     above = None
-                next_it =  self.next(self._dragged_row)
+                next_it = self.next(self._dragged_row)
                 if next_it != '':
                     below = self.bbox(next_it)[3]
                 else:
@@ -424,8 +424,8 @@ if __name__ == '__main__':
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     sortable = tk.BooleanVar(root, False)
-    drag_row =  tk.BooleanVar(root, False)
-    drag_col =  tk.BooleanVar(root, False)
+    drag_row = tk.BooleanVar(root, False)
+    drag_col = tk.BooleanVar(root, False)
     columns = ["A", "B", "C", "D", "E", "F", "G"]
     tree = Table(root, columns=columns, sortable=sortable.get(), drag_cols=drag_col.get(),
                  drag_rows=drag_row.get())
