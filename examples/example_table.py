@@ -31,7 +31,7 @@ for col in columns:
 # sort column A content as int instead of strings
 table.column('A', type=int)
 
-for i in range(10):
+for i in range(12):
     table.insert('', 'end', iid=i,
                  values=(i, i) + tuple(i + 10 * j for j in range(2, 7)))
 
@@ -44,6 +44,7 @@ table.grid(sticky='ewns')
 sx.grid(row=1, column=0, sticky='ew')
 sy.grid(row=0, column=1, sticky='ns')
 root.update_idletasks()
+
 
 # toggle table properties
 def toggle_sort():

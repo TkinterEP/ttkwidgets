@@ -6,7 +6,6 @@ Source: This repository
 
 Table made out of a Treeview with possibility to drag rows and columns and to sort columns.
 """
-# TODO: issues when dragging row and using mousewheel
 # TODO: check whether everything looks fine in windows
 # TODO: scroll horizontally when swapping columns like for rows?
 
@@ -75,7 +74,6 @@ class Table(ttk.Treeview):
             self._initialize_style()
             for seq in self.bind_class('Treeview'):
                 self.bind_class('Table', seq, self.bind_class('Treeview', seq))
-                print(seq)
             Table._initialized = True
 
         if not self['style']:
@@ -96,7 +94,6 @@ class Table(ttk.Treeview):
         self._dragged_col_x = 0  # x coordinate of the dragged column upper left corner
         self._dragged_row_y = 0  # y coordinate of the dragged column upper left corner
         self._dragged_col_neighbor_widths = (None, None)
-        self._dragged_row_neighbor_heights = (None, None)
         self._dragged_col_index = None
 
         self.config = self.configure
@@ -169,16 +166,9 @@ class Table(ttk.Treeview):
             self._dragged_col_index = i2
             self._dragged_col_neighbor_widths = (left, right)
 
-    def _swap_rows(self, side):
+    def _move_dragged_row(self, item):
         """Swap dragged row with its side (=above/below) neighbor."""
-        if side == 'above':
-            prev_it = self.prev(self._dragged_row)
-            if prev_it:
-                self.move(self._dragged_row, '', self.index(prev_it))
-        else:
-            next_it = self.next(self._dragged_row)
-            if next_it:
-                self.move(self._dragged_row, '', self.index(next_it))
+        self.move(self._dragged_row, '', self.index(item))
         self.see(self._dragged_row)
         bbox = self.bbox(self._dragged_row)
         if bbox:
@@ -252,25 +242,6 @@ class Table(ttk.Treeview):
                 self._dy = bbox[1] - event.y
                 self._dragged_row_y = bbox[1]
                 self._dragged_row_height = bbox[3]
-                prev_it = self.prev(self._dragged_row)
-                if prev_it != '':
-                    bbox_prev = self.bbox(prev_it)
-                    if not bbox_prev:
-                        above = None
-                    else:
-                        above = self.bbox(prev_it)[3]
-                else:
-                    above = None
-                next_it = self.next(self._dragged_row)
-                if next_it != '':
-                    bbox_next = self.bbox(next_it)
-                    if not bbox_next:
-                        below = None
-                    else:
-                        below = bbox_next[3]
-                else:
-                    below = None
-                self._dragged_row_neighbor_heights = (above, below)
                 self._visual_drag.place(in_=self, x=0, y=bbox[1],
                                         height=self._visual_drag.winfo_reqheight() + 2,
                                         anchor='nw', relwidth=1)
@@ -278,6 +249,8 @@ class Table(ttk.Treeview):
                 self.selection_remove(self._dragged_row)
                 self._visual_drag.update_idletasks()
                 self._visual_drag.see(self._dragged_row)
+                self._visual_drag.update_idletasks()
+                self._visual_drag.xview_moveto(self.xview()[0])
 
     def _on_release(self, event):
         """Stop dragging."""
@@ -301,12 +274,43 @@ class Table(ttk.Treeview):
                     self._swap_columns('right')
             # --- row dragging
             elif self._drag_rows and self._dragged_row is not None:
+                # get dragged row new upper y coordinate
                 y = self._dy + event.y
+                # update row position
                 self._visual_drag.place_configure(y=y)
-                if (self._dragged_row_neighbor_heights[0] is not None and y < self._dragged_row_y - self._dragged_row_neighbor_heights[0] / 2):
-                    self._swap_rows('above')
-                elif (self._dragged_row_neighbor_heights[1] is not None and y > self._dragged_row_y + self._dragged_row_neighbor_heights[1] / 2):
-                    self._swap_rows('below')
+
+                if y > self._dragged_row_y:
+                    # moving downward
+                    item = self.identify_row(y + self._dragged_row_height)
+                    if item != '':
+                        bbox = self.bbox(item)
+                        if not bbox:
+                            # the item is not visible so make it visible
+                            self.see(item)
+                            self.update_idletasks()
+                            bbox = self.bbox(item)
+                        if y > self._dragged_row_y + bbox[3] / 2:
+                            # the row is beyond half of item, so insert it below
+                            self._move_dragged_row(item)
+                        elif item != self.next(self._dragged_row):
+                            # item is not the lower neighbor of the dragged row so insert the row above
+                            self._move_dragged_row(self.prev(item))
+                elif y < self._dragged_row_y:
+                    # moving upward
+                    item = self.identify_row(y)
+                    if item != '':
+                        bbox = self.bbox(item)
+                        if not bbox:
+                            # the item is not visible so make it visible
+                            self.see(item)
+                            self.update_idletasks()
+                            bbox = self.bbox(item)
+                        if y < self._dragged_row_y - bbox[3] / 2:
+                            # the row is beyond half of item, so insert it above
+                            self._move_dragged_row(item)
+                        elif item != self.prev(self._dragged_row):
+                            # item is not the upper neighbor of the dragged row so insert the row below
+                            self._move_dragged_row(self.next(item))
                 self.selection_remove(self._dragged_row)
 
     def _sort_column(self, column, reverse):
