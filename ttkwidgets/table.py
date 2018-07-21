@@ -51,7 +51,7 @@ class Table(ttk.Treeview):
 
         """
         ttk.Treeview.__init__(self, master, show=show, **kwargs)
-        # copy of the Treeview to show the dragged column
+        # copy of the Treeview to show the dragged column/row
         self._visual_drag = ttk.Treeview(self, show=show, **kwargs)
 
         # specific options
@@ -79,6 +79,7 @@ class Table(ttk.Treeview):
         if not self['style']:
             self['style'] = 'Table'
 
+        # drag bindings
         self.bind("<ButtonPress-1>", self._on_press)
         self.bind("<ButtonRelease-1>", self._on_release)
         self.bind("<Motion>", self._on_motion)
@@ -146,59 +147,66 @@ class Table(ttk.Treeview):
         i1 = self._dragged_col_index
         i2 = i1 + 1 if side == 'right' else i1 - 1
         if 0 <= i2 < len(displayed_cols):
+            # there is a neighbor, swap columns:
             displayed_cols[i1] = displayed_cols[i2]
             displayed_cols[i2] = self._dragged_col
             self["displaycolumns"] = displayed_cols
             if side == 'left':
                 right = self._dragged_col_neighbor_widths[0]
-                self._dragged_col_x -= right
+                self._dragged_col_x -= right  # update dragged column x coordinate
+                # set new left neighbor width
                 if i2 > 0:
                     left = ttk.Treeview.column(self, displayed_cols[i2 - 1], 'width')
                 else:
                     left = None
             else:
                 left = self._dragged_col_neighbor_widths[1]
-                self._dragged_col_x += left
+                self._dragged_col_x += left  # update x coordinate of dragged column
+                # set new right neighbor width
                 if i2 < len(displayed_cols) - 1:
                     right = ttk.Treeview.column(self, displayed_cols[i2 + 1], 'width')
                 else:
                     right = None
-            self._dragged_col_index = i2
+            self._dragged_col_index = i2  # update dragged column index
             self._dragged_col_neighbor_widths = (left, right)
 
     def _move_dragged_row(self, item):
-        """Swap dragged row with its side (=above/below) neighbor."""
+        """Insert dragged row at item's position."""
         self.move(self._dragged_row, '', self.index(item))
         self.see(self._dragged_row)
         bbox = self.bbox(self._dragged_row)
-        if bbox:
-            self._dragged_row_y = bbox[1]
-            self._dragged_row_height = bbox[3]
+        self._dragged_row_y = bbox[1]
+        self._dragged_row_height = bbox[3]
         self._visual_drag.see(self._dragged_row)
 
     def _on_press(self, event):
-        """Start dragging column on left click."""
+        """Start dragging column/row on left click."""
         if 'disabled' not in self.state():
             region = self.identify_region(event.x, event.y)
+
             # --- column dragging
             if self._drag_cols and region == 'heading':
+                # identify dre=agged column
                 col = self.identify_column(event.x)
                 self._dragged_col = ttk.Treeview.column(self, col, 'id')
                 # get column width
                 self._dragged_col_width = w = ttk.Treeview.column(self, col, 'width')
-                # get x coordinate of the upper left corner of the column
+                # get x coordinate of the left side of the column
                 x = event.x
                 while self.identify_region(x, event.y) == 'heading':
+                    # decrease x until reaching the separator
                     x -= 1
                 x_sep = x
                 w_sep = 0
+                # determine sepaartor width
                 while self.identify_region(x_sep, event.y) == 'separator':
                     w_sep += 1
                     x_sep -= 1
-                if event.x - x <= self._im_drag.width():  # start dragging
+                if event.x - x <= self._im_drag.width():
+                    # start dragging if mouse click was on dragging icon
                     x = x - w_sep // 2 - 1
                     self._dragged_col_x = x
-                    # neighboring columns
+                    # get neighboring column widths
                     displayed_cols = list(self["displaycolumns"])
                     if displayed_cols[0] == "#all":
                         displayed_cols = list(self["columns"])
@@ -212,8 +220,8 @@ class Table(ttk.Treeview):
                     else:
                         right = None
                     self._dragged_col_neighbor_widths = (left, right)
-                    # distance between cursor and column left border
-                    self._dx = x - event.x
+                    self._dx = x - event.x  # distance between cursor and column left border
+                    # configure dragged column preview
                     self._visual_drag.column(self._dragged_col, width=w)
                     self._visual_drag.configure(displaycolumns=[self._dragged_col])
                     if 'headings' in tuple(str(p) for p in self['show']):
@@ -227,9 +235,15 @@ class Table(ttk.Treeview):
                     self._visual_drag.yview_moveto(self.yview()[0])
                 else:
                     self._dragged_col = None
+
             # --- row dragging
             elif self._drag_rows and region == 'cell':
-                self._dragged_row = self.identify_row(event.y)
+                self._dragged_row = self.identify_row(event.y)  # identify dragged row
+                bbox = self.bbox(self._dragged_row)
+                self._dy = bbox[1] - event.y   # distance between cursor and row upper border
+                self._dragged_row_y = bbox[1]  # y coordinate of dragged row upper border
+                self._dragged_row_height = bbox[3]
+                # configure dragged row preview
                 self._visual_drag.configure(displaycolumns=self['displaycolumns'],
                                             height=1)
                 for col in self['columns']:
@@ -238,10 +252,6 @@ class Table(ttk.Treeview):
                     self._visual_drag.configure(show='tree')
                 else:
                     self._visual_drag.configure(show='')
-                bbox = self.bbox(self._dragged_row)
-                self._dy = bbox[1] - event.y
-                self._dragged_row_y = bbox[1]
-                self._dragged_row_height = bbox[3]
                 self._visual_drag.place(in_=self, x=0, y=bbox[1],
                                         height=self._visual_drag.winfo_reqheight() + 2,
                                         anchor='nw', relwidth=1)
@@ -262,22 +272,22 @@ class Table(ttk.Treeview):
     def _on_motion(self, event):
         """Drag around label if visible."""
         if self._visual_drag.winfo_ismapped():
+
             # --- column dragging
             if self._drag_cols and self._dragged_col is not None:
-                x = self._dx + event.x
-                self._visual_drag.place_configure(x=x)
+                x = self._dx + event.x  # get dragged column new left x coordinate
+                self._visual_drag.place_configure(x=x)  # update column preview position
                 # if one border of the dragged column is beyon the middle of the
                 # neighboring column, swap them
                 if (self._dragged_col_neighbor_widths[0] is not None and x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
                     self._swap_columns('left')
                 elif (self._dragged_col_neighbor_widths[1] is not None and x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
                     self._swap_columns('right')
+
             # --- row dragging
             elif self._drag_rows and self._dragged_row is not None:
-                # get dragged row new upper y coordinate
-                y = self._dy + event.y
-                # update row position
-                self._visual_drag.place_configure(y=y)
+                y = self._dy + event.y  # get dragged row new upper y coordinate
+                self._visual_drag.place_configure(y=y)  # update row preview position
 
                 if y > self._dragged_row_y:
                     # moving downward
@@ -316,10 +326,14 @@ class Table(ttk.Treeview):
     def _sort_column(self, column, reverse):
         """Sort column."""
         if 'disabled' not in self.state():
-            l = [(self.set(k, column), k) for k in self.get_children('')]
+            # get list of (value, item) tuple where value is the value in column for the item
+            l = [(self.set(child, column), child) for child in self.get_children('')]
+            # sort list using the column type
             l.sort(reverse=reverse, key=lambda x: self._column_types[column](x[0]))
-            for index, (val, k) in enumerate(l):
-                self.move(k, "", index)
+            # reorder items
+            for index, (val, child) in enumerate(l):
+                self.move(child, "", index)
+            # reverse sorting direction for the next time
             self.heading(column, command=lambda: self._sort_column(column, not reverse))
 
     def cget(self, key):
@@ -381,6 +395,7 @@ class Table(ttk.Treeview):
                 drag_cols = bool(kw.pop('drag_cols'))
                 if drag_cols != self._drag_cols:
                     self._drag_cols = drag_cols
+                    # remove/display drag icon
                     if self._drag_cols:
                         self._im_drag.paste(self._im_draggable)
                     else:
@@ -391,13 +406,14 @@ class Table(ttk.Treeview):
                 config = True
                 self._drag_rows = bool(kw.pop('drag_rows'))
             if 'columns' in kw:
+                # update column type dict
                 for col in list(self._column_types.keys()):
                     if col not in kw['columns']:
                         del self._column_types[col]
                 for col in kw['columns']:
                     if col not in self._column_types:
                         self._column_types[col] = str
-
+            # remove some keywords from the preview configuarion dict
             kw2 = kw.copy()
             kw2.pop('displaycolumns', None)
             kw2.pop('xscrollcommand', None)
@@ -423,6 +439,7 @@ class Table(ttk.Treeview):
 
     def heading(self, column, option=None, **kw):
         if kw and not kw.get('image'):
+            # put by default the drag icon as image of the heading
             kw['image'] = self._im_drag
         if kw:
             self._visual_drag.heading(ttk.Treeview.column(self, column, 'id'), option, **kw)
