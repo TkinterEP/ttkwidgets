@@ -6,14 +6,18 @@
 from ttkwidgets import Table
 try:
     import Tkinter as tk
+    import ttk
 except ImportError:
     import tkinter as tk
+    from tkinter import ttk
 
 root = tk.Tk()
 
 root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
 
+style = ttk.Style(root)
+style.theme_use('alt')
 sortable = tk.BooleanVar(root, False)
 drag_row = tk.BooleanVar(root, False)
 drag_col = tk.BooleanVar(root, False)
@@ -59,5 +63,4 @@ tk.Checkbutton(frame, text='sortable', variable=sortable, command=toggle_sort).p
 tk.Checkbutton(frame, text='drag columns', variable=drag_col, command=toggle_drag_col).pack(side='left')
 tk.Checkbutton(frame, text='drag rows', variable=drag_row, command=toggle_drag_row).pack(side='left')
 frame.grid()
-
 root.mainloop()

@@ -6,7 +6,9 @@ Source: This repository
 
 Table made out of a Treeview with possibility to drag rows and columns and to sort columns.
 """
-# TODO: there are some small glitches about the dragged column content the first time\
+# TODO: issues when dragging row and using mousewheel
+# TODO: check whether everything looks fine in windows
+# TODO: scroll horizontally when swapping columns like for rows?
 
 try:
     import tkinter as tk
@@ -105,8 +107,28 @@ class Table(ttk.Treeview):
                                       {'sticky': 'nswe',
                                        'children': [('Treeheading.image', {'side': 'left', 'sticky': ''}),
                                                     ('Treeheading.text', {'sticky': 'we'})]})]})])
-        style.configure('Table', **style.configure('Treeview'))
-        style.map('Table', **style.map('Treeview'))
+        config = style.configure('Treeview')
+        if config:
+            style.configure('Table', **config)
+        config_heading = style.configure('Treeview.Heading')
+        if config_heading:
+            style.configure('Table.Heading', **config_heading)
+        style_map = style.map('Treeview')
+        # add noticeable disabled style
+        fieldbackground = style_map.get('fieldbackground', [])
+        fieldbackground.append(("disabled", '#E6E6E6'))
+        style_map['fieldbackground'] = fieldbackground
+        foreground = style_map.get('foreground', [])
+        foreground.append(("disabled", 'gray40'))
+        style_map['foreground'] = foreground
+        background = style_map.get('background', [])
+        background.append(("disabled", '#E6E6E6'))
+        style_map['background'] = background
+        style.map('Table', **style_map)
+
+        style_map_heading = style.map('Treeview.Heading')
+        background = style_map_heading.get('background', [])
+        style.map('Table.Heading', **style_map_heading)
 
         if not self['style']:
             self['style'] = 'Table'
@@ -209,6 +231,7 @@ class Table(ttk.Treeview):
                     self._visual_drag.place(in_=self, x=x, y=0, anchor='nw',
                                             width=w + 2, relheight=1)
                     self._visual_drag.state(('active', ))
+                    self._visual_drag.update_idletasks()
                     self._visual_drag.yview_moveto(self.yview()[0])
                 else:
                     self._dragged_col = None
