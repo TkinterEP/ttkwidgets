@@ -276,11 +276,12 @@ class Table(ttk.Treeview):
 
     def _sort_column(self, column, reverse):
         """Sort column."""
-        l = [(self.set(k, column), k) for k in self.get_children('')]
-        l.sort(reverse=reverse, key=lambda x: self._column_types[column](x[0]))
-        for index, (val, k) in enumerate(l):
-            self.move(k, "", index)
-        self.heading(column, command=lambda: self._sort_column(column, not reverse))
+        if 'disabled' not in self.state():
+            l = [(self.set(k, column), k) for k in self.get_children('')]
+            l.sort(reverse=reverse, key=lambda x: self._column_types[column](x[0]))
+            for index, (val, k) in enumerate(l):
+                self.move(k, "", index)
+            self.heading(column, command=lambda: self._sort_column(column, not reverse))
 
     def cget(self, key):
         if key == 'sortable':
@@ -444,18 +445,15 @@ if __name__ == '__main__':
     sy.grid(row=0, column=1, sticky='ns')
 
     def toggle_sort():
-#        sortable.set(not sortable.get())
         tree.config(sortable=sortable.get())
 
     def toggle_drag_col():
-#        drag_col.set(not drag_col.get())
         tree.config(drag_cols=drag_col.get())
 
     def toggle_drag_row():
-#        drag_row.set(not drag_row.get())
         tree.config(drag_rows=drag_row.get())
 
     tk.Checkbutton(root, text='sortable', variable=sortable, command=toggle_sort, indicatoron=False).grid()
     tk.Checkbutton(root, text='drag columns', variable=drag_col, command=toggle_drag_col, indicatoron=False).grid()
     tk.Checkbutton(root, text='drag rows', variable=drag_row, command=toggle_drag_row, indicatoron=False).grid()
-#    root.mainloop()
+    root.mainloop()
