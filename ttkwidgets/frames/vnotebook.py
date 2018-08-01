@@ -124,7 +124,6 @@ class VNotebook(ttk.Frame):
             self.__current_tab.grid_forget()
         for button in self._tab_buttons.values():
             button.grid_forget()
-        return
 
     def _grid_tabs(self):
         """Organize tab buttons"""
@@ -151,7 +150,7 @@ class VNotebook(ttk.Frame):
             supports:
             :param id: ID for the newly added Tab. If the ID is not
                 given, one is generated automatically.
-            :param where: Position of the new Notebook
+            :param index: Position of the new Notebook
         :return: ID for the new Tab
         """
         tab_id = kwargs.pop("id", hash(child))
@@ -159,7 +158,7 @@ class VNotebook(ttk.Frame):
             self._buttons_frame, variable=self._variable, value=tab_id)
         self._tab_frames[tab_id] = child
         # Process where argument
-        where = kwargs.pop("where", tk.END)
+        where = kwargs.pop("index", tk.END)
         if where == tk.END:
             self._tab_ids.append(tab_id)
         else:
@@ -167,22 +166,26 @@ class VNotebook(ttk.Frame):
         self.tab(tab_id, **kwargs)
         return tab_id
 
-    def insert(self, where, child, **kwargs):
+    def insert(self, index, child, **kwargs):
         """add() alias with non-optional where argument"""
-        kwargs.update({"where": where})
+        kwargs.update({"index": index})
         return self.add(child, **kwargs)
 
     def enable_traversal(self, enable=True):
         """Setup keybinds for CTRL-TAB to switch tabs"""
         if enable is True:
             func = "bind"
-            args = ("<Control-Tab>", self.__switch_tab,)
+            args = ("<Control-Tab>", self._switch_tab,)
         else:
             func = "unbind"
             args = ("<Control-Tab>",)
         for widget in (self, self._buttons_frame, self._separator) + tuple(self._tab_frames.values()):
             getattr(widget, func)(*args)
         return enable
+
+    def disable_traversal(self):
+        """Alias of self.enable_traversal(enable=False)"""
+        return self.enable_traversal(enable=False)
 
     def forget(self, child):
         """Remove a child by widget or tab_id"""
@@ -197,7 +200,13 @@ class VNotebook(ttk.Frame):
         """Hide or unhide a Tab"""
         tab_id = self.get_id_for_tab(child)
         self._hidden[tab_id] = hide
+        if tab_id == self.active and len(self._tab_ids) != 1:
+            self.activate(self._tab_ids[0])
         self.grid_widgets()
+
+    def show(self, child):
+        """Alias for hide(hide=False)"""
+        return self.hide(child, hide=False)
 
     def index(self, child):
         """Return zero-indexed index value of a child OR tab_id"""
@@ -210,50 +219,30 @@ class VNotebook(ttk.Frame):
         :param tab_id: Non-optional tab ID of the tab to be configured
         :param option: If not None, function returns value for option
             key given in this argument
-
-        :param compound: Determines position of image in the Tab Button
-            if an image is given
-        :param padding: Amount of space around the frame
-        :param sticky: Passed on to grid function called upon the
-            notebook tab frame
-        :param image: Image that is shown on the tab Button
-        :param text: Text that is shown on the tab Button
-        :param underline: Whether the text for the Button is underlined.
-            This argument should be a bool value, which does not match
-            the ttk.Notebook behaviour!
-
-        :param font: Font tuple or instance passed on to Button. If
-            font is given, underline is ignored.
         """
         if option is not None:
             return self._tab_buttons[tab_id].cget(option)
         # Argument processing
-        font = kwargs.pop("font", None)
-        underline = kwargs.pop("underline", False)
         self._frame_padding[tab_id] = \
-            (kwargs.pop("padding", 0), kwargs.pop("sticky", tk.N))
+            (kwargs.pop("padding", self._padding), kwargs.pop("sticky", tk.N))
         kwargs["command"] = lambda tab_id=tab_id: self.activate(tab_id)
         kwargs["style"] = "Toolbutton"
-        # Process underline if font argument is Font type
-        if isinstance(font, Font):
-            if underline != font.cget("underline"):
-                font.configure(underline=underline)
-            kwargs["font"] = font
         # Configure Buttons
         self._tab_buttons[tab_id].configure(**kwargs)
         self._grid_tabs()
 
     def tab_configure(self, tab_id, **kwargs):
         """configure alias for self.tab"""
-        self.tab(tab_id, **kwargs)
+        return self.tab(tab_id, **kwargs)
 
     def tab_cget(self, tab_id, key):
         """cget alias for self.tab"""
-        self.tab(tab_id, option=key)
+        return self.tab(tab_id, option=key)
 
+    @property
     def tabs(self):
         """Return list of tab IDs"""
-        return self._tab_ids
+        return self._tab_ids.copy()
 
     def config(self, **kwargs):
         """Alias for self.configure"""
@@ -303,7 +292,7 @@ class VNotebook(ttk.Frame):
             return child
         return {widget: tab_id for tab_id, widget in self._tab_frames.items()}[child]
 
-    def __switch_tab(self, event):
+    def _switch_tab(self, event):
         """Callback for CTRL-TAB"""
         if self.active is None:
             self.activate(self._tab_ids[0])
@@ -321,8 +310,11 @@ if __name__ == '__main__':
     notebook = VNotebook(root, compound=tk.RIGHT)
     notebook.add(ttk.Scale(notebook), text="Scale")
     notebook.add(ttk.Button(notebook, text="Destroy", command=root.destroy), text="Button")
-    id = notebook.add(ttk.Frame(notebook), text="Hidden")
-    notebook.hide(id)
+    frame = ttk.Frame(notebook)
+    id = notebook.add(frame, text="Hidden")
+    def callback():
+        notebook.hide(id)
+    ttk.Button(frame, command=callback, text="Hide").grid()
     notebook.enable_traversal()
     notebook.grid(row=1)
     root.mainloop()
