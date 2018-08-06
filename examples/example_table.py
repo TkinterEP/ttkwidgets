@@ -27,6 +27,7 @@ table = Table(root, columns=columns, sortable=sortable.get(), drag_cols=drag_col
               drag_rows=drag_row.get(), height=6)
 for col in columns:
     table.heading(col, text=col)
+    table.column(col, width=100, stretch=False)
 
 # sort column A content as int instead of strings
 table.column('A', type=int)
@@ -64,4 +65,6 @@ tk.Checkbutton(frame, text='sortable', variable=sortable, command=toggle_sort).p
 tk.Checkbutton(frame, text='drag columns', variable=drag_col, command=toggle_drag_col).pack(side='left')
 tk.Checkbutton(frame, text='drag rows', variable=drag_row, command=toggle_drag_row).pack(side='left')
 frame.grid()
+root.geometry('400x200')
+
 root.mainloop()

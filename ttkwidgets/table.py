@@ -7,7 +7,6 @@ Source: This repository
 Table made out of a Treeview with possibility to drag rows and columns and to sort columns.
 """
 # TODO: check whether everything looks fine in windows
-# TODO: scroll horizontally when swapping columns like for rows?
 
 try:
     import tkinter as tk
@@ -30,7 +29,6 @@ class Table(ttk.Treeview):
     This widget is based on the ttk.Treeview and shares many options and methods
     with it.
     """
-    _init = False
     _initialized = False  # to kwnow whether class bindings and Table layout have been created yet
 
     def __init__(self, master=None, show='headings', drag_cols=True, drag_rows=True,
@@ -198,7 +196,7 @@ class Table(ttk.Treeview):
                     x -= 1
                 x_sep = x
                 w_sep = 0
-                # determine sepaartor width
+                # determine separator width
                 while self.identify_region(x_sep, event.y) == 'separator':
                     w_sep += 1
                     x_sep -= 1
@@ -283,6 +281,12 @@ class Table(ttk.Treeview):
                     self._swap_columns('left')
                 elif (self._dragged_col_neighbor_widths[1] is not None and x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
                     self._swap_columns('right')
+                if x < 0 and self.xview()[0] > 0:
+                    self.xview_scroll(-10, 'units')
+                    self._dragged_col_x += 10
+                elif x + self._dragged_col_width / 2 > self.winfo_width() and self.xview()[1] < 1:
+                    self.xview_scroll(10, 'units')
+                    self._dragged_col_x -= 10
 
             # --- row dragging
             elif self._drag_rows and self._dragged_row is not None:
