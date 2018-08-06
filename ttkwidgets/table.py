@@ -42,8 +42,8 @@ class Table(ttk.Treeview):
             drag_cols: boolean to set whether columns are draggable
             drag_rows: boolean to set whether rows are draggable
             sortable: boolean to set whether columns are sortable by clicking on
-                      their headings (the type of data (str, float ...) can be
-                      set with the column method)
+                      their headings. The sorting order depends on the type of
+                      data (str, float, ...) which can be set with the column method.
             show: which parts of the treeview to show (same as the Treeview option)
             **kwargs: all ttk.Treeview options
 
@@ -82,16 +82,14 @@ class Table(ttk.Treeview):
         self.bind("<ButtonRelease-1>", self._on_release)
         self.bind("<Motion>", self._on_motion)
 
-        # distance between cursor and column left border
-        # (needed to drag around self._visual_drag)
-        self._dx = 0
-        self._dy = 0
-        self._dragged_row = None  # row being dragged
-        self._dragged_col = None  # column being dragged
-        self._dragged_col_width = 0
-        self._dragged_row_height = 0
-        self._dragged_col_x = 0  # x coordinate of the dragged column upper left corner
-        self._dragged_row_y = 0  # y coordinate of the dragged column upper left corner
+        self._dx = 0  # distance between cursor and column left border (needed to drag around self._visual_drag)
+        self._dy = 0  # distance between cursor and row upper border (needed to drag around self._visual_drag)
+        self._dragged_row = None      # row being dragged
+        self._dragged_col = None      # column being dragged
+        self._dragged_col_width = 0   # dragged column width
+        self._dragged_row_height = 0  # dragged row height
+        self._dragged_col_x = 0       # x coordinate of the dragged column left border
+        self._dragged_row_y = 0       # y coordinate of the dragged row upper border
         self._dragged_col_neighbor_widths = (None, None)
         self._dragged_col_index = None
 
@@ -281,10 +279,13 @@ class Table(ttk.Treeview):
                     self._swap_columns('left')
                 elif (self._dragged_col_neighbor_widths[1] is not None and x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
                     self._swap_columns('right')
+                # horizontal scrolling if the cursor reaches the side of the table
                 if x < 0 and self.xview()[0] > 0:
+                    # scroll left and update dragged column x coordinate
                     self.xview_scroll(-10, 'units')
                     self._dragged_col_x += 10
                 elif x + self._dragged_col_width / 2 > self.winfo_width() and self.xview()[1] < 1:
+                    # scroll right and update dragged column x coordinate
                     self.xview_scroll(10, 'units')
                     self._dragged_col_x -= 10
 
