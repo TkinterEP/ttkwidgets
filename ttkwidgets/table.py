@@ -459,10 +459,9 @@ class Table(ttk.Treeview):
         ttk.Treeview.detach(self, *items)
 
     def heading(self, column, option=None, **kw):
-        if kw and not kw.get('image'):
-            # put by default the drag icon as image of the heading
-            kw['image'] = self._im_drag
         if kw:
+            # Set the default image of the heading to the drag icon
+            kw.setdefault("image", self._im_drag)
             self._visual_drag.heading(ttk.Treeview.column(self, column, 'id'), option, **kw)
         return ttk.Treeview.heading(self, column, option, **kw)
 
