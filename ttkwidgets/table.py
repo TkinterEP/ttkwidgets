@@ -126,7 +126,6 @@ class Table(ttk.Treeview):
         style.map('Table', **style_map)
 
         style_map_heading = style.map('Treeview.Heading')
-        background = style_map_heading.get('background', [])
         style.map('Table.Heading', **style_map_heading)
 
     def __setitem__(self, key, value):
