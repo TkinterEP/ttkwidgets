@@ -182,83 +182,88 @@ class Table(ttk.Treeview):
 
         region = self.identify_region(event.x, event.y)
 
-        # --- column dragging
         if self._drag_cols and region == 'heading':
-            # identify dragged column
-            col = self.identify_column(event.x)
-            self._dragged_col = ttk.Treeview.column(self, col, 'id')
-            # get column width
-            self._dragged_col_width = w = ttk.Treeview.column(self, col, 'width')
-            # get x coordinate of the left side of the column
-            x = event.x
-            while self.identify_region(x, event.y) == 'heading':
-                # decrease x until reaching the separator
-                x -= 1
-            x_sep = x
-            w_sep = 0
-            # determine separator width
-            while self.identify_region(x_sep, event.y) == 'separator':
-                w_sep += 1
-                x_sep -= 1
-            if event.x - x <= self._im_drag.width():
-                # start dragging if mouse click was on dragging icon
-                x = x - w_sep // 2 - 1
-                self._dragged_col_x = x
-                # get neighboring column widths
-                displayed_cols = list(self["displaycolumns"])
-                if displayed_cols[0] == "#all":
-                    displayed_cols = list(self["columns"])
-                self._dragged_col_index = i1 = displayed_cols.index(self._dragged_col)
-                if i1 > 0:
-                    left = ttk.Treeview.column(self, displayed_cols[i1 - 1], 'width')
-                else:
-                    left = None
-                if i1 < len(displayed_cols) - 1:
-                    right = ttk.Treeview.column(self, displayed_cols[i1 + 1], 'width')
-                else:
-                    right = None
-                self._dragged_col_neighbor_widths = (left, right)
-                self._dx = x - event.x  # distance between cursor and column left border
-                # configure dragged column preview
-                self._visual_drag.column(self._dragged_col, width=w)
-                self._visual_drag.configure(displaycolumns=[self._dragged_col])
-                if 'headings' in tuple(str(p) for p in self['show']):
-                    self._visual_drag.configure(show='headings')
-                else:
-                    self._visual_drag.configure(show='')
-                self._visual_drag.place(in_=self, x=x, y=0, anchor='nw',
-                                        width=w + 2, relheight=1)
-                self._visual_drag.state(('active', ))
-                self._visual_drag.update_idletasks()
-                self._visual_drag.yview_moveto(self.yview()[0])
-            else:
-                self._dragged_col = None
-
-        # --- row dragging
+            self._start_drag_col(event)
         elif self._drag_rows and region == 'cell':
-            self._dragged_row = self.identify_row(event.y)  # identify dragged row
-            bbox = self.bbox(self._dragged_row)
-            self._dy = bbox[1] - event.y   # distance between cursor and row upper border
-            self._dragged_row_y = bbox[1]  # y coordinate of dragged row upper border
-            self._dragged_row_height = bbox[3]
-            # configure dragged row preview
-            self._visual_drag.configure(displaycolumns=self['displaycolumns'],
-                                        height=1)
-            for col in self['columns']:
-                self._visual_drag.column(col, width=self.column(col, 'width'))
-            if 'tree' in tuple(str(p) for p in self['show']):
-                self._visual_drag.configure(show='tree')
+            self._start_drag_row(event)
+
+    def _start_drag_col(self, event):
+        """Start dragging a column"""
+        # identify dragged column
+        col = self.identify_column(event.x)
+        self._dragged_col = ttk.Treeview.column(self, col, 'id')
+        # get column width
+        self._dragged_col_width = w = ttk.Treeview.column(self, col, 'width')
+        # get x coordinate of the left side of the column
+        x = event.x
+        while self.identify_region(x, event.y) == 'heading':
+            # decrease x until reaching the separator
+            x -= 1
+        x_sep = x
+        w_sep = 0
+        # determine separator width
+        while self.identify_region(x_sep, event.y) == 'separator':
+            w_sep += 1
+            x_sep -= 1
+        if event.x - x <= self._im_drag.width():
+            # start dragging if mouse click was on dragging icon
+            x = x - w_sep // 2 - 1
+            self._dragged_col_x = x
+            # get neighboring column widths
+            displayed_cols = list(self["displaycolumns"])
+            if displayed_cols[0] == "#all":
+                displayed_cols = list(self["columns"])
+            self._dragged_col_index = i1 = displayed_cols.index(self._dragged_col)
+            if i1 > 0:
+                left = ttk.Treeview.column(self, displayed_cols[i1 - 1], 'width')
+            else:
+                left = None
+            if i1 < len(displayed_cols) - 1:
+                right = ttk.Treeview.column(self, displayed_cols[i1 + 1], 'width')
+            else:
+                right = None
+            self._dragged_col_neighbor_widths = (left, right)
+            self._dx = x - event.x  # distance between cursor and column left border
+            # configure dragged column preview
+            self._visual_drag.column(self._dragged_col, width=w)
+            self._visual_drag.configure(displaycolumns=[self._dragged_col])
+            if 'headings' in tuple(str(p) for p in self['show']):
+                self._visual_drag.configure(show='headings')
             else:
                 self._visual_drag.configure(show='')
-            self._visual_drag.place(in_=self, x=0, y=bbox[1],
-                                    height=self._visual_drag.winfo_reqheight() + 2,
-                                    anchor='nw', relwidth=1)
-            self._visual_drag.selection_add(self._dragged_row)
-            self.selection_remove(self._dragged_row)
+            self._visual_drag.place(in_=self, x=x, y=0, anchor='nw',
+                                    width=w + 2, relheight=1)
+            self._visual_drag.state(('active',))
             self._visual_drag.update_idletasks()
-            self._visual_drag.see(self._dragged_row)
-            self._visual_drag.update_idletasks()
-            self._visual_drag.xview_moveto(self.xview()[0])
+            self._visual_drag.yview_moveto(self.yview()[0])
+        else:
+            self._dragged_col = None
+
+    def _start_drag_row(self, event):
+        """Start dragging a row"""
+        self._dragged_row = self.identify_row(event.y)  # identify dragged row
+        bbox = self.bbox(self._dragged_row)
+        self._dy = bbox[1] - event.y  # distance between cursor and row upper border
+        self._dragged_row_y = bbox[1]  # y coordinate of dragged row upper border
+        self._dragged_row_height = bbox[3]
+        # configure dragged row preview
+        self._visual_drag.configure(displaycolumns=self['displaycolumns'],
+                                    height=1)
+        for col in self['columns']:
+            self._visual_drag.column(col, width=self.column(col, 'width'))
+        if 'tree' in tuple(str(p) for p in self['show']):
+            self._visual_drag.configure(show='tree')
+        else:
+            self._visual_drag.configure(show='')
+        self._visual_drag.place(in_=self, x=0, y=bbox[1],
+                                height=self._visual_drag.winfo_reqheight() + 2,
+                                anchor='nw', relwidth=1)
+        self._visual_drag.selection_add(self._dragged_row)
+        self.selection_remove(self._dragged_row)
+        self._visual_drag.update_idletasks()
+        self._visual_drag.see(self._dragged_row)
+        self._visual_drag.update_idletasks()
+        self._visual_drag.xview_moveto(self.xview()[0])
 
     def _on_release(self, event):
         """Stop dragging."""
