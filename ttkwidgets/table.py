@@ -60,9 +60,7 @@ class Table(ttk.Treeview):
         else:
             self._im_drag = ImageTk.PhotoImage(self._im_not_draggable, master=self)
         self._sortable = bool(sortable)
-        if self._sortable:
-            for col in self['columns']:
-                self.heading(col, command=lambda c=col: self._sort_column(c, True))
+        self._config_options()
         self._column_types = {col: str for col in self['columns']}
 
         # style and class bindings initialization
@@ -393,62 +391,67 @@ class Table(ttk.Treeview):
             return res
 
     def configure(self, cnf=None, **kw):
+        """Configure widget options"""
         if cnf == 'drag_cols':
-            return ('drag_cols', self._drag_cols)
+            return 'drag_cols', self._drag_cols
         elif cnf == 'drag_rows':
-            return ('drag_rows', self._drag_rows)
+            return 'drag_rows', self._drag_rows
         elif cnf == 'sortable':
-            return ('sortable', self._sortable)
+            return 'sortable', self._sortable
+
+        sortable = bool(kw.pop("sortable", self._sortable))
+        if sortable != self._sortable:
+            self._config_sortable(sortable)
+        drag_cols = bool(kw.pop("drag_cols", self._drag_cols))
+        if drag_cols != self._drag_cols:
+            self._config_drag_cols(drag_cols)
+        self._drag_rows = bool(kw.pop("drag_rows", self._drag_rows))
+        if 'columns' in kw:
+            # update column type dict
+            for col in list(self._column_types.keys()):
+                if col not in kw['columns']:
+                    del self._column_types[col]
+            for col in kw['columns']:
+                if col not in self._column_types:
+                    self._column_types[col] = str
+        # Remove some keywords from the preview configuration dict
+        kw2 = kw.copy()
+        kw2.pop('displaycolumns', None)
+        kw2.pop('xscrollcommand', None)
+        kw2.pop('yscrollcommand', None)
+        if isinstance(cnf, dict):
+            cnf2 = cnf.copy()
+            cnf2.pop('displaycolumns', None)
+            cnf2.pop('xscrollcommand', None)
+            cnf2.pop('yscrollcommand', None)
         else:
-            config = False
-            if 'sortable' in kw:
-                config = True
-                self._sortable = bool(kw.pop('sortable'))
-                if self._sortable:
-                    for col in self['columns']:
-                        ttk.Treeview.heading(self, col,
-                                             command=lambda c=col: self._sort_column(c, True))
-                else:
-                    for col in self['columns']:
-                        ttk.Treeview.heading(self, col, command='')
-            if 'drag_cols' in kw:
-                config = True
-                drag_cols = bool(kw.pop('drag_cols'))
-                if drag_cols != self._drag_cols:
-                    self._drag_cols = drag_cols
-                    # remove/display drag icon
-                    if self._drag_cols:
-                        self._im_drag.paste(self._im_draggable)
-                    else:
-                        self._im_drag.paste(self._im_not_draggable)
-                    self.focus_set()
-                    self.update_idletasks()
-            if 'drag_rows' in kw:
-                config = True
-                self._drag_rows = bool(kw.pop('drag_rows'))
-            if 'columns' in kw:
-                # update column type dict
-                for col in list(self._column_types.keys()):
-                    if col not in kw['columns']:
-                        del self._column_types[col]
-                for col in kw['columns']:
-                    if col not in self._column_types:
-                        self._column_types[col] = str
-            # remove some keywords from the preview configuarion dict
-            kw2 = kw.copy()
-            kw2.pop('displaycolumns', None)
-            kw2.pop('xscrollcommand', None)
-            kw2.pop('yscrollcommand', None)
-            if isinstance(cnf, dict):
-                cnf2 = cnf.copy()
-                cnf2.pop('displaycolumns', None)
-                cnf2.pop('xscrollcommand', None)
-                cnf2.pop('yscrollcommand', None)
-            else:
-                cnf2 = cnf
-            self._visual_drag.configure(cnf2, **kw2)
-            if kw or not config:
-                return ttk.Treeview.configure(self, cnf, **kw)
+            cnf2 = cnf
+        self._visual_drag.configure(cnf2, **kw2)
+        if len(kw) != 0:
+            return ttk.Treeview.configure(self, cnf, **kw)
+
+    def _config_options(self):
+        """Apply options set in attributes to Treeview"""
+        self._config_sortable(self._sortable)
+        self._config_drag_cols(self._drag_cols)
+
+    def _config_sortable(self, sortable):
+        """Configure a new sortable state"""
+        for col in self["columns"]:
+            command = (lambda c=col: self._sort_column(c, True)) if sortable else ""
+            self.heading(col, command=command)
+        self._sortable = sortable
+
+    def _config_drag_cols(self, drag_cols):
+        """Configure a new drag_cols state"""
+        self._drag_cols = drag_cols
+        # remove/display drag icon
+        if self._drag_cols:
+            self._im_drag.paste(self._im_draggable)
+        else:
+            self._im_drag.paste(self._im_not_draggable)
+        self.focus_set()
+        self.update_idletasks()
 
     def delete(self, *items):
         self._visual_drag.delete(*items)
