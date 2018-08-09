@@ -344,17 +344,18 @@ class Table(ttk.Treeview):
         self.selection_remove(self._dragged_row)
 
     def _sort_column(self, column, reverse):
-        """Sort column."""
-        if 'disabled' not in self.state():
-            # get list of (value, item) tuple where value is the value in column for the item
-            l = [(self.set(child, column), child) for child in self.get_children('')]
-            # sort list using the column type
-            l.sort(reverse=reverse, key=lambda x: self._column_types[column](x[0]))
-            # reorder items
-            for index, (val, child) in enumerate(l):
-                self.move(child, "", index)
-            # reverse sorting direction for the next time
-            self.heading(column, command=lambda: self._sort_column(column, not reverse))
+        """Sort a column by its values"""
+        if tk.DISABLED in self.state():
+            return
+        # get list of (value, item) tuple where value is the value in column for the item
+        l = [(self.set(child, column), child) for child in self.get_children('')]
+        # sort list using the column type
+        l.sort(reverse=reverse, key=lambda x: self._column_types[column](x[0]))
+        # reorder items
+        for index, (val, child) in enumerate(l):
+            self.move(child, "", index)
+        # reverse sorting direction for the next time
+        self.heading(column, command=lambda: self._sort_column(column, not reverse))
 
     def cget(self, key):
         if key == 'sortable':
