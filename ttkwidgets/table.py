@@ -55,10 +55,7 @@ class Table(ttk.Treeview):
         self._drag_cols = bool(drag_cols)
         self._im_draggable = Image.open(IM_DRAG)
         self._im_not_draggable = Image.new('RGBA', self._im_draggable.size)
-        if self._drag_cols:
-            self._im_drag = ImageTk.PhotoImage(self._im_draggable, master=self)
-        else:
-            self._im_drag = ImageTk.PhotoImage(self._im_not_draggable, master=self)
+        self._im_drag = ImageTk.PhotoImage(self._im_not_draggable, master=self)
         self._sortable = bool(sortable)
         self._config_options()
         self._column_types = {col: str for col in self['columns']}
