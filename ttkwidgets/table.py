@@ -184,7 +184,7 @@ class Table(ttk.Treeview):
 
         # --- column dragging
         if self._drag_cols and region == 'heading':
-            # identify dre=agged column
+            # identify dragged column
             col = self.identify_column(event.x)
             self._dragged_col = ttk.Treeview.column(self, col, 'id')
             # get column width
