@@ -277,64 +277,69 @@ class Table(ttk.Treeview):
         if not self._visual_drag.winfo_ismapped():
             return
 
-        # --- column dragging
         if self._drag_cols and self._dragged_col is not None:
-            x = self._dx + event.x  # get dragged column new left x coordinate
-            self._visual_drag.place_configure(x=x)  # update column preview position
-            # if one border of the dragged column is beyon the middle of the
-            # neighboring column, swap them
-            if (self._dragged_col_neighbor_widths[0] is not None and x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
-                self._swap_columns('left')
-            elif (self._dragged_col_neighbor_widths[1] is not None and x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
-                self._swap_columns('right')
-            # horizontal scrolling if the cursor reaches the side of the table
-            if x < 0 and self.xview()[0] > 0:
-                # scroll left and update dragged column x coordinate
-                self.xview_scroll(-10, 'units')
-                self._dragged_col_x += 10
-            elif x + self._dragged_col_width / 2 > self.winfo_width() and self.xview()[1] < 1:
-                # scroll right and update dragged column x coordinate
-                self.xview_scroll(10, 'units')
-                self._dragged_col_x -= 10
-
-        # --- row dragging
+            self._drag_col(event)
         elif self._drag_rows and self._dragged_row is not None:
-            y = self._dy + event.y  # get dragged row new upper y coordinate
-            self._visual_drag.place_configure(y=y)  # update row preview position
+            self._drag_row(event)
 
-            if y > self._dragged_row_y:
-                # moving downward
-                item = self.identify_row(y + self._dragged_row_height)
-                if item != '':
+    def _drag_col(self, event):
+        """Continue dragging a column"""
+        x = self._dx + event.x  # get dragged column new left x coordinate
+        self._visual_drag.place_configure(x=x)  # update column preview position
+        # if one border of the dragged column is beyon the middle of the
+        # neighboring column, swap them
+        if (self._dragged_col_neighbor_widths[0] is not None and x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
+            self._swap_columns('left')
+        elif (self._dragged_col_neighbor_widths[1] is not None and x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
+            self._swap_columns('right')
+        # horizontal scrolling if the cursor reaches the side of the table
+        if x < 0 and self.xview()[0] > 0:
+            # scroll left and update dragged column x coordinate
+            self.xview_scroll(-10, 'units')
+            self._dragged_col_x += 10
+        elif x + self._dragged_col_width / 2 > self.winfo_width() and self.xview()[1] < 1:
+            # scroll right and update dragged column x coordinate
+            self.xview_scroll(10, 'units')
+            self._dragged_col_x -= 10
+
+    def _drag_row(self, event):
+        """Continue dragging a row"""
+        y = self._dy + event.y  # get dragged row new upper y coordinate
+        self._visual_drag.place_configure(y=y)  # update row preview position
+
+        if y > self._dragged_row_y:
+            # moving downward
+            item = self.identify_row(y + self._dragged_row_height)
+            if item != '':
+                bbox = self.bbox(item)
+                if not bbox:
+                    # the item is not visible so make it visible
+                    self.see(item)
+                    self.update_idletasks()
                     bbox = self.bbox(item)
-                    if not bbox:
-                        # the item is not visible so make it visible
-                        self.see(item)
-                        self.update_idletasks()
-                        bbox = self.bbox(item)
-                    if y > self._dragged_row_y + bbox[3] / 2:
-                        # the row is beyond half of item, so insert it below
-                        self._move_dragged_row(item)
-                    elif item != self.next(self._dragged_row):
-                        # item is not the lower neighbor of the dragged row so insert the row above
-                        self._move_dragged_row(self.prev(item))
-            elif y < self._dragged_row_y:
-                # moving upward
-                item = self.identify_row(y)
-                if item != '':
+                if y > self._dragged_row_y + bbox[3] / 2:
+                    # the row is beyond half of item, so insert it below
+                    self._move_dragged_row(item)
+                elif item != self.next(self._dragged_row):
+                    # item is not the lower neighbor of the dragged row so insert the row above
+                    self._move_dragged_row(self.prev(item))
+        elif y < self._dragged_row_y:
+            # moving upward
+            item = self.identify_row(y)
+            if item != '':
+                bbox = self.bbox(item)
+                if not bbox:
+                    # the item is not visible so make it visible
+                    self.see(item)
+                    self.update_idletasks()
                     bbox = self.bbox(item)
-                    if not bbox:
-                        # the item is not visible so make it visible
-                        self.see(item)
-                        self.update_idletasks()
-                        bbox = self.bbox(item)
-                    if y < self._dragged_row_y - bbox[3] / 2:
-                        # the row is beyond half of item, so insert it above
-                        self._move_dragged_row(item)
-                    elif item != self.prev(self._dragged_row):
-                        # item is not the upper neighbor of the dragged row so insert the row below
-                        self._move_dragged_row(self.next(item))
-            self.selection_remove(self._dragged_row)
+                if y < self._dragged_row_y - bbox[3] / 2:
+                    # the row is beyond half of item, so insert it above
+                    self._move_dragged_row(item)
+                elif item != self.prev(self._dragged_row):
+                    # item is not the upper neighbor of the dragged row so insert the row below
+                    self._move_dragged_row(self.next(item))
+        self.selection_remove(self._dragged_row)
 
     def _sort_column(self, column, reverse):
         """Sort column."""
