@@ -288,9 +288,11 @@ class Table(ttk.Treeview):
         self._visual_drag.place_configure(x=x)  # update column preview position
         # if one border of the dragged column is beyon the middle of the
         # neighboring column, swap them
-        if (self._dragged_col_neighbor_widths[0] is not None and x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
+        if (self._dragged_col_neighbor_widths[0] is not None and
+               x < self._dragged_col_x - self._dragged_col_neighbor_widths[0] / 2):
             self._swap_columns('left')
-        elif (self._dragged_col_neighbor_widths[1] is not None and x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
+        elif (self._dragged_col_neighbor_widths[1] is not None and
+               x > self._dragged_col_x + self._dragged_col_neighbor_widths[1] / 2):
             self._swap_columns('right')
         # horizontal scrolling if the cursor reaches the side of the table
         if x < 0 and self.xview()[0] > 0:
