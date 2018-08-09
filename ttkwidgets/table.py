@@ -137,9 +137,7 @@ class Table(ttk.Treeview):
 
     def _swap_columns(self, side):
         """Swap dragged column with its side (=left/right) neighbor."""
-        displayed_cols = list(self["displaycolumns"])
-        if displayed_cols[0] == "#all":
-            displayed_cols = list(self["columns"])
+        displayed_cols = self._displayed_cols
         i1 = self._dragged_col_index
         i2 = i1 + 1 if side == 'right' else i1 - 1
         if 0 <= i2 < len(displayed_cols):
@@ -210,9 +208,7 @@ class Table(ttk.Treeview):
             x = x - w_sep // 2 - 1
             self._dragged_col_x = x
             # get neighboring column widths
-            displayed_cols = list(self["displaycolumns"])
-            if displayed_cols[0] == "#all":
-                displayed_cols = list(self["columns"])
+            displayed_cols = self._displayed_cols
             self._dragged_col_index = i1 = displayed_cols.index(self._dragged_col)
             if i1 > 0:
                 left = ttk.Treeview.column(self, displayed_cols[i1 - 1], 'width')
@@ -356,6 +352,13 @@ class Table(ttk.Treeview):
             self.move(child, "", index)
         # reverse sorting direction for the next time
         self.heading(column, command=lambda: self._sort_column(column, not reverse))
+
+    @property
+    def _displayed_cols(self):
+        displayed_cols = list(self["displaycolumns"])
+        if displayed_cols[0] == "#all":
+            displayed_cols = list(self["columns"])
+        return displayed_cols
 
     def cget(self, key):
         if key == 'sortable':
