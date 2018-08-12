@@ -396,36 +396,38 @@ class Table(ttk.Treeview):
         elif cnf == 'sortable':
             return 'sortable', self._sortable
 
-        sortable = bool(kw.pop("sortable", self._sortable))
+        if isinstance(cnf, dict):
+            kwargs = cnf.copy()
+            kwargs.update(kw)  # keyword arguments override cnf content
+            cnf = {}   # everything is in kwargs so no need of cnf
+            cnf2 = {}  # to configure the preview
+        else:
+            kwargs = kw
+            cnf2 = cnf
+
+        sortable = bool(kwargs.pop("sortable", self._sortable))
         if sortable != self._sortable:
             self._config_sortable(sortable)
-        drag_cols = bool(kw.pop("drag_cols", self._drag_cols))
+        drag_cols = bool(kwargs.pop("drag_cols", self._drag_cols))
         if drag_cols != self._drag_cols:
             self._config_drag_cols(drag_cols)
-        self._drag_rows = bool(kw.pop("drag_rows", self._drag_rows))
-        if 'columns' in kw:
+        self._drag_rows = bool(kwargs.pop("drag_rows", self._drag_rows))
+        if 'columns' in kwargs:
             # update column type dict
             for col in list(self._column_types.keys()):
-                if col not in kw['columns']:
+                if col not in kwargs['columns']:
                     del self._column_types[col]
-            for col in kw['columns']:
+            for col in kwargs['columns']:
                 if col not in self._column_types:
                     self._column_types[col] = str
         # Remove some keywords from the preview configuration dict
-        kw2 = kw.copy()
+        kw2 = kwargs.copy()
         kw2.pop('displaycolumns', None)
         kw2.pop('xscrollcommand', None)
         kw2.pop('yscrollcommand', None)
-        if isinstance(cnf, dict):
-            cnf2 = cnf.copy()
-            cnf2.pop('displaycolumns', None)
-            cnf2.pop('xscrollcommand', None)
-            cnf2.pop('yscrollcommand', None)
-        else:
-            cnf2 = cnf
         self._visual_drag.configure(cnf2, **kw2)
-        if len(kw) != 0:
-            return ttk.Treeview.configure(self, cnf, **kw)
+        if len(kwargs) != 0:
+            return ttk.Treeview.configure(self, cnf, **kwargs)
 
     def _config_options(self):
         """Apply options set in attributes to Treeview"""
