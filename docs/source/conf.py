@@ -14,7 +14,7 @@
 #
 # import os
 import sys
-sys.path.insert(0, '/home/juliette/Documents/ttkwidgets')
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
