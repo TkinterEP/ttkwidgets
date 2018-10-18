@@ -15,9 +15,10 @@ A collection of widgets for Tkinter's ttk extensions by various authors
    :maxdepth: 2
    :caption: Contents:
 
+   authors
    installation
    documentation
-   authors
+   examples
    genindex
 
    

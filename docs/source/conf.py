@@ -29,6 +29,11 @@ version = ''
 release = '0.9.0'
 
 
+# -- Example Generation ------------------------------------------------------
+with open("generate_examples.py") as fi:
+    exec(fi.read())
+
+
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
