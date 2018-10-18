@@ -20,8 +20,8 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'ttkwidgets'
-copyright = '2018, ttwidgets developpers'
-author = 'ttwidgets developpers'
+copyright = '2018, ttkwidgets developers'
+author = 'ttkwidgets developers'
 
 # The short X.Y version
 version = ''
