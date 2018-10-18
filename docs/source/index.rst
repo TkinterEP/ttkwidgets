@@ -12,22 +12,25 @@ A collection of widgets for Tkinter's ttk extensions by various authors
 
     
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 2
    :caption: Contents:
 
    installation
    documentation
    authors
+   genindex
+
    
 License
 -------
 
-ttkwidgets: A collection of widgets for Tkinter's ttk extensions by various authors 
-Copyright (C) RedFantom 2017
-Copyright (C) The Python Team
-Copyright (C) Mitja Martini 2008
-Copyright (C) Russell Adams 2011
-Copyright (C) Juliette Monsel 2017
+ttkwidgets: A collection of widgets for Tkinter's ttk extensions by various authors.
+
+* Copyright (C) RedFantom 2017
+* Copyright (C) The Python Team
+* Copyright (C) Mitja Martini 2008
+* Copyright (C) Russell Adams 2011
+* Copyright (C) Juliette Monsel 2017
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,14 +43,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see http://www.gnu.org/licenses/.
 
-
-Indices and tables
-==================
- 
-* :ref:`genindex`
-* :ref:`search`
 
 .. |Travis| image:: https://travis-ci.org/RedFantom/ttkwidgets.svg?branch=master
     :alt: Travis CI Build Status

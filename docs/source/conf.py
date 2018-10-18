@@ -14,7 +14,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -40,9 +40,8 @@ release = '0.9.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
+    'sphinx.ext.autosummary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -154,7 +153,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'ttkwidgets', 'ttkwidgets Documentation',
-     author, 'ttkwidgets', 'One line description of project.',
+     author, 'ttkwidgets', "A collection of widgets for Tkinter's ttk extensions by various authors.",
      'Miscellaneous'),
 ]
 
@@ -178,3 +177,4 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
+autosummary_generate = True

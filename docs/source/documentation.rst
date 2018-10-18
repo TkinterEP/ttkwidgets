@@ -1,71 +1,30 @@
 Documentation
 =============
-.. currentmodule:: ttkwidgets
 
-Submodules
-~~~~~~~~~~
 .. toctree::
+    :hidden:
+    :glob:
     :maxdepth: 1
-    
-    autocomplete
-    color
-    font
-    frames
+    :Caption: Packages
 
-Widgets
-~~~~~~~
+    ttkwidgets/*
 
-AutoHideScrollbar
------------------
-.. autoclass:: AutoHideScrollbar
-    :members:
-    
-Calendar
---------
-.. autoclass:: Calendar
-    :members:
-    
-CheckboxTreeview
-----------------
-.. autoclass:: CheckboxTreeview
-    :members:
-    
-DebugWindow  
------------
-.. autoclass:: DebugWindow
-    :members:
-    
-ItemsCanvas
------------
-.. autoclass:: ItemsCanvas
-    :members:
+Package structure
 
-LinkLabel
----------
-.. autoclass:: LinkLabel
-    :members:
+::
 
-ScaleEntry
-----------
-.. autoclass:: ScaleEntry
-    :members:
+    ttkwidgets
+    ├── autocomplete
+    ├── color
+    ├── font
+    └── frames
 
-ScrolledListbox
----------------
-.. autoclass:: ScrolledListbox
-    :members:
-
-Table
------    
-.. autoclass:: Table
-    :members:
-
-TickScale
----------
-.. autoclass:: TickScale
-    :members:
-
-TimeLine
---------    
-.. autoclass:: TimeLine
-    :members:
+=================== =======================
+Package             Content
+=================== =======================
+:ref:`ttkwidgets`   Miscellanous widgets.
+:ref:`autocomplete` Autocompletion widgets.
+:ref:`color`        Color choosing widgets.
+:ref:`font`         Font choosing widgets.
+:ref:`frames`       Frame based widgets.
+=================== =======================      
