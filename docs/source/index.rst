@@ -12,7 +12,7 @@ A collection of widgets for Tkinter's ttk extensions by various authors
 
     
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    authors

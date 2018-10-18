@@ -17,8 +17,8 @@ EXAMPLES = os.listdir(FOLDER)
 EXAMPLES_FILE = \
     "Examples\n" \
     "========\n" \
-    ".. toctree::\n\n" \
-    "   :maxdepth: 2\n" \
+    ".. toctree::\n" \
+    "   :maxdepth: 2\n\n" \
     "   {}"
 
 if not os.path.exists("examples"):
