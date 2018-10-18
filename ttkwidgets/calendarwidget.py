@@ -35,9 +35,23 @@ class Calendar(ttk.Frame):
 
     def __init__(self, master=None, **kw):
         """
-        WIDGET-SPECIFIC OPTIONS
-            locale, firstweekday, year, month, selectbackground,
-            selectforeground
+        Create a Calendar.
+        
+        :param master: master widget
+        :type master: widget
+        :param locale: calendar locale (defines the language, date formatting)
+        :type locale: str
+        :param firstweekday: first day of the week, 0 is monday
+        :type firstweekday: int
+        :param year: year to display
+        :type year: int
+        :param month: month to display
+        :type month: int
+        :param selectbackground: background color of the selected day
+        :type selectbackground: str
+        :param selectforeground: selectforeground color of the selected day
+        :type selectforeground: str
+        :param kw: options to be passed on to the ``ttk.Frame`` initializer
         """
         # remove custom options from kw before initializating ttk.Frame
         fwday = kw.pop('firstweekday', calendar.MONDAY)
@@ -202,7 +216,11 @@ class Calendar(ttk.Frame):
 
     @property
     def selection(self):
-        """Return a datetime representing the current selected date."""
+        """
+        Return the currently selected date.
+        
+        :rtype: datetime
+        """
         if not self._selection:
             return None
 
