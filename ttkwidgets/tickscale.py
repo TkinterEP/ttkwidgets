@@ -20,27 +20,33 @@ class TickScale(ttk.Frame):
         """
         Create a TickScale with parent master.
 
-        Arguments:
-            * master: parent window
-            * digits: number of digits after the comma to display, if negative
-                use the %g format
-            * labelpos: if showvalue is True, position of the label:
-                n, s, e, w
-            * resolution: increment by which the slider can be moved. 0 means
-                continuous sliding.
-            * showvalue: display current value next to the slider
-            * tickinterval: if not 0, display ticks with the given interval
-            * tickpos: if tickinterval is not 0, position of the ticks:
-                vertical scale: w or e
-                horizontal scale: n or s
-            * all ttk.Scale options:
-                class, cursor, style, takefocus, command, from, length, orient,
-                to, value, variable
+        :param master: master widget
+        :type master: widget
+        :param digits: number of digits after the comma to display, 
+                       if negative use the %g format
+        :type digits: int
+        :param labelpos: "n", "s", "e or "w": if showvalue is True, 
+                          position of the label
+        :type labelpos: str
+        :param resolution: increment by which the slider can be moved. 
+                           0 means continuous sliding.
+        :type resolution: float
+        :param showvalue: whether to display current value next to the slider
+        :type showvalue: bool
+        :param tickinterval: if not 0, display ticks with the given interval
+        :type tickinterval: float
+        :param tickpos: "w" or "e" (vertical scale), "n" or "s" (horizontal scale): if tickinterval is not 0, position of the ticks
+        :type tickpos: str
+        :param kwargs: options to be passed on to the ``ttk.Scale`` initializer
+                       (class, cursor, style, takefocus, command, from, 
+                       length, orient, to, value, variable)
 
-                The style must derive from Vertical.TScale or Horizontal.TScale
-                depending on the orientation. Depending on the theme, the default
-                slider length might not be correct. If it is the case, this can
-                be solve by setting the 'sliderlength' through ttk.Style.
+        .. note:: The style must derive from "Vertical.TScale" or 
+                  "Horizontal.TScale" depending on the orientation. 
+                  Depending on the theme, the default slider length 
+                  might not be correct. If it is the case, this can
+                  be solve by setting the 'sliderlength' through 
+                  ``ttk.Style``.
         """
         ttk.Frame.__init__(self, master, class_='TickScale', padding=2)
         self.rowconfigure(0, weight=1)
@@ -303,7 +309,15 @@ class TickScale(ttk.Frame):
             return self.scale.get()
 
     def convert_to_pixels(self, value):
-        """Convert value in the scale's unit into a position in pixels."""
+        """
+        Convert value in the scale's unit into a position in pixels.
+        
+        :param value: value to convert
+        :type value: float
+        
+        :return: the corresponding position in pixels
+        :rtype: float
+        """
         percent = ((value - self._start) / self._extent)
         return percent * (self.get_scale_length() - self._sliderlength) + self._sliderlength / 2
 
