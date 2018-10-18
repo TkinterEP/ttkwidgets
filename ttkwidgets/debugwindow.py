@@ -19,6 +19,19 @@ class DebugWindow(tk.Toplevel):
     A Toplevel that shows sys.stdout and sys.stderr for Tkinter applications
     """
     def __init__(self, master=None, title="Debug window", stdout=True, stderr=False, width=70, **kwargs):
+        """
+        Create a Debug window.
+        
+        :param master: master widget
+        :type master: widget
+        :param stdout: whether to redirect stdout to the widget
+        :type stdout: bool
+        :param stderr:  whether to redirect stderr to the widget
+        :type stderr: bool
+        :param width:
+        :type width: int
+        :param kwargs: options to be passed on to the ``tk.Toplevel`` initializer
+        """
         self._width = width
         tk.Toplevel.__init__(self, master, **kwargs)
         self.protocol("WM_DELETE_WINDOW", self.quit)
@@ -42,6 +55,7 @@ class DebugWindow(tk.Toplevel):
         self._grid_widgets()
 
     def save(self):
+        """Save widget content."""
         file_name = fd.asksaveasfilename()
         if file_name is "" or file_name is None:
             return
@@ -53,6 +67,12 @@ class DebugWindow(tk.Toplevel):
         self.scroll.grid(row=0, column=1, sticky="ns")
 
     def write(self, line):
+        """
+        Write line at the end of the widget.
+        
+        :param line: text to insert in the widget
+        :type line: str
+        """
         self.text.insert(tk.END, line)
 
     def flush(self):
