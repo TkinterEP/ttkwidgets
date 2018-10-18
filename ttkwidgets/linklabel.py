@@ -20,11 +20,17 @@ class LinkLabel(ttk.Label):
     """
     def __init__(self, master=None, **kwargs):
         """
+        Create a LinkLabel.
+        
         :param master: master widget
         :param link: link to be opened
+        :type link: str
         :param normal_color: text color when widget is created
+        :type normal_color: str
         :param hover_color: text color when hovering over the widget
+        :type hover_color: str
         :param clicked_color: text color when link is clicked
+        :type clicked_color: str
         :param kwargs: options to be passed on to Label initializer
         """
         self._cursor = kwargs.pop("cursor", "hand1")
@@ -46,17 +52,11 @@ class LinkLabel(ttk.Label):
         self.configure(**{key: value})
 
     def _on_enter(self, *args):
-        """
-        Sets the text color to the hover color
-        :return: None
-        """
+        """Set the text color to the hover color."""
         self.config(foreground=self._hover_color, cursor=self._cursor)
 
     def _on_leave(self, *args):
-        """
-        Sets the text color to either the normal color when not clicked or the clicked color when clicked
-        :return: None
-        """
+        """Set the text color to either the normal color when not clicked or the clicked color when clicked."""
         if self.__clicked:
             self.config(foreground=self._clicked_color)
         else:
@@ -64,25 +64,19 @@ class LinkLabel(ttk.Label):
         self.config(cursor="")
 
     def reset(self):
-        """
-        Reset Label to unclicked status if previously clicked
-        :return: None
-        """
+        """Reset Label to unclicked status if previously clicked."""
         self.__clicked = False
         self._on_leave()
 
     def open_link(self, *args):
-        """
-        Open the link in the web browser
-        :return: None
-        """
+        """Open the link in the web browser."""
         if "disabled" not in self.state():
             webbrowser.open(self._link)
             self.__clicked = True
             self._on_leave()
 
     def cget(self, key):
-        """ Return the resource value for a KEY given as string. """
+        """Return the resource value for a KEY given as string."""
         if key is "link":
             return self._link
         elif key is "hover_color":
@@ -110,7 +104,7 @@ class LinkLabel(ttk.Label):
         self._on_leave()
 
     def keys(self):
-        """ Return a list of all resource names of this widget. """
+        """Return a list of all resource names of this widget."""
         keys = ttk.Label.keys(self)
         keys.extend(["link", "normal_color", "hover_color", "clicked_color"])
         return keys
