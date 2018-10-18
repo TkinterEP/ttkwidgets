@@ -15,12 +15,12 @@ class AutoHideScrollbar(ttk.Scrollbar):
     """Scrollbar that automatically hides when not needed."""
     def __init__(self, master=None, **kwargs):
         """
-        Create the scrollbar.
+        Create a scrollbar.
 
         :param master: master widget
         :param kwargs: options to be passed on to the ``ttk.Scrollbar`` initializer
         """
-        ttk.Scrollbar.__init__(self, *args, **kwargs)
+        ttk.Scrollbar.__init__(self, master=master, **kwargs)
         self._pack_kw = {}
         self._place_kw = {}
         self._layout = 'place'
