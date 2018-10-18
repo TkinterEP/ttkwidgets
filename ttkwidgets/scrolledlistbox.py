@@ -17,11 +17,17 @@ class ScrolledListbox(ttk.Frame):
     """
     def __init__(self, master=None, compound=tk.RIGHT, **kwargs):
         """
+        Create a Listbox with a vertical scrollbar.
+        
         :param master: master widget
-        :param compound: side for the Scrollbar to be on (tk.LEFT or tk.RIGHT)
+        :type master: widget
+        :param compound: side for the Scrollbar to be on (``tk.LEFT`` or ``tk.RIGHT``)
+        :type compound: str
         :param listheight: height of the Listbox in items
+        :type listheight: int
         :param listwidth: width of the Listbox in characters
-        :param kwargs: keyword arguments passed on to Listbox initializer
+        :type listwidth: int
+        :param kwargs: keyword arguments passed on to the ``tk.Listbox`` initializer
         """
         ttk.Frame.__init__(self, master)
         self.listbox = tk.Listbox(self, **kwargs)
