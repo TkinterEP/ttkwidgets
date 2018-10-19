@@ -83,11 +83,11 @@ class CheckboxTreeview(ttk.Treeview):
         """
         Modify or inquire widget state.
         
-        :param statespec: Widget state is returned if statespec is None, 
+        :param statespec: Widget state is returned if `statespec` is None, 
                           otherwise it is set according to the statespec 
                           flags and then a new state spec is returned 
                           indicating which flags were changed.
-        :type statespec: None or sequence
+        :type statespec: None or sequence[str]
         """
         if statespec:
             if "disabled" in statespec:
@@ -146,11 +146,6 @@ class CheckboxTreeview(ttk.Treeview):
         """
         Creates a new item and return the item identifier of the newly created item.
         
-        .. note:: Same method as for the standard :class:`ttk.Treeview` but 
-                  add the tag for the box state accordingly to the parent 
-                  state if no tag among 
-                  ('checked', 'unchecked', 'tristate') is given.
-        
         :param parent: identifier of the parent item
         :type parent: str
         :param index: where in the list of parent's children to insert the new item
@@ -161,6 +156,11 @@ class CheckboxTreeview(ttk.Treeview):
         
         :return: the item identifier of the newly created item
         :rtype: str
+
+        .. note:: Same method as for the standard :class:`ttk.Treeview` but 
+                  add the tag for the box state accordingly to the parent 
+                  state if no tag among 
+                  ('checked', 'unchecked', 'tristate') is given.
         """
         if self.tag_has("checked", parent):
             tag = "checked"
