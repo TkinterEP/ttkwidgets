@@ -412,7 +412,7 @@ class Table(ttk.Treeview):
 
     def configure(self, cnf=None, **kw):
         """
-        Configure resources of a widget.
+        Configure resources of the widget.
 
         To get the list of options for this widget, call the method :meth:`~Table.keys`.
         See :meth:`~Table.__init__` for a description of the widget specific option.

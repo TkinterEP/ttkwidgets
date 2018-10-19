@@ -161,6 +161,12 @@ class ScaleEntry(ttk.Frame):
         return self._scale.cget(key)
 
     def configure(self, cnf={}, **kw):
+        """
+        Configure resources of the widget.
+
+        To get the list of options for this widget, call the method :meth:`~ScaleEntry.keys`.
+        See :meth:`~ScaleEntry.__init__` for a description of the widget specific option.
+        """
         kw.update(cnf)
         reinit = False
         if 'scalewidth' in kw:
@@ -201,19 +207,14 @@ class ScaleEntry(ttk.Frame):
         if reinit:
             self._grid_widgets()
 
-    def config(self, cnf={}, **kw):
-        self.configure(cnf, **kw)
+    config = configure
 
     def config_entry(self, cnf={}, **kwargs):
-        """
-        Wrapper around the Entry widget's config function for the user
-        """
+        """Configure resources of the Entry widget."""
         self._entry.config(cnf, **kwargs)
 
     def config_scale(self, cnf={}, **kwargs):
-        """
-        Wrapper around the Scale widget's config function for the user
-        """
+        """Configure resources of the Scale widget."""
         self._scale.config(cnf, **kwargs)
         # udpate self._variable limits in case the ones of the scale have changed
         self._variable.configure(high=self._scale['to'],

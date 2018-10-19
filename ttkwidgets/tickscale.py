@@ -195,6 +195,12 @@ class TickScale(ttk.Frame):
             return self.scale.cget(key)
 
     def configure(self, cnf={}, **kw):
+        """
+        Configure resources of the widget.
+
+        To get the list of options for this widget, call the method :meth:`~TickScale.keys`.
+        See :meth:`~TickScale.__init__` for a description of the widget specific option.
+        """
         kw.update(cnf)
         reinit = False
         if 'orient' in kw:
@@ -308,8 +314,7 @@ class TickScale(ttk.Frame):
             # needed after the reinitialization in case of orientation change
             self._apply_style()
 
-    def config(self, cnf={}, **kw):
-        self.configure(cnf=cnf, **kw)
+    config = configure
 
     def get(self):
         if self._digits >= 0:

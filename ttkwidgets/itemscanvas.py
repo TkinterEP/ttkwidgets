@@ -242,6 +242,12 @@ class ItemsCanvas(ttk.Frame):
             ttk.Frame.cget(self, key)
 
     def config(self, **kwargs):
+        """
+        Configure resources of the widget.
+
+        To get the list of options for this widget, call the method :meth:`~ItemsCanvas.keys`.
+        See :meth:`~ItemsCanvas.__init__` for a description of the widget specific option.
+        """
         self._canvaswidth = kwargs.pop("canvaswidth", self._canvaswidth)
         self._canvasheight = kwargs.pop("canvasheight", self._canvasheight)
         self.canvas.config(width=self._canvaswidth, height=self._canvasheight)
@@ -251,8 +257,7 @@ class ItemsCanvas(ttk.Frame):
         self._callback_move = kwargs.pop("callback_move", self._callback_move)
         ttk.Frame.config(self, **kwargs)
 
-    def configure(self, **kwargs):
-        self.config(**kwargs)
+    configure = config
 
     def __getitem__(self, item):
         return self.cget(item)

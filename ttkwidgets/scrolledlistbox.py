@@ -48,8 +48,6 @@ class ScrolledListbox(ttk.Frame):
         self.scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
 
     def config_listbox(self, *args, **kwargs):
-        """
-        Pass on arguments to listbox.configure
-        """
+       """Configure resources of the Listbox widget."""
         self.listbox.configure(*args, **kwargs)
 

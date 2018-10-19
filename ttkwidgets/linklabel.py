@@ -98,11 +98,10 @@ class LinkLabel(ttk.Label):
 
     def configure(self, **kwargs):
         """
-        Configure resources of a widget.
+        Configure resources of the widget.
 
-        The values for resources are specified as keyword
-        arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
+        To get the list of options for this widget, call the method :meth:`~LinkLabel.keys`.
+        See :meth:`~LinkLabel.__init__` for a description of the widget specific option.
         """
         self._link = kwargs.pop("link", self._link)
         self._hover_color = kwargs.pop("hover_color", self._hover_color)
