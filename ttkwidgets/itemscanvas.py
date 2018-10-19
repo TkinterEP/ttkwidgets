@@ -217,6 +217,15 @@ class ItemsCanvas(ttk.Frame):
         self.canvas.tag_lower("background")
 
     def cget(self, key):
+        """
+        Query widget option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
+
+        To get the list of options for this widget, call the method :meth:`~ItemsCanvas.keys`.
+        """
         if key is "canvaswidth":
             return self._canvaswidth
         elif key is "canvasheight":

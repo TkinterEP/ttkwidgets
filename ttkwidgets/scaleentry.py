@@ -114,6 +114,15 @@ class ScaleEntry(ttk.Frame):
         return keys
 
     def cget(self, key):
+        """
+        Query widget option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
+
+        To get the list of options for this widget, call the method :meth:`~ScaleEntry.keys`.
+        """
         if key == 'scalewidth':
             return self._scale.cget('length')
         elif key == 'from':
@@ -133,13 +142,21 @@ class ScaleEntry(ttk.Frame):
 
     def cget_entry(self, key):
         """
-        Wrapper around the Entry widget's cget function for the user
+        Query the Entry widget's option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
         """
         return self._entry.cget(key)
 
     def cget_scale(self, key):
         """
-        Wrapper around the Scale widget's cget function for the user
+        Query the Scale widget's option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
         """
         return self._scale.cget(key)
 

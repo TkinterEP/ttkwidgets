@@ -359,10 +359,11 @@ class Table(ttk.Treeview):
         """
         Query widget option.
 
-        To get the list of options for this widget, call the method :meth:`~Table.keys`.
-
         :param key: option name
         :type key: str
+        :return: value of the option
+
+        To get the list of options for this widget, call the method :meth:`~Table.keys`.
         """
         if key == 'sortable':
             return self._sortable

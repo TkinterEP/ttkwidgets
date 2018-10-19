@@ -170,6 +170,15 @@ class TickScale(ttk.Frame):
         return keys + ['showvalue', 'tickinterval', 'digits']
 
     def cget(self, key):
+        """
+        Query widget option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
+
+        To get the list of options for this widget, call the method :meth:`~TickScale.keys`.
+        """
         if key == 'showvalue':
             return self._showvalue
         elif key == 'tickinterval':

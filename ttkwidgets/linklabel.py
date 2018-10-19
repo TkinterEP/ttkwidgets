@@ -76,7 +76,15 @@ class LinkLabel(ttk.Label):
             self._on_leave()
 
     def cget(self, key):
-        """Return the resource value for a KEY given as string."""
+        """
+        Query widget option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
+
+        To get the list of options for this widget, call the method :meth:`~LinkLabel.keys`.
+        """
         if key is "link":
             return self._link
         elif key is "hover_color":

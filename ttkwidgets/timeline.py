@@ -1025,9 +1025,7 @@ class TimeLine(ttk.Frame):
         self.configure(cnf=cnf, **kwargs)
 
     def cget(self, item):
-        """
-        Return the value of an option
-        """
+        """Return the value of an option."""
         return getattr(self, "_" + item) if item in self.options else ttk.Frame.cget(self, item)
 
     def __getitem__(self, item):
