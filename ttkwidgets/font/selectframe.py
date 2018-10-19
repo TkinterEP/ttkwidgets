@@ -19,17 +19,19 @@ from .sizedropdown import FontSizeDropdown
 
 class FontSelectFrame(ttk.Frame):
     """
-    A frame to use in your own application to let the user choose a font
+    A frame to use in your own application to let the user choose a font.
 
-    For tkFont object, use font property
+    For :class:`~font.Font` object, use :obj:`font` property.
     """
 
     def __init__(self, master=None, callback=None, **kwargs):
         """
-        :param master: master widgets
-        :param callback: callback passed argument (str family, int size, bool bold, bool italic, bool underline,
-                                                   bool overstrike)
-        :param kwargs: passed on to Frame initializer
+        :param master: master widget
+        :type master: widget
+        :param callback: callback passed argument
+                         (`str` family, `int` size, `bool` bold, `bool` italic, `bool` underline)
+        :type callback: function
+        :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
         self.__callback = callback
@@ -46,8 +48,7 @@ class FontSelectFrame(ttk.Frame):
 
     def _grid_widgets(self):
         """
-        Puts all the widgets in the correct place
-        :return: None
+        Puts all the widgets in the correct place.
         """
         self._family_dropdown.grid(row=0, column=0, sticky="nswe")
         self._size_dropdown.grid(row=0, column=1, sticky="nswe")
@@ -55,18 +56,18 @@ class FontSelectFrame(ttk.Frame):
 
     def _on_family(self, name):
         """
-        Callback if family is changed
+        Callback if family is changed.
+        
         :param name: font family name
-        :return: None
         """
         self._family = name
         self._on_change()
 
     def _on_size(self, size):
         """
-        Callback if size is changed
+        Callback if size is changed.
+        
         :param size: font size int
-        :return: None
         """
         self._size = size
         self._on_change()
@@ -74,23 +75,21 @@ class FontSelectFrame(ttk.Frame):
     def _on_properties(self, properties):
         """
         Callback if properties are changed
+        
         :param properties: tuple (bold, italic, underline, overstrike)
-        :return: None
         """
         self._bold, self._italic, self._underline, self._overstrike = properties
         self._on_change()
 
     def _on_change(self):
-        """
-        Call callback if any property is changed
-        :return: None
-        """
+        """Call callback if any property is changed."""
         if callable(self.__callback):
             self.__callback((self._family, self._size, self._bold, self._italic, self._underline, self._overstrike))
 
     def __generate_font_tuple(self):
         """
-        Generate a font tuple for tkinter widgets based on the user's entries
+        Generate a font tuple for tkinter widgets based on the user's entries.
+        
         :return: font tuple (family_name, size, *options)
         """
         if not self._family:
@@ -109,8 +108,10 @@ class FontSelectFrame(ttk.Frame):
     @property
     def font(self):
         """
-        Returns a Font object if family is set, else None
-        :return: Font or None
+        Font property.
+        
+        :return: a :class:`~font.Font` object if family is set, else None
+        :rtype: :class:`~font.Font` or None
         """
         if not self._family:
             return None

@@ -23,8 +23,10 @@ class FontSizeDropdown(AutocompleteCombobox):
     def __init__(self, master=None, callback=None, **kwargs):
         """
         :param master: master widget
-        :param callback: callback on click with signle argument: int size
-        :param kwargs: keyword arguments passed on to AutocompleteCombobox initializer
+        :type master: widget
+        :param callback: callback on click with single argument: `int` size
+        :type callback: function
+        :param kwargs: keyword arguments passed on to the :class:`~ttkwidgets.autocomplete.AutocompleteCombobox` initializer
         """
         int_values = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72]
         values = [str(value) for value in int_values]
@@ -36,8 +38,8 @@ class FontSizeDropdown(AutocompleteCombobox):
     def _on_click(self, event):
         """
         Function bound to event of selection in the Combobox, calls callback if callable
+        
         :param event: Tkinter event
-        :return: None
         """
         if callable(self.__callback):
             self.__callback(self.selection)
@@ -45,8 +47,10 @@ class FontSizeDropdown(AutocompleteCombobox):
     @property
     def selection(self):
         """
-        Property that returns None if no value is selected and int size if selected
-        :return: None
+        Selection property.
+
+        :return: None if no value is selected and size if selected.
+        :rtype: None or int
         """
         if self.get() is "":
             return None
