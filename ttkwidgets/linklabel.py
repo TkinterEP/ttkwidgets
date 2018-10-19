@@ -31,7 +31,7 @@ class LinkLabel(ttk.Label):
         :type hover_color: str
         :param clicked_color: text color when link is clicked
         :type clicked_color: str
-        :param kwargs: options to be passed on to the ``ttk.Label`` initializer
+        :param kwargs: options to be passed on to the :class:`ttk.Label` initializer
         """
         self._cursor = kwargs.pop("cursor", "hand1")
         self._link = kwargs.pop("link", "")

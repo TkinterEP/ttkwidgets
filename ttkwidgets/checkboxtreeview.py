@@ -34,7 +34,7 @@ class CheckboxTreeview(ttk.Treeview):
 
         :param master: master widget
         :type master: widget
-        :param kw: options to be passed on to the ``ttk.Treeview`` initializer
+        :param kw: options to be passed on to the :class:`ttk.Treeview` initializer
         """
         ttk.Treeview.__init__(self, master, style='Checkbox.Treeview', **kw)
         # style (make a noticeable disabled style)
@@ -87,7 +87,7 @@ class CheckboxTreeview(ttk.Treeview):
                           otherwise it is set according to the statespec 
                           flags and then a new state spec is returned 
                           indicating which flags were changed.
-        :type statespec: None, sequence
+        :type statespec: None or sequence
         """
         if statespec:
             if "disabled" in statespec:
@@ -146,7 +146,7 @@ class CheckboxTreeview(ttk.Treeview):
         """
         Creates a new item and return the item identifier of the newly created item.
         
-        .. note:: Same method as for the standard ``ttk.Treeview`` but 
+        .. note:: Same method as for the standard :class:`ttk.Treeview` but 
                   add the tag for the box state accordingly to the parent 
                   state if no tag among 
                   ('checked', 'unchecked', 'tristate') is given.
@@ -154,10 +154,10 @@ class CheckboxTreeview(ttk.Treeview):
         :param parent: identifier of the parent item
         :type parent: str
         :param index: where in the list of parent's children to insert the new item
-        :type index: int, "end"
+        :type index: int or "end"
         :param iid: item identifier, iid must not already exist in the tree. If iid is None a new unique identifier is generated.
-        :type iid: None, str
-        :param kw: other options to be passed on to the ``ttk.Treeview.insert()`` method
+        :type iid: None or str
+        :param kw: other options to be passed on to the :meth:`ttk.Treeview.insert` method
         
         :return: the item identifier of the newly created item
         :rtype: str

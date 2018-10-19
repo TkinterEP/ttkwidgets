@@ -37,7 +37,7 @@ class TickScale(ttk.Frame):
         :type tickinterval: float
         :param tickpos: "w" or "e" (vertical scale), "n" or "s" (horizontal scale): if tickinterval is not 0, position of the ticks
         :type tickpos: str
-        :param kwargs: options to be passed on to the ``ttk.Scale`` initializer
+        :param kwargs: options to be passed on to the :class:`ttk.Scale` initializer
                        (class, cursor, style, takefocus, command, from, 
                        length, orient, to, value, variable)
 
@@ -46,7 +46,7 @@ class TickScale(ttk.Frame):
                   Depending on the theme, the default slider length 
                   might not be correct. If it is the case, this can
                   be solve by setting the 'sliderlength' through 
-                  ``ttk.Style``.
+                  :class:`ttk.Style`.
         """
         ttk.Frame.__init__(self, master, class_='TickScale', padding=2)
         self.rowconfigure(0, weight=1)

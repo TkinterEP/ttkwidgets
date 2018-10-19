@@ -51,7 +51,7 @@ class Calendar(ttk.Frame):
         :type selectbackground: str
         :param selectforeground: selectforeground color of the selected day
         :type selectforeground: str
-        :param kw: options to be passed on to the ``ttk.Frame`` initializer
+        :param kw: options to be passed on to the :class:`ttk.Frame` initializer
         """
         # remove custom options from kw before initializating ttk.Frame
         fwday = kw.pop('firstweekday', calendar.MONDAY)

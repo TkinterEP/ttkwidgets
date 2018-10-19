@@ -156,7 +156,7 @@ class ItemsCanvas(ttk.Frame):
         :param text: text to display
         :type text: str
         :param font: font of the text
-        :type font: tuple, Font object
+        :type font: tuple or :class:`~tkinter.font.Font`
         :param backgroundcolor: background color
         :type  backgroundcolor: str
         :param textcolor: text color

@@ -30,7 +30,7 @@ class DebugWindow(tk.Toplevel):
         :type stderr: bool
         :param width:
         :type width: int
-        :param kwargs: options to be passed on to the ``tk.Toplevel`` initializer
+        :param kwargs: options to be passed on to the :class:`tk.Toplevel` initializer
         """
         self._width = width
         tk.Toplevel.__init__(self, master, **kwargs)

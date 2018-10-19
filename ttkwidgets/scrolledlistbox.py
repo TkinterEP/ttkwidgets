@@ -27,7 +27,7 @@ class ScrolledListbox(ttk.Frame):
         :type listheight: int
         :param listwidth: width of the Listbox in characters
         :type listwidth: int
-        :param kwargs: keyword arguments passed on to the ``tk.Listbox`` initializer
+        :param kwargs: keyword arguments passed on to the :class:`tk.Listbox` initializer
         """
         ttk.Frame.__init__(self, master)
         self.listbox = tk.Listbox(self, **kwargs)

@@ -19,7 +19,7 @@ class AutoHideScrollbar(ttk.Scrollbar):
 
         :param master: master widget
         :type master: widget
-        :param kwargs: options to be passed on to the ``ttk.Scrollbar`` initializer
+        :param kwargs: options to be passed on to the :class:`ttk.Scrollbar` initializer
         """
         ttk.Scrollbar.__init__(self, master=master, **kwargs)
         self._pack_kw = {}
