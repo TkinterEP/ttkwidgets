@@ -227,7 +227,7 @@ class ScaleEntry(ttk.Frame):
     def config_scale(self, cnf={}, **kwargs):
         """Configure resources of the Scale widget."""
         self._scale.config(cnf, **kwargs)
-        # udpate self._variable limits in case the ones of the scale have changed
+        # Update self._variable limits in case the ones of the scale have changed
         self._variable.configure(high=self._scale['to'],
                                  low=self._scale['from'])
         if 'orient' in cnf or 'orient' in kwargs:
