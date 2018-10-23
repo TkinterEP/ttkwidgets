@@ -111,7 +111,7 @@ class TimeLine(ttk.Frame):
         :type zoom_enabled: bool
         :param categories: A dictionary with the names of the categories
             as the keys and the keyword argument dictionaries as values.
-            Use an :obj: `OrderedDict` in order to preserve category
+            Use an :obj:`OrderedDict` in order to preserve category
             order.
         :type categories: dict[Any, dict]
         :param background: Background color for the Canvas widget
@@ -678,16 +678,16 @@ class TimeLine(ttk.Frame):
 
         :param move_callback: Callback to be called upon moving a
             marker. Arguments to callback:
-            (iid: str, (old_start: float, old_finish: float),
-            (new_start: float, new_finish: float))
+            ``(iid: str, (old_start: float, old_finish: float),
+            (new_start: float, new_finish: float))``
         :type move_callback: callable
         :param left_callback: Callback to be called upon left clicking
             a marker. Arguments to callback:
-            (iid: str, x_coord: int, y_coord: int)
+            ``(iid: str, x_coord: int, y_coord: int)``
         :type left_callback: callable
         :param right_callback: Callback to be called upon right clicking
             a marker. Arguments to callback:
-            (iid: str, x_coord: int, y_coord: int)
+            ``(iid: str, x_coord: int, y_coord: int)``
         :type right_callback: callable
         :param menu: A Menu widget to show upon right click. Can be
             used with the right_callback option simultaneously.
@@ -885,14 +885,14 @@ class TimeLine(ttk.Frame):
         marker["finish"] = finish
 
     def _enter_handler(self, event):
-        """Callback for :obj: `<Enter>` event on marker, to set hover options"""
+        """Callback for :obj:`<Enter>` event on marker, to set hover options"""
         iid = self.current_iid
         if iid is None or iid == self.active:
             return
         self.update_state(iid, "hover")
 
-    def leave_handler(self, event):
-        """Callback for :obj: `<Leave>` event on marker, to set normal options"""
+    def _leave_handler(self, event):
+        """Callback for :obj:`<Leave>` event on marker, to set normal options"""
         iid = self.current_iid
         if iid is None or self.active == iid:
             return
@@ -993,7 +993,7 @@ class TimeLine(ttk.Frame):
         """
         Currently active item's iid
 
-        :rtype str:
+        :rtype: str
         """
         current = self.current
         if current is None or current not in self._canvas_markers:
