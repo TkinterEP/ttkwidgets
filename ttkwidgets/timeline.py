@@ -85,6 +85,7 @@ class TimeLine(ttk.Frame):
         "TimeLine.TLabel" style.
 
         **Base TimeLine Widget Options**
+
         :param width: Width of the timeline in pixels
         :type width: int
         :param height: Height of the timeline in pixels
@@ -110,7 +111,7 @@ class TimeLine(ttk.Frame):
         :type zoom_enabled: bool
         :param categories: A dictionary with the names of the categories
             as the keys and the keyword argument dictionaries as values.
-            Use an :obj: OrderedDict in order to preserve category
+            Use an :obj: `OrderedDict` in order to preserve category
             order.
         :type categories: dict[Any, dict]
         :param background: Background color for the Canvas widget
@@ -131,6 +132,7 @@ class TimeLine(ttk.Frame):
         :type menu: tk.Menu
 
         **Marker Default Options**
+
         :param marker_font: Font tuple to specify the default font for
             the markers
         :type marker_font: tuple
@@ -260,8 +262,9 @@ class TimeLine(ttk.Frame):
         """
         Configure all widgets using the grid geometry manager
 
-        Automatically called by the __init__ method. Does not have to
-        be called by the user except in extraordinary cases.
+        Automatically called by the :meth:`~TimeLine.__init__` method.
+        Does not have to be called by the user except in extraordinary
+        cases.
         """
         # Categories
         for index, label in enumerate(self._category_labels.values()):
@@ -675,16 +678,16 @@ class TimeLine(ttk.Frame):
 
         :param move_callback: Callback to be called upon moving a
             marker. Arguments to callback:
-            *(iid: str, (old_start: float, old_finish: float),
+            (iid: str, (old_start: float, old_finish: float),
             (new_start: float, new_finish: float))
         :type move_callback: callable
         :param left_callback: Callback to be called upon left clicking
             a marker. Arguments to callback:
-            *(iid: str, x_coord: int, y_coord: int)
+            (iid: str, x_coord: int, y_coord: int)
         :type left_callback: callable
         :param right_callback: Callback to be called upon right clicking
             a marker. Arguments to callback:
-            *(iid: str, x_coord: int, y_coord: int)
+            (iid: str, x_coord: int, y_coord: int)
         :type right_callback: callable
         :param menu: A Menu widget to show upon right click. Can be
             used with the right_callback option simultaneously.
@@ -767,7 +770,7 @@ class TimeLine(ttk.Frame):
         :type: float
         :param unit: Unit to apply format of. Only supports hours ('h')
             and minutes ('m').
-        :type unit: str, :obj: m, :obj: h
+        :type unit: str
         :return: A string in format '{whole}:{part}'
         :rtype: str
         """
@@ -882,14 +885,14 @@ class TimeLine(ttk.Frame):
         marker["finish"] = finish
 
     def _enter_handler(self, event):
-        """Callback for <Enter> event on marker, to set hover options"""
+        """Callback for :obj: `<Enter>` event on marker, to set hover options"""
         iid = self.current_iid
         if iid is None or iid == self.active:
             return
         self.update_state(iid, "hover")
 
     def leave_handler(self, event):
-        """Callback for <Leave> event on marker, to set normal options"""
+        """Callback for :obj: `<Leave>` event on marker, to set normal options"""
         iid = self.current_iid
         if iid is None or self.active == iid:
             return
@@ -901,7 +904,7 @@ class TimeLine(ttk.Frame):
 
         :param iid: Marker to set the state of
         :type iid: str
-        :param state: Supports :obj: active, :obj: hover, :obj: normal
+        :param state: Supports "active", "hover", "normal"
         :type state: str
         """
         if state not in ["normal", "hover", "active"]:
@@ -938,6 +941,7 @@ class TimeLine(ttk.Frame):
     def call_callbacks(self, iid, type, args):
         """
         Call the available callbacks for a certain marker
+
         :param iid: iid of the marker
         :type iid: str
         :param type: type of callback (key in tag dictionary)
@@ -1088,7 +1092,7 @@ class TimeLine(ttk.Frame):
 
     @staticmethod
     def range(start, finish, step):
-        """Like built-in range(), but with float support"""
+        """Like built-in :func:`~builtins.range`, but with float support"""
         value = start
         while value <= finish:
             yield value
