@@ -4,7 +4,7 @@
 # Copyright (c) Juliette Monsel 2017
 # For license see LICENSE
 
-from ttkwidgets.debugwindow import DebugWindow
+from ttkwidgets import DebugWindow
 try:
     import Tkinter as tk
     import ttk
