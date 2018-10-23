@@ -17,14 +17,22 @@ EXAMPLES = os.listdir(FOLDER)
 EXAMPLES_FILE = \
     "Examples\n" \
     "========\n" \
-    ".. toctree::\n" \
-    "   :maxdepth: 2\n\n" \
-    "   {}"
+    "\n" \
+    "{}"
 
+TOCTREE_TEMPLATE = \
+    ".. toctree::\n" \
+    "   :glob:\n" \
+    "   :Caption: {}\n" \
+    "\n" \
+    "   {}"
+    
 if not os.path.exists("examples"):
     os.makedirs("examples")
 
 example_files = list()
+
+pkgs = {}
 
 for example in EXAMPLES:
     path = os.path.join(FOLDER, example)
@@ -40,6 +48,11 @@ for example in EXAMPLES:
     if widget is None:
         print("[WARNING] Could not determine imported widget in {}".format(example))
         continue
+
+    pkg = package
+    if not pkg in pkgs:
+        pkgs[pkg] = []
+    
     package = package.split(".")
     package = "" if len(package) != 2 else package[1]
 
@@ -54,9 +67,12 @@ for example in EXAMPLES:
     with open(out_file, "w") as fo:
         fo.write(text)
 
-    example_files.append(out_file.replace(".rst", "") + "\n")
+    pkgs[pkg].append(out_file.replace(".rst", "") + "\n")
 
+toctrees = []
+
+for pkg in sorted(pkgs.keys()):
+    toctrees.append(TOCTREE_TEMPLATE.format(pkg, "   ".join(sorted(pkgs[pkg]))))
+    
 with open("examples.rst", "w") as fo:
-    fo.write(EXAMPLES_FILE.format("   ".join(sorted(example_files))))
-
-
+    fo.write(EXAMPLES_FILE.format("\n\n".join(sorted(toctrees))))
