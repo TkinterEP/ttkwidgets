@@ -26,7 +26,7 @@ class TimeLine(ttk.Frame):
     with the identifier of the tag as well as a Tkinter event instance
     that was generated upon clicking. For example, the markers may be
     moved, or the user may want to add a menu that shows upon
-    right-clicking. See the create_marker function for more details on
+    right-clicking. See the :meth:`create_marker` function for more details on
     the markers.
 
     The markers are put into a Canvas, which contains rows for each
@@ -34,7 +34,7 @@ class TimeLine(ttk.Frame):
     black separating lines. Underneath the rows of categories, there is
     a second Canvas containing markers for the ticks of the time unit.
     Some time units get special treatment, such as "h" and "m",
-    displayed in anappropriate H:M and M:S format respectively.
+    displayed in an appropriate H:M and M:S format respectively.
 
     The height of the row for each category is automatically adjusted to
     the height of its respective Label to give a uniform appearance.
@@ -43,7 +43,7 @@ class TimeLine(ttk.Frame):
     on the number of markers to draw, it may take a long time.
 
     The TimeLine can be scrolled in two ways: horizontally (with
-    _scrollbar_timeline) and vertically (with _scrollbar_timeline_v),
+    :obj:`_scrollbar_timeline`) and vertically (with :obj:`_scrollbar_timeline_v`),
     which both use a class function as a proxy to allow for other
     functions to be called upon scrolling. The horizontal scrollbar
     makes a small pop-up window appear to indicate the time the cursor
@@ -51,25 +51,27 @@ class TimeLine(ttk.Frame):
 
     The markers can be retrieved from the class using the markers
     property, and they can be saved and then the markers can be
-    recreated by calling create_marker again for each marker. This
+    recreated by calling :meth:`create_marker` again for each marker. This
     functionality is not built into the class, if the user wants to do
     something like this, he or she should write the code required, as it
     can be done in different ways.
 
-    Some of the code has been inspired by the ItemsCanvas, as that is
+    Some of the code has been inspired by the :class:`ItemsCanvas`, as that is
     also a Canvas that supports the manipulation of items, but as this
     works in a fundamentally different way, the classes do not share any
     common parent class.
 
-    This widget is *absolutely not* thread-safe, and it was not designed
-    as such. It may work in some situations, but nothing is guaranteed
-    when using this widget from multiple threads, even with Tkinter
-    compiled with thread-safe flags or when using mtTkinter for
-    Python 2.
+    .. warning::
+         This widget is *absolutely not* thread-safe, and it was not designed
+         as such. It may work in some situations, but nothing is guaranteed
+         when using this widget from multiple threads, even with Tkinter
+         compiled with thread-safe flags or when using mtTkinter for
+         Python 2.
 
-    Some themes may conflict with this widget, for example because it
-    makes the default font bigger for the category Labels. This should
-    be fixed by the user by modifying the TimeLine.T(Widget) style.
+    .. note::
+         Some themes may conflict with this widget, for example because it
+         makes the default font bigger for the category Labels. This should
+         be fixed by the user by modifying the "TimeLine.T(Widget)" style.
     """
 
     def __init__(self, master=None, **kwargs):
@@ -262,7 +264,7 @@ class TimeLine(ttk.Frame):
         """
         Configure all widgets using the grid geometry manager
 
-        Automatically called by the :meth:`~TimeLine.__init__` method.
+        Automatically called by the :meth:`__init__` method.
         Does not have to be called by the user except in extraordinary
         cases.
         """
@@ -413,11 +415,9 @@ class TimeLine(ttk.Frame):
         :type finish: float
         :param marker: marker dictionary (replaces kwargs)
         :type marker: dict[str, Any]
-        :return: marker iid
-        :rtype: str
-        :raise ValueError: One of the specified arguments is invalid
 
         **Marker Options**
+        
         Options can be given either in the marker dictionary argument,
         or as keyword arguments. Given keyword arguments take precedence
         over tag options, which take precedence over default options.
@@ -452,14 +452,15 @@ class TimeLine(ttk.Frame):
         :type move: bool
 
         Additionally, all the options with the ``marker_`` prefix from
-        __init__, but without the prefix, are supported. Active state
+        :meth:`__init__`, but without the prefix, are supported. Active state
         options are also available, with the ``active_`` prefix for
         ``background``, ``foreground``, ``outline``, ``border``. These
         options are also available for the hover state with the
         ``hover_`` prefix.
 
-        :returns: iid of the created marker
-        :raises: ValueError
+        :return: identifier of the created marker
+        :rtype: str
+        :raise ValueError: One of the specified arguments is invalid
         """
         kwargs = kwargs if marker is None else marker
         if category not in self._categories:
@@ -547,7 +548,7 @@ class TimeLine(ttk.Frame):
         """
         Change the options for a certain marker and redraw the marker
 
-        :param iid: iid of the marker to change
+        :param iid: identifier of the marker to change
         :type iid: str
         :param kwargs: Dictionary of options to update
         :type kwargs: dict
@@ -562,7 +563,12 @@ class TimeLine(ttk.Frame):
         return self.create_marker(marker["category"], marker["start"], marker["finish"], marker)
 
     def delete_marker(self, iid):
-        """Delete a marker from the TimeLine by its iid"""
+        """
+        Delete a marker from the TimeLine
+
+        :param iid: marker identifier
+        :type iid: str
+        """
         if iid == tk.ALL:
             for iid in self.markers.keys():
                 self.delete_marker(iid)
@@ -767,7 +773,7 @@ class TimeLine(ttk.Frame):
         Create a properly formatted string given a time and unit
 
         :param time: Time to format
-        :type: float
+        :type time: float
         :param unit: Unit to apply format of. Only supports hours ('h')
             and minutes ('m').
         :type unit: str
@@ -902,9 +908,9 @@ class TimeLine(ttk.Frame):
         """
         Set a custom state of the marker
 
-        :param iid: Marker to set the state of
+        :param iid: identifier of the marker to set the state of
         :type iid: str
-        :param state: Supports "active", "hover", "normal"
+        :param state: supports "active", "hover", "normal"
         :type state: str
         """
         if state not in ["normal", "hover", "active"]:
@@ -942,7 +948,7 @@ class TimeLine(ttk.Frame):
         """
         Call the available callbacks for a certain marker
 
-        :param iid: iid of the marker
+        :param iid: marker identifier
         :type iid: str
         :param type: type of callback (key in tag dictionary)
         :type type: str
@@ -1029,7 +1035,7 @@ class TimeLine(ttk.Frame):
 
     @property
     def options(self):
-        """List of available options to __init__"""
+        """List of available options to :meth:`__init__`"""
         return [
             # TimeLine options
             "width", "height", "extend", "start", "finish", "resolution", "tick_resolution", "unit", "zoom_enabled",
@@ -1057,8 +1063,7 @@ class TimeLine(ttk.Frame):
         ttk.Frame.configure(self, **kwargs)
         self.draw_timeline()
 
-    def config(self, cnf={}, **kwargs):
-        self.configure(cnf=cnf, **kwargs)
+    config = configure
 
     def cget(self, item):
         """Return the value of an option"""
@@ -1101,7 +1106,7 @@ class TimeLine(ttk.Frame):
     @staticmethod
     def check_kwargs(kwargs):
         """
-        Check the type and values of keyword arguments to __init__
+        Check the type and values of keyword arguments to :meth:`__init__`
 
         :param kwargs: Dictionary of keyword arguments
         :type kwargs: dict[str, Any]
