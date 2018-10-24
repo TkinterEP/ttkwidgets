@@ -21,9 +21,10 @@ EXAMPLES_FILE = \
     "{}"
 
 TOCTREE_TEMPLATE = \
+    "{}\n"\
+    "\n" \
     ".. toctree::\n" \
     "   :glob:\n" \
-    "   :Caption: {}\n" \
     "\n" \
     "   {}"
     
@@ -72,7 +73,8 @@ for example in EXAMPLES:
 toctrees = []
 
 for pkg in sorted(pkgs.keys()):
-    toctrees.append(TOCTREE_TEMPLATE.format(pkg, "   ".join(sorted(pkgs[pkg]))))
+    header = pkg + '\n' + '-' * len(pkg)
+    toctrees.append(TOCTREE_TEMPLATE.format(header, "   ".join(sorted(pkgs[pkg]))))
     
 with open("examples.rst", "w") as fo:
     fo.write(EXAMPLES_FILE.format("\n\n".join(sorted(toctrees))))
