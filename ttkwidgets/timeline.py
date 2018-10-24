@@ -297,7 +297,7 @@ class TimeLine(ttk.Frame):
         self._timeline.bind("<B1-Motion>", self._left_motion)
         self._timeline.bind("<ButtonPress-3>", self._right_click)
         self._timeline.tag_bind("marker", "<Enter>", self._enter_handler)
-        self._timeline.tag_bind("marker", "<Leave>", self.leave_handler)
+        self._timeline.tag_bind("marker", "<Leave>", self._leave_handler)
         self._canvas_ticks.bind("<B1-Motion>", self._time_marker_move)
         self._canvas_ticks.bind("<ButtonRelease-1>", self._time_marker_release)
 
