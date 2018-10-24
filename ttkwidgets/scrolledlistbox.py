@@ -24,6 +24,8 @@ class ScrolledListbox(ttk.Frame):
         :param kwargs: keyword arguments passed on to Listbox initializer
         """
         ttk.Frame.__init__(self, master)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
         self.listbox = tk.Listbox(self, **kwargs)
         self.scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
         self.config_listbox(yscrollcommand=self.scrollbar.set)
