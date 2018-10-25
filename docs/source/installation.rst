@@ -1,11 +1,18 @@
 Installation
 ============
 
-ttkwidgets is available in `pypi <https://pypi.org/project/ttkwidgets>`_ and can be installed with pip:
+- With pip:
 
-::
+    ::
 
-    pip install ttkwidgets
+        pip install ttkwidgets
     
+- Ubuntu: ttkwidgets is available in the PPA `ppa:j-4321-i/ttkwidgets <https://launchpad.net/~j-4321-i/+archive/ubuntu/ttkwidgets>`_.
+
+    .. code-block:: text
     
-For Archlinux users, ttwidgets is available in `AUR <https://aur.archlinux.org/packages/python-ttkwidgets/>`_.
+        sudo add-apt-repository ppa:j-4321-i/ttkwidgets
+        sudo apt-get update
+        sudo apt-get install python(3)-ttkwidgets
+
+- Archlinux: ttkwidgets is available in `AUR <https://aur.archlinux.org/packages/python-ttkwidgets/>`_.
