@@ -31,6 +31,9 @@ class ScrolledFrame(ttk.Frame):
         :param kwargs: passed on to Frame.__init__
         """
         ttk.Frame.__init__(self, master, **kwargs)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        
         self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
         self._canvas = tk.Canvas(self, borderwidth=canvasborder, highlightthickness=0,
                                  yscrollcommand=self._scrollbar.set, width=canvaswidth, height=canvasheight)
@@ -50,7 +53,6 @@ class ScrolledFrame(ttk.Frame):
         """
         scrollbar_column = 0 if self.__compound is tk.LEFT else 2
         self._canvas.grid(row=0, column=1, sticky="nswe")
-        self.interior.grid(row=0, column=1, sticky="nswe")
         self._scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
 
     def __configure_interior(self, *args):

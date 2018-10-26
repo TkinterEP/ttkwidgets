@@ -115,8 +115,3 @@ class LinkLabel(ttk.Label):
         keys.extend(["link", "normal_color", "hover_color", "clicked_color"])
         return keys
 
-
-if __name__ == '__main__':
-    window = tk.Tk()
-    LinkLabel(window, text="Label").pack()
-    window.mainloop()
