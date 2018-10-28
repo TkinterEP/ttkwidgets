@@ -25,9 +25,10 @@ def get_calendar(locale, fwday):
 class Calendar(ttk.Frame):
     """
     ttk Widget that enables a calender within a frame, allowing the user to select dates.
-    Credits to: The Python team
-    Source: The Python/ttk samples
-    License: The Python GPL-compatible license
+    
+    | Credits to: The Python team
+    | Source: The Python/ttk samples
+    | License: The Python GPL-compatible license
     """
 
     datetime = calendar.datetime.datetime
