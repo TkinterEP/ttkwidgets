@@ -12,6 +12,7 @@ try:
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
+from ttkwidgets import AutoHideScrollbar
 
 
 class ScrolledFrame(ttk.Frame):
@@ -34,7 +35,7 @@ class ScrolledFrame(ttk.Frame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         
-        self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
+        self._scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL)
         self._canvas = tk.Canvas(self, borderwidth=canvasborder, highlightthickness=0,
                                  yscrollcommand=self._scrollbar.set, width=canvaswidth, height=canvasheight)
         self.__compound = compound
