@@ -15,8 +15,8 @@ import webbrowser
 
 class LinkLabel(ttk.Label):
     """
-    A ttk Label that can be clicked to open a link with a default blue color, a purple color when clicked and a bright
-    blue color when hovering over the Label
+    A :class:`ttk.Label` that can be clicked to open a link with a default blue color, a purple color when clicked and a bright
+    blue color when hovering over the Label.
     """
     def __init__(self, master=None, **kwargs):
         """

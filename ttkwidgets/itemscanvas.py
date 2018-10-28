@@ -15,8 +15,9 @@ from PIL import Image, ImageTk
 
 class ItemsCanvas(ttk.Frame):
     """
-    A Tkinter Frame containing a Canvas upon which text items can be placed with a coloured background. The items can
-    be moved around and deleted. A background can also be set.
+    A :class:`ttk.Frame` containing a Canvas upon which text items can be placed with a coloured background. 
+    
+    The items can be moved around and deleted. A background can also be set.
     """
 
     def __init__(self, *args, **kwargs):

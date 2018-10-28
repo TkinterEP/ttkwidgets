@@ -12,16 +12,14 @@ except ImportError:
 
 
 class ScrolledListbox(ttk.Frame):
-    """
-    Simple Listbox with an added scrollbar
-    """
+    """Simple :class:`tk.Listbox` with an added scrollbar."""
     def __init__(self, master=None, compound=tk.RIGHT, **kwargs):
         """
         Create a Listbox with a vertical scrollbar.
 
         :param master: master widget
         :type master: widget
-        :param compound: side for the Scrollbar to be on (``tk.LEFT`` or ``tk.RIGHT``)
+        :param compound: side for the Scrollbar to be on (:obj:`tk.LEFT` or :obj:`tk.RIGHT`)
         :type compound: str
         :param kwargs: keyword arguments passed on to the :class:`tk.Listbox` initializer
         """

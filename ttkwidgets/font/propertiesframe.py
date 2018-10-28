@@ -16,7 +16,7 @@ except ImportError:
 
 class FontPropertiesFrame(ttk.Frame):
     """
-    Simple frame with buttons for Bold, Italic and Undelrine font types.
+    Simple frame with buttons for Bold, Italic and Underline font types.
     """
 
     def __init__(self, master=None, callback=None, label=True, fontsize=11, **kwargs):

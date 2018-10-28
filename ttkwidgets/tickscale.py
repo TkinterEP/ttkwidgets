@@ -13,7 +13,7 @@ except ImportError:
 
 class TickScale(ttk.Frame):
     """
-    A ttk.Scale that can display the current value next to the slider and
+    A :class:`ttk.Scale` that can display the current value next to the slider and
     supports ticks.
     """
     def __init__(self, master=None, **kwargs):

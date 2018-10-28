@@ -58,9 +58,7 @@ class ScaleEntry(ttk.Frame):
         self._grid_widgets()
 
     def _grid_widgets(self):
-        """
-        Puts the widgets in the correct position based on self.__compound
-        """
+        """Put the widgets in the correct position based on self.__compound."""
         orient = str(self._scale.cget('orient'))
         self._scale.grid(row=2, column=2, sticky='ew' if orient == tk.HORIZONTAL else 'ns',
                          padx=(0, self.__entryscalepad) if self.__compound is tk.RIGHT else
@@ -88,9 +86,9 @@ class ScaleEntry(ttk.Frame):
 
     def _on_entry(self, event):
         """
-        Callback for the Entry widget, sets the Scale variable to the appropriate value
+        Callback for the Entry widget, sets the Scale variable to the appropriate value.
+        
         :param event: Tkinter event
-        :return: None
         """
         contents = self._entry.get()
         if contents == "":
@@ -104,9 +102,9 @@ class ScaleEntry(ttk.Frame):
 
     def _on_scale(self, event):
         """
-        Callback for the Scale widget, inserts an int value into the Entry
+        Callback for the Scale widget, inserts an int value into the Entry.
+
         :param event: Tkinter event
-        :return:
         """
         self._entry.delete(0, tk.END)
         self._entry.insert(0, str(self._variable.get()))
@@ -235,15 +233,11 @@ class ScaleEntry(ttk.Frame):
 
     @property
     def value(self):
-        """
-        Get the value of the LimitedIntVar instance of the class
-        """
+        """Get the value of the :class:`LimitedIntVar` instance of the class."""
         return self._variable.get()
 
     class LimitedIntVar(tk.IntVar):
-        """
-        Subclass of :class:`tk.IntVar` that allows limits in the value of the variable stored
-        """
+        """Subclass of :class:`tk.IntVar` that allows limits in the value of the variable stored."""
         def __init__(self, low, high):
             self._low = low
             self._high = high

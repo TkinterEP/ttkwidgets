@@ -17,8 +17,8 @@ from ttkwidgets import ScrolledListbox
 
 class FontFamilyListbox(ScrolledListbox):
     """
-    ScrolledListbox listing all font families available on the system with a Scrollbar on the right with the option
-    of a callback when double clicked and a property to get the font family name
+    :class:`~ttkwidgets.ScrolledListbox` listing all font families available on the system with a Scrollbar on the right with the option
+    of a callback when double clicked and a property to get the font family name.
     """
 
     def __init__(self, master=None, callback=None, **kwargs):
@@ -29,7 +29,7 @@ class FontFamilyListbox(ScrolledListbox):
         :type master: widget
         :param callback: callable object with one argument: the font family name
         :type callback: function
-        :param kwargs: keyword arguments passed to :class:`ScrolledListbox`, in turn passed to :class:`tk.Listbox`
+        :param kwargs: keyword arguments passed to :class:`~ttkwidgets.ScrolledListbox`, in turn passed to :class:`tk.Listbox`
         """
         ScrolledListbox.__init__(self, master, compound=tk.RIGHT, **kwargs)
         self._callback = callback
