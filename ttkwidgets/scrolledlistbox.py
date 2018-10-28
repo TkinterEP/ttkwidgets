@@ -18,15 +18,11 @@ class ScrolledListbox(ttk.Frame):
     def __init__(self, master=None, compound=tk.RIGHT, **kwargs):
         """
         Create a Listbox with a vertical scrollbar.
-        
+
         :param master: master widget
         :type master: widget
         :param compound: side for the Scrollbar to be on (``tk.LEFT`` or ``tk.RIGHT``)
         :type compound: str
-        :param listheight: height of the Listbox in items
-        :type listheight: int
-        :param listwidth: width of the Listbox in characters
-        :type listwidth: int
         :param kwargs: keyword arguments passed on to the :class:`tk.Listbox` initializer
         """
         ttk.Frame.__init__(self, master)
@@ -39,10 +35,7 @@ class ScrolledListbox(ttk.Frame):
         self._grid_widgets()
 
     def _grid_widgets(self):
-        """
-        Puts the two whole widgets in the correct position depending on compound
-        :return: None
-        """
+        """Puts the two whole widgets in the correct position depending on compound."""
         scrollbar_column = 0 if self.__compound is tk.LEFT else 2
         self.listbox.grid(row=0, column=1, sticky="nswe")
         self.scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
@@ -50,4 +43,3 @@ class ScrolledListbox(ttk.Frame):
     def config_listbox(self, *args, **kwargs):
         """Configure resources of the Listbox widget."""
         self.listbox.configure(*args, **kwargs)
-
