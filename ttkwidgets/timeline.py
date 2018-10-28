@@ -11,6 +11,7 @@ except ImportError:
     from tkinter import ttk
 from ttkwidgets.utilities import open_icon
 from collections import OrderedDict
+from ttkwidgets import AutoHideScrollbar
 
 
 class TimeLine(ttk.Frame):
@@ -189,8 +190,8 @@ class TimeLine(ttk.Frame):
         self._canvas_scroll = tk.Canvas(self, background=self._background, width=self._width, height=self._height)
         self._timeline = tk.Canvas(self._canvas_scroll, background=self._background, borderwidth=0)
         self._timeline_id = self._canvas_scroll.create_window(0, 0, window=self._timeline, anchor=tk.NW)
-        self._scrollbar_timeline = ttk.Scrollbar(self, command=self.set_scroll, orient=tk.HORIZONTAL)
-        self._scrollbar_vertical = ttk.Scrollbar(self, command=self.set_scroll_v, orient=tk.VERTICAL)
+        self._scrollbar_timeline = AutoHideScrollbar(self, command=self.set_scroll, orient=tk.HORIZONTAL)
+        self._scrollbar_vertical = AutoHideScrollbar(self, command=self.set_scroll_v, orient=tk.VERTICAL)
         self._canvas_scroll.config(xscrollcommand=self._scrollbar_timeline.set,
                                    yscrollcommand=self._scrollbar_vertical.set)
         self._canvas_categories.config(yscrollcommand=self._scrollbar_vertical.set)
