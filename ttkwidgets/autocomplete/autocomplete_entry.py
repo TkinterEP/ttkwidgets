@@ -17,9 +17,9 @@ tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresi
 
 class AutocompleteEntry(ttk.Entry):
     """
-    Subclass of tk.Entry that features autocompletion.
+    Subclass of :class:`ttk.Entry` that features autocompletion.
 
-    To enable autocompletion use set_completion_list(list) to define
+    To enable autocompletion use :meth:`set_completion_list` to define
     a list of possible strings to hit.
     To cycle through hits use down and up arrow keys.
     """
@@ -31,7 +31,7 @@ class AutocompleteEntry(ttk.Entry):
         :type master: widget
         :param completevalues: autocompletion values
         :type completevalues: list
-        :param kwargs: keyword arguments passed to the ``ttk.Entry`` initializer
+        :param kwargs: keyword arguments passed to the :class:`ttk.Entry` initializer
         """
         ttk.Entry.__init__(self, master, **kwargs)
         self._completion_list = completevalues

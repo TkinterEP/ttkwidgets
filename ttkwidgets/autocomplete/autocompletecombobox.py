@@ -16,9 +16,7 @@ tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresi
 
 
 class AutocompleteCombobox(ttk.Combobox):
-    """
-    Combobox widget that features autocompletion.
-    """
+    """:class:`ttk.Combobox` widget that features autocompletion."""
     def __init__(self, master=None, completevalues=None, **kwargs):
         """
         Create an AutocompleteCombobox.
@@ -27,7 +25,7 @@ class AutocompleteCombobox(ttk.Combobox):
         :type master: widget
         :param completevalues: autocompletion values
         :type completevalues: list
-        :param kwargs: keyword arguments passed to the ``ttk.Combobox`` initializer
+        :param kwargs: keyword arguments passed to the :class:`ttk.Combobox` initializer
         """
         ttk.Combobox.__init__(self, master, values=completevalues, **kwargs)
         self._completion_list = completevalues
@@ -39,7 +37,7 @@ class AutocompleteCombobox(ttk.Combobox):
 
     def set_completion_list(self, completion_list):
         """
-        Use our completion list as our drop down selection menu, arrows move through menu.
+        Use the completion list as drop down selection menu, arrows move through menu.
         
         :param completion_list: completion values
         :type completion_list: list
