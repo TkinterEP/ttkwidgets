@@ -28,7 +28,7 @@ class DebugWindow(tk.Toplevel):
         :type stdout: bool
         :param stderr:  whether to redirect stderr to the widget
         :type stderr: bool
-        :param width:
+        :param width: window width (in characters)
         :type width: int
         :param kwargs: options to be passed on to the :class:`tk.Toplevel` initializer
         """
