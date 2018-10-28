@@ -23,9 +23,11 @@ IM_TRISTATE = os.path.join(get_assets_directory(), "tristate.png")
 
 class CheckboxTreeview(ttk.Treeview):
     """
-    Treeview widget with checkboxes left of each item.
-    The checkboxes are done via the image attribute of the item, so to keep
-    the checkbox, you cannot add an image to the item.
+    :class:`ttk.Treeview` widget with checkboxes left of each item.
+    
+    .. note::
+        The checkboxes are done via the image attribute of the item, 
+        so to keep the checkbox, you cannot add an image to the item.
     """
 
     def __init__(self, master=None, **kw):
