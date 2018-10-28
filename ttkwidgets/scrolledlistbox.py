@@ -9,6 +9,7 @@ try:
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
+from ttkwidgets import AutoHideScrollbar
 
 
 class ScrolledListbox(ttk.Frame):
@@ -27,7 +28,7 @@ class ScrolledListbox(ttk.Frame):
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
         self.listbox = tk.Listbox(self, **kwargs)
-        self.scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
+        self.scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
         self.config_listbox(yscrollcommand=self.scrollbar.set)
         if compound is not tk.LEFT and compound is not tk.RIGHT:
             raise ValueError("Invalid compound value passed: {0}".format(compound))
