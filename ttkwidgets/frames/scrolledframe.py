@@ -22,20 +22,24 @@ class ScrolledFrame(ttk.Frame):
     Widgets can be placed in instance.interior attribute Frame with any geometry manager
     """
 
-    def __init__(self, master=None, compound=tk.RIGHT, canvasheight=400, canvaswidth=400, canvasborder=0, **kwargs):
+    def __init__(self, master=None, compound=tk.RIGHT, canvasheight=400, 
+                 canvaswidth=400, canvasborder=0, autohidescrollbar=True, **kwargs):
         """
         :param master: master widget
         :param compound: side the scrollbar should be on
         :param canvasheight: hight of the internal canvas
         :param canvaswidth: width of the internal canvas
         :param canvasborder: border width of the internal canvas
+        :param autohidescrollbar: whether to use an AutoHideScrollbar or a ttk.Scrollbar
         :param kwargs: passed on to Frame.__init__
         """
         ttk.Frame.__init__(self, master, **kwargs)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        
-        self._scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL)
+        if autohidescrollbar:
+            self._scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL)
+        else:
+            self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
         self._canvas = tk.Canvas(self, borderwidth=canvasborder, highlightthickness=0,
                                  yscrollcommand=self._scrollbar.set, width=canvaswidth, height=canvasheight)
         self.__compound = compound
