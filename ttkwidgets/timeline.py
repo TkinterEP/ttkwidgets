@@ -1056,7 +1056,7 @@ class TimeLine(ttk.Frame):
         return self.cget(item)
 
     def __setitem__(self, key, value):
-        return self.configure(key=value)
+        return self.configure(**{key: value})
 
     def itemconfigure(self, iid, rectangle_options, text_options):
         """
