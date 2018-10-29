@@ -20,7 +20,7 @@ class DebugWindow(tk.Toplevel):
     A Toplevel that shows sys.stdout and sys.stderr for Tkinter applications
     """
     def __init__(self, master=None, title="Debug window", stdout=True, 
-                 stderr=False, width=70, autohidescrollbars=True, **kwargs):
+                 stderr=False, width=70, autohidescrollbar=True, **kwargs):
         self._width = width
         tk.Toplevel.__init__(self, master, **kwargs)
         self.columnconfigure(0, weight=1)
@@ -40,7 +40,7 @@ class DebugWindow(tk.Toplevel):
         self.filemenu.add_command(label="Exit", command=self.quit)
         self.menu.add_cascade(label="File", menu=self.filemenu)
         self.text = tk.Text(self, width=width, wrap=tk.WORD)
-        if autohidescrollbars:
+        if autohidescrollbar:
             self.scroll = AutoHideScrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         else:
             self.scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
