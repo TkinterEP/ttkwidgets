@@ -11,10 +11,13 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
     import tkinter.filedialog as fd
+from contextlib import contextmanager
 import sys
 from threading import Lock
 import rlcompleter
 import traceback
+from ttkwidgets import AutoHideScrollbar
+import subprocess as sp
 
 
 class Console(ttk.Frame):
@@ -39,13 +42,14 @@ class Console(ttk.Frame):
         "Alt": 0x20000,
         "Caps_Lock": 0x00002,
         "Right_Down": 0x00400,
-        "Middile_Down": 0x00200
+        "Middle_Down": 0x00200
     }
 
     _WELCOME_PYTHON = "Python {}.{}.{}".format(*sys.version_info)
     _WELCOME_SYSTEM = ""
 
-    def __init__(self, master: tk.Widget, **kwargs):
+    def __init__(self, master, **kwargs):
+        # type: ((tk.Tk, tk.Widget, tk.BaseWidget)) -> None
         """
         :param master: master widget
 
@@ -73,9 +77,31 @@ class Console(ttk.Frame):
         self._write_lock = Lock()
 
         # Child widgets
-        self._scroll = ttk.Scrollbar(self)
+        self._scroll = AutoHideScrollbar(self)
         self._text = tk.Text(self, yscrollcommand=self._scroll.set)
         self._scroll.config(command=self._text.yview)
+
+        self.setup_console()
+
+        self.grid_widgets()
+
+    def setup_console(self):
+        """Configure Console properties, input and output"""
+        if self._kind == Console.SYSTEM and sys.platform == "linux":
+            from subprocess import Popen, PIPE
+            p = Popen(["bash"], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+            self.__stdout = p.stdout
+            self.__stderr = p.stderr
+            self.__stdin = p.stdin
+        elif self._kind == Console.PYTHON:
+            pass
+        else:
+            raise ValueError("Invalid type of Console requested")
+
+    def grid_widgets(self):
+        """Configure child widgets in grid geometry manager"""
+        self._text.grid(row=1, column=1, padx=5, pady=5)
+        self._scroll.grid(row=1, column=2, padx=(0, 5), pady=5, sticky="ns")
 
     def setup_bindings(self):
         """Setup the bindings for the Text widget"""
@@ -96,31 +122,6 @@ class Console(ttk.Frame):
         self._text.tag_config("out", foreground=self._colors["foreground"])
         self._text.tag_config("path", foreground=self._colors["path"])
         self._text.config(background=self._colors["background"])
-
-    def exec(self, cmd: str=None):
-        """Configure Text widget for executing command"""
-        self._text.tag_add("cmd", "limit", "%s-1c" % tk.INSERT)
-        if cmd is None:
-            cmd = self._text.get("limit", tk.END).lstrip()
-            self._history.append(cmd)
-        self.eval(cmd)
-
-    def eval(self, cmd: str):
-        """Execute a given command in the Python interpreter"""
-        try:
-            compile(cmd, "<stdin>", "eval")
-        except SyntaxError:
-            try:
-                exec(cmd, globals())
-            except Exception:
-                self.write_exception()
-            return
-        try:
-            result = eval(cmd, globals())
-            if result is not None:
-                self.write(tk.END, result, tags=("out",))
-        except Exception:
-            self.write_exception()
 
     def login(self):
         """Change username/host prompt for SYSTEM Console"""
@@ -229,34 +230,96 @@ class Console(ttk.Frame):
         return text
 
 
-class Buffer(object):
-    """Write stdout or stderr also to tk.Text widget"""
-    def __init__(self, text: Console, output: (sys.__stdout__, sys.__stderr__)):
-        """
-        :param text: Text widget to write data to
-        :param output: Also write given data to this output buffer
-        """
-        self._text = text
-        self._out = output
+class PythonInterface(object):
+    """Create an stdout, stderr and stdin interface to Python"""
 
-    def write(self, string):
-        """Write a given string to buffers"""
-        self._out.write(string)
-        l1, _ = Console.index_to_tuple(self._text._text, "%s-1c" % tk.END)
-        l2, _ = Console.index_to_tuple(self._text._text, 'limit')
-        if l1 == l2:
-            self._text.write('limit-3c', string)
-        else:
-            self._text.write('end', string)
-        self._text._text.see('end')
+    class _Python(object):
+        """Provide access to the Python interpreter"""
 
-    def writelines(self, lines: list):
-        """Write a list of lines to output buffers"""
-        self._out.writelines(lines)
-        for line in lines:
-            self._text.write(line)
+        def __init__(self, stdout, stderr):
+            """Initialize with given output buffers"""
+            # type: PythonInterface.Buffer, PythonInterface.Buffer -> None
+            self._stdout = stdout
+            self._stderr = stderr
 
-    def flush(self):
-        """Flush output buffers"""
-        self._out.flush()
-        self._text.update_idletasks()
+        def write(self, string):
+            # type: (bytes) -> int
+            """Write a string of UTF-8 encoded bytes to eval"""
+            string = string.decode()
+            try:
+                with PythonInterface.grab_stdout() as stdout:
+                    exec(string)
+                self._stdout.write(stdout)
+            except BaseException:
+                # Handle error with stderr
+                self._stderr.write(traceback.format_exc().encode())
+                return 0
+            return len(string)
+
+    def __init__(self):
+        """Initialize input and output buffers"""
+        self.stdout = PythonInterface.Buffer()
+        self.stderr = PythonInterface.Buffer()
+        self.stdin = PythonInterface._Python(self.stdout, self.stderr)
+
+    @staticmethod
+    @contextmanager
+    def grab_stdout():
+        """Context manager that temporarily redirects stdout"""
+        # type: () -> bytes
+        b = PythonInterface.Buffer()
+        stdout = sys.__stdout__
+        sys.__stdout__ = b
+        yield
+        s = b.read(-1)
+        sys.__stdout__ = stdout
+        return s
+
+    class Buffer(object):
+        """Redirect for any buffer instance"""
+
+        def __init__(self):
+            """Instantiate buffer instance and attributes"""
+            self._buffer = bytes()
+
+        def write(self, string):
+            """Write a bytes string to the buffer"""
+            # type: bytes -> int
+            self._buffer += string
+            return len(string)
+
+        def writelines(self, lines):
+            """Write a set of bytes lines to the buffer"""
+            self._buffer += b"".join(lines)
+            return len(lines)
+
+        def read(self, amount):
+            """Read a specified amount of bytes from the buffer"""
+            # type: int -> bytes
+            if amount == -1:
+                b = self._buffer
+                self._buffer = bytes()
+                return b
+            b = self._buffer[:amount]
+            self._buffer = self._buffer[amount:]
+            return b
+
+        def flush(self):
+            pass
+
+
+class SystemInterface(sp.Popen):
+    """Provide a platform-dependent interface to the system console"""
+
+    COMMAND = "bash" if "linux" in sys.platform else "cmd"
+
+    def __init__(self):
+        """Initialize process for system console command"""
+        sp.Popen.__init__(self, [SystemInterface.COMMAND], stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE)
+
+
+if __name__ == "__main__":
+    window = tk.Tk()
+    console = Console(window)
+    console.pack()
+    console.mainloop()
