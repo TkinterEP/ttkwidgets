@@ -39,7 +39,7 @@ class TimeLine(ttk.Frame):
 
     The height of the row for each category is automatically adjusted to
     the height of its respective Label to give a uniform appearance.
-    All markers are redrawn if the generate_canvas_contents is called,
+    All markers are redrawn if :meth:`draw_timeline` is called,
     and therefore it should be called after any size change. Depending
     on the number of markers to draw, it may take a long time.
 
