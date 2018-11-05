@@ -11,6 +11,7 @@ except ImportError:
     from tkinter import ttk
 from ttkwidgets.utilities import open_icon
 from collections import OrderedDict
+from ttkwidgets import AutoHideScrollbar
 
 
 class TimeLine(ttk.Frame):
@@ -180,6 +181,7 @@ class TimeLine(ttk.Frame):
         self._extend = kwargs.pop("extend", False)
         self._snap_margin = kwargs.pop("snap_margin", 10)
         self._menu = kwargs.pop("menu", None)
+        self._autohidescrollbars = kwargs.pop("autohidescrollbars", False)
         kwargs["style"] = self._style
         self._marker_font = kwargs.pop("marker_font", ("default", 10))
         self._marker_background = kwargs.pop("marker_background", "lightblue")
@@ -249,10 +251,14 @@ class TimeLine(ttk.Frame):
         self._canvas_scroll = tk.Canvas(self, background=self._background, width=self._width, height=self._height)
         self._timeline = tk.Canvas(self._canvas_scroll, background=self._background, borderwidth=0)
         self._timeline_id = self._canvas_scroll.create_window(0, 0, window=self._timeline, anchor=tk.NW)
-        self._scrollbar_timeline = ttk.Scrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
-        self._scrollbar_vertical = ttk.Scrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
-        self._canvas_scroll.config(
-            xscrollcommand=self._scrollbar_timeline.set, yscrollcommand=self._scrollbar_vertical.set)
+        if self._autohidescrollbars:
+            self._scrollbar_timeline = AutoHideScrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+            self._scrollbar_vertical = AutoHideScrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
+        else:
+            self._scrollbar_timeline = ttk.Scrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+            self._scrollbar_vertical = ttk.Scrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
+        self._canvas_scroll.config(xscrollcommand=self._scrollbar_timeline.set,
+                                   yscrollcommand=self._scrollbar_vertical.set)
         self._canvas_categories.config(yscrollcommand=self._scrollbar_vertical.set)
 
         self._setup_bindings()
@@ -1039,7 +1045,7 @@ class TimeLine(ttk.Frame):
         return [
             # TimeLine options
             "width", "height", "extend", "start", "finish", "resolution", "tick_resolution", "unit", "zoom_enabled",
-            "categories", "background", "style", "zoom_factors", "zoom_default", "extend", "menu", "snap_margin",
+            "categories", "background", "style", "zoom_factors", "zoom_default", "extend", "menu", "autohidescrollbars", "snap_margin",
             # Marker options
             "marker_font", "marker_background", "marker_foreground", "marker_outline", "marker_border", "marker_move",
             "marker_change_category", "marker_allow_overlap", "marker_snap_to_ticks"
@@ -1057,9 +1063,24 @@ class TimeLine(ttk.Frame):
         """Update options of the TimeLine widget"""
         kwargs.update(cnf)
         TimeLine.check_kwargs(kwargs)
+        scrollbars = 'autohidescrollbars' in kwargs
         for option in self.options:
             attribute = "_" + option
             setattr(self, attribute, kwargs.pop(option, getattr(self, attribute)))
+        if scrollbars:
+            self._scrollbar_timeline.destroy()
+            self._scrollbar_vertical.destroy()
+            if self._autohidescrollbars:
+                self._scrollbar_timeline = AutoHideScrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+                self._scrollbar_vertical = AutoHideScrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
+            else:
+                self._scrollbar_timeline = ttk.Scrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+                self._scrollbar_vertical = ttk.Scrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
+            self._canvas_scroll.config(xscrollcommand=self._scrollbar_timeline.set,
+                                       yscrollcommand=self._scrollbar_vertical.set)
+            self._canvas_categories.config(yscrollcommand=self._scrollbar_vertical.set)
+            self._scrollbar_timeline.grid(column=1, row=2, padx=(0, 5), pady=(0, 5), sticky="we")
+            self._scrollbar_vertical.grid(column=2, row=0, pady=5, padx=(0, 5), sticky="ns")
         ttk.Frame.configure(self, **kwargs)
         self.draw_timeline()
 
@@ -1173,6 +1194,9 @@ class TimeLine(ttk.Frame):
         menu = kwargs.get("menu", None)
         if menu is not None and not isinstance(menu, tk.Menu):
             raise TypeError("menu argument is not a tk.Menu widget")
+        autohidescrollbars = kwargs.get("autohidescrollbars", False)
+        if not isinstance(autohidescrollbars, bool):
+            raise TypeError("autohidescrollbars argument is not of bool type")
         # marker options
         marker_font = kwargs.get("marker_font", ("default", 10))
         marker_background = kwargs.get("marker_background", "lightblue")

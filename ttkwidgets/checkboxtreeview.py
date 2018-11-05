@@ -16,9 +16,9 @@ import os
 from PIL import Image, ImageTk
 from ttkwidgets.utilities import get_assets_directory
 
-IM_CHECKED = os.path.join(get_assets_directory(), "checked.png")
-IM_UNCHECKED = os.path.join(get_assets_directory(), "unchecked.png")
-IM_TRISTATE = os.path.join(get_assets_directory(), "tristate.png")
+IM_CHECKED = os.path.join(get_assets_directory(), "checked.png")      # These three checkbox icons were isolated from
+IM_UNCHECKED = os.path.join(get_assets_directory(), "unchecked.png")  # Checkbox States.svg (https://commons.wikimedia.org/wiki/File:Checkbox_States.svg?uselang=en)
+IM_TRISTATE = os.path.join(get_assets_directory(), "tristate.png")    # by Marekich [CC BY-SA 3.0  (https://creativecommons.org/licenses/by-sa/3.0)]
 
 
 class CheckboxTreeview(ttk.Treeview):

@@ -12,6 +12,7 @@ try:
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
+from ttkwidgets import AutoHideScrollbar
 
 
 class ScrolledFrame(ttk.Frame):
@@ -21,7 +22,8 @@ class ScrolledFrame(ttk.Frame):
     :ivar interior: :class:`ttk.Frame` in which to put the widgets to be scrolled with any geometry manager.
     """
 
-    def __init__(self, master=None, compound=tk.RIGHT, canvasheight=400, canvaswidth=400, canvasborder=0, **kwargs):
+    def __init__(self, master=None, compound=tk.RIGHT, canvasheight=400, 
+                 canvaswidth=400, canvasborder=0, autohidescrollbar=True, **kwargs):
         """
         Create a ScrolledFrame.
         
@@ -35,10 +37,16 @@ class ScrolledFrame(ttk.Frame):
         :type canvaswidth: int
         :param canvasborder: border width of the internal canvas
         :type canvasborder: int
+        :param autohidescrollbar: whether to use an AutoHideScrollbar or a ttk.Scrollbar
         :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
-        self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        if autohidescrollbar:
+            self._scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL)
+        else:
+            self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
         self._canvas = tk.Canvas(self, borderwidth=canvasborder, highlightthickness=0,
                                  yscrollcommand=self._scrollbar.set, width=canvaswidth, height=canvasheight)
         self.__compound = compound
@@ -54,7 +62,6 @@ class ScrolledFrame(ttk.Frame):
         """Places all the child widgets in the appropriate positions."""
         scrollbar_column = 0 if self.__compound is tk.LEFT else 2
         self._canvas.grid(row=0, column=1, sticky="nswe")
-        self.interior.grid(row=0, column=1, sticky="nswe")
         self._scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
 
     def __configure_interior(self, *args):

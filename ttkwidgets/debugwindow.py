@@ -12,13 +12,15 @@ except ImportError:
     from tkinter import ttk
     import tkinter.filedialog as fd
 import sys
+from ttkwidgets import AutoHideScrollbar
 
 
 class DebugWindow(tk.Toplevel):
     """
     A Toplevel that shows sys.stdout and sys.stderr for Tkinter applications
     """
-    def __init__(self, master=None, title="Debug window", stdout=True, stderr=False, width=70, **kwargs):
+    def __init__(self, master=None, title="Debug window", stdout=True, 
+                 stderr=False, width=70, autohidescrollbar=True, **kwargs):
         """
         Create a Debug window.
         
@@ -34,6 +36,8 @@ class DebugWindow(tk.Toplevel):
         """
         self._width = width
         tk.Toplevel.__init__(self, master, **kwargs)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
         self.protocol("WM_DELETE_WINDOW", self.quit)
         self.wm_title(title)
         self._oldstdout = sys.stdout
@@ -49,7 +53,10 @@ class DebugWindow(tk.Toplevel):
         self.filemenu.add_command(label="Exit", command=self.quit)
         self.menu.add_cascade(label="File", menu=self.filemenu)
         self.text = tk.Text(self, width=width, wrap=tk.WORD)
-        self.scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
+        if autohidescrollbar:
+            self.scroll = AutoHideScrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
+        else:
+            self.scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         self.text.config(yscrollcommand=self.scroll.set)
         self.text.bind("<Key>", lambda e: "break")
         self._grid_widgets()
@@ -63,7 +70,7 @@ class DebugWindow(tk.Toplevel):
             f.write(self.text.get("1.0", tk.END))
 
     def _grid_widgets(self):
-        self.text.grid(row=0, column=0)
+        self.text.grid(row=0, column=0, sticky="nsew")
         self.scroll.grid(row=0, column=1, sticky="ns")
 
     def write(self, line):

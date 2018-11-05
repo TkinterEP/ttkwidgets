@@ -13,6 +13,13 @@ class TestScrolledFrame(BaseWidgetTest):
         frame = ScrolledFrame(self.window)
         frame.pack()
         self.window.update()
+        self.assertFalse(frame._scrollbar.winfo_ismapped())
+        
+        frame.destroy()
+        frame = ScrolledFrame(self.window, autohidescrollbar=False)
+        frame.pack()
+        self.window.update()
+        self.assertTrue(frame._scrollbar.winfo_ismapped())
 
     def test_scrollframe_methods(self):
         frame = ScrolledFrame(self.window)

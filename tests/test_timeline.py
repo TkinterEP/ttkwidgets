@@ -15,6 +15,7 @@ class TestTimeLine(BaseWidgetTest):
     def test_kwargs(self):
         alternates = {
             "background": "black",
+            "autohidescrollbars": True,
             "marker_foreground": "white",
             "menu": tk.Menu(),
             "categories": ("category_a", "category_b"),
