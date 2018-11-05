@@ -32,6 +32,8 @@ class DebugWindow(tk.Toplevel):
         :type stderr: bool
         :param width: window width (in characters)
         :type width: int
+        :param autohidescrollbar: whether to use an :class:`~ttkwidgets.AutoHideScrollbar` or a :class:`ttk.Scrollbar`
+        :type autohidescrollbar: bool
         :param kwargs: options to be passed on to the :class:`tk.Toplevel` initializer
         """
         self._width = width

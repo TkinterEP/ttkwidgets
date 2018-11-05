@@ -37,7 +37,8 @@ class ScrolledFrame(ttk.Frame):
         :type canvaswidth: int
         :param canvasborder: border width of the internal canvas
         :type canvasborder: int
-        :param autohidescrollbar: whether to use an AutoHideScrollbar or a ttk.Scrollbar
+        :param autohidescrollbar: whether to use an :class:`~ttkwidgets.AutoHideScrollbar` or a :class:`ttk.Scrollbar`
+        :type autohidescrollbar: bool
         :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)

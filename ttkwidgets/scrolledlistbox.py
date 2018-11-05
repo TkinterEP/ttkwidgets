@@ -22,7 +22,8 @@ class ScrolledListbox(ttk.Frame):
         :type master: widget
         :param compound: side for the Scrollbar to be on (:obj:`tk.LEFT` or :obj:`tk.RIGHT`)
         :type compound: str
-        :param autohidescrollbar: whether to use an AutoHideScrollbar or a ttk.Scrollbar
+        :param autohidescrollbar: whether to use an :class:`~ttkwidgets.AutoHideScrollbar` or a :class:`ttk.Scrollbar`
+        :type autohidescrollbar: bool
         :param kwargs: keyword arguments passed on to the :class:`tk.Listbox` initializer
         """
         ttk.Frame.__init__(self, master)

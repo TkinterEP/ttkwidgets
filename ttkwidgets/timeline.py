@@ -133,6 +133,9 @@ class TimeLine(ttk.Frame):
         :param menu: Menu to show when a right-click is performed
             somewhere on the TimeLine without a marker being active
         :type menu: tk.Menu
+        :param autohidescrollbars: whether to use :class:`~ttkwidgets.AutoHideScrollbar`
+            or :class:`ttk.Scrollbar` for the scrollbars
+        :type autohidescrollbars: bool
 
         **Marker Default Options**
 
