@@ -43,7 +43,7 @@ A collection of widgets for Tkinter's ttk extensions by various authors.
 - Archlinux: ttkwidgets is available in [AUR](https://aur.archlinux.org/packages/python-ttkwidgets).
 
 ## Documentation
-Online documentation is available here: https://ttkwidgets.readthedocs.io/en/latest/?badge=latest
+Online documentation is available here: https://ttkwidgets.readthedocs.io/en/latest/
 
 ## Contributing
 If you have created a widget that you think is worth adding, then feel free to fork the repository and create a Pull
