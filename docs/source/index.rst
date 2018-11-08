@@ -46,6 +46,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses/.
 
+Contributing
+------------
+
+If you have created a widget that you think is worth adding, then feel 
+free to fork the `repository <https://github.com/RedFantom/ttkwidgets/tree/master>`_ 
+and create a `Pull Request <https://github.com/RedFantom/ttkwidgets/pulls>`_ 
+when you've added the widget to your copy of the repository. You will be 
+credited for your work, and you can add headers to your files. 
+You will also be added to the 
+`AUTHORS.md <https://github.com/RedFantom/ttkwidgets/blob/master/AUTHORS.md>`_ file.
+
+Issues
+------
+If you find any bugs or have any ideas, feel free to open an 
+`issue <https://github.com/RedFantom/ttkwidgets/issues>`_ in the 
+repository, and it will be looked at.
+
+
 
 .. |Travis| image:: https://travis-ci.org/RedFantom/ttkwidgets.svg?branch=master
     :alt: Travis CI Build Status
