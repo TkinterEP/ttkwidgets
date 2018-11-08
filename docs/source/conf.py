@@ -137,7 +137,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'ttkwidgets.tex', 'ttkwidgets Documentation',
-     'ttwidgets developpers', 'manual'),
+     'ttwidgets developpers', 'howto'),
 ]
 
 
