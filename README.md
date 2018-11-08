@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/RedFantom/ttkwidgets/branch/master/graph/badge.svg)](https://codecov.io/gh/RedFantom/ttkwidgets)
 [![PyPI version](https://badge.fury.io/py/ttkwidgets.svg)](https://badge.fury.io/py/ttkwidgets)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
-
+[![Documentation Status](https://readthedocs.org/projects/ttkwidgets/badge/?version=latest)](https://ttkwidgets.readthedocs.io/en/latest/?badge=latest)
 A collection of widgets for Tkinter's ttk extensions by various authors.
 
 ## License
@@ -40,6 +40,9 @@ A collection of widgets for Tkinter's ttk extensions by various authors.
         sudo apt-get install python(3)-ttkwidgets
 
 - Archlinux: ttkwidgets is available in [AUR](https://aur.archlinux.org/packages/python-ttkwidgets).
+
+## Documentation
+Online documentation is available here: https://ttkwidgets.readthedocs.io/en/latest/?badge=latest
 
 ## Contributing
 If you have created a widget that you think is worth adding, then feel free to fork the repository and create a Pull
