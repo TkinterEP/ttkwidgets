@@ -41,7 +41,7 @@ class TestTimeLine(BaseWidgetTest):
         self.assertTrue(iid in timeline.markers)
 
     def test_timeline_content_generation(self):
-        TimeLine(self.window, categories=("category",)).generate_timeline_contents()
+        TimeLine(self.window, categories=("category",)).draw_timeline()
 
     def test_markers_property(self):
         timeline = TimeLine(self.window, categories=("category",))
@@ -56,7 +56,7 @@ class TestTimeLine(BaseWidgetTest):
     def test_timeline_contents(self):
         timeline = TimeLine(self.window, categories=("category",))
         iid = timeline.create_marker("category", 1.0, 2.0, text="Test")
-        timeline.generate_timeline_contents()
+        timeline.draw_timeline()
         ids = timeline._timeline.find_all()
         rectangle = timeline.markers[iid]["rectangle_id"]
         text = timeline.markers[iid]["text_id"]
@@ -98,8 +98,8 @@ class TestTimeLine(BaseWidgetTest):
         xr, yr, _, _ = timeline._timeline.bbox(rectangle)
         xw, yw = timeline._timeline.winfo_x(), timeline._timeline.winfo_y()
         event = MockEvent(xr+xw, yr+yw)
-        timeline.left_click(event)
-        timeline.right_click(event)
+        timeline._left_click(event)
+        timeline._right_click(event)
 
     def test_direct_configure(self):
         timeline = TimeLine(self.window, categories=("category",))
@@ -123,9 +123,9 @@ class TestTimeLine(BaseWidgetTest):
         x, y = timeline._canvas_ticks.winfo_x(), timeline._canvas_ticks.winfo_y()
         x += 20
         y += 10
-        timeline.time_marker_move(MockEvent(x, y))
+        timeline._time_marker_move(MockEvent(x, y))
         self.assertIsInstance(timeline._time_window, tk.Toplevel)
-        timeline.time_marker_release(MockEvent(x, y))
+        timeline._time_marker_release(MockEvent(x, y))
 
     def test_update_marker(self):
         timeline = TimeLine(self.window, categories=("category",))

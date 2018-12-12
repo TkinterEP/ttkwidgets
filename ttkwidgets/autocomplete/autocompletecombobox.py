@@ -16,14 +16,16 @@ tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresi
 
 
 class AutocompleteCombobox(ttk.Combobox):
-    """
-    Combobox widget that features autocomplete
-    """
+    """:class:`ttk.Combobox` widget that features autocompletion."""
     def __init__(self, master=None, completevalues=None, **kwargs):
         """
+        Create an AutocompleteCombobox.
+        
         :param master: master widget
-        :param completevalues: autocompletion values list
-        :param kwargs: keyword arguments passed to Combobox initializer
+        :type master: widget
+        :param completevalues: autocompletion values
+        :type completevalues: list
+        :param kwargs: keyword arguments passed to the :class:`ttk.Combobox` initializer
         """
         ttk.Combobox.__init__(self, master, values=completevalues, **kwargs)
         self._completion_list = completevalues
@@ -35,9 +37,10 @@ class AutocompleteCombobox(ttk.Combobox):
 
     def set_completion_list(self, completion_list):
         """
-        Use our completion list as our drop down selection menu, arrows move through menu.
-        :param completion_list: list of values
-        :return: None
+        Use the completion list as drop down selection menu, arrows move through menu.
+        
+        :param completion_list: completion values
+        :type completion_list: list
         """
         self._completion_list = sorted(completion_list, key=str.lower)  # Work with a sorted list
         self._hits = []
@@ -48,9 +51,10 @@ class AutocompleteCombobox(ttk.Combobox):
 
     def autocomplete(self, delta=0):
         """
-        Autocomplete the Combobox, delta may be 0/1/-1 to cycle through possible hits
-        :param delta: int
-        :return: None
+        Autocomplete the Combobox.
+        
+        :param delta: 0, 1 or -1: how to cycle through possible hits
+        :type delta: int
         """
         if delta:  # need to delete selection otherwise we would fix the current position
             self.delete(self.position, tk.END)
@@ -76,9 +80,9 @@ class AutocompleteCombobox(ttk.Combobox):
 
     def handle_keyrelease(self, event):
         """
-        Event handler for the keyrelease event on this widget
+        Event handler for the keyrelease event on this widget.
+        
         :param event: Tkinter event
-        :return: None
         """
         if event.keysym == "BackSpace":
             self.delete(self.index(tk.INSERT), tk.END)
@@ -102,8 +106,8 @@ class AutocompleteCombobox(ttk.Combobox):
     def handle_return(self, event):
         """
         Function to bind to the Enter/Return key so if Enter is pressed the selection is cleared
+        
         :param event: Tkinter event
-        :return: None
         """
         self.icursor(tk.END)
         self.selection_clear()

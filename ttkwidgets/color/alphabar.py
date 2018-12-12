@@ -5,9 +5,9 @@ License: GNU GPLv3
 Source: https://github.com/j4321/tkColorPicker
 
 Edited by RedFantom for Python 2/3 cross-compatibility and docstring formatting
-"""
 
-"""
+
+
 tkcolorpicker - Alternative to colorchooser for Tkinter.
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
 
@@ -41,12 +41,19 @@ class AlphaBar(tk.Canvas):
         """
         Create a bar to select the alpha value.
 
-        Keyword arguments:
-            * parent: parent window
-            * alpha: initially selected alpha value
-            * color: gradient color
-            * variable: IntVar linked to the alpha value
-            * height, width, and any keyword argument accepted by a tkinter Canvas
+        :param parent: parent widget
+        :type parent: widget
+        :param alpha: initially selected alpha value (between 0 and 255)
+        :type alpha: int
+        :param color: gradient color in RGB format
+        :type color: tuple[int]
+        :param variable: variable linked to the alpha value
+        :type variable: IntVar
+        :param height: height of the widget in pixels
+        :type height: int
+        :param width: width of the widget in pixels
+        :type width: int
+        :param kwargs: options to be passed on to the :class:`tk.Canvas` initializer
         """
         tk.Canvas.__init__(self, parent, width=width, height=height, **kwargs)
         self.gradient = tk.PhotoImage(master=self, width=width, height=height)
@@ -126,18 +133,32 @@ class AlphaBar(tk.Canvas):
         self.event_generate("<<AlphaChanged>>")
 
     def get(self):
-        """Return hue of color under cursor."""
+        """Return alpha value of color under cursor."""
         coords = self.coords('cursor')
         return round2((255. * coords[0]) / self.winfo_width())
 
     def set(self, alpha):
-        """Set cursor position on the color corresponding to the hue value."""
+        """
+        Set cursor position on the color corresponding to the alpha value.
+
+        :param alpha: new alpha value (between 0 and 255)
+        :type alpha: int
+        """
+        if alpha > 255:
+            alpha = 255
+        elif alpha < 0:
+            alpha = 0
         x = alpha / 255. * self.winfo_width()
         self.coords('cursor', x, 0, x, self.winfo_height())
         self._variable.set(alpha)
 
     def set_color(self, color):
-        """Set gradient color to color in RGB(A)."""
+        """
+        Change gradient color and change cursor position if an alpha value is supplied.
+
+        :param color: new gradient color in RGB(A) format
+        :type color: tuple[int]
+        """
         if len(color) == 3:
             alpha = self.get()
         else:

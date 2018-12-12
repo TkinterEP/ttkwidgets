@@ -21,7 +21,7 @@ timeline.create_marker("2", 2.0, 3.0, background="green", text="Change Category"
                        change_category=True)
 timeline.create_marker("3", 1.0, 2.0, text="Show Menu", tags=("1",))
 timeline.create_marker("4", 4.0, 5.0, text="Do nothing", move=False)
-timeline.generate_timeline_contents()
+timeline.draw_timeline()
 timeline.grid()
 window.after(2500, lambda: timeline.configure(marker_background="cyan"))
 window.after(5000, lambda: timeline.update_marker("1", background="red"))

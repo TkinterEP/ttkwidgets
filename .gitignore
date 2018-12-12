@@ -102,3 +102,8 @@ ENV/
 
 # PyCharm
 /.idea
+
+# Documentation
+docs/source/examples
+docs/source/examples.rst
+

@@ -4,7 +4,7 @@
 # Copyright (c) Juliette Monsel 2017
 # For license see LICENSE
 
-from ttkwidgets import debugwindow
+from ttkwidgets import DebugWindow
 try:
     import Tkinter as tk
     import ttk
@@ -14,5 +14,5 @@ except ImportError:
 
 root = tk.Tk()
 ttk.Button(root, text="Print ok", command=lambda: print('ok')).pack()
-debugwindow.DebugWindow(root)
+DebugWindow(root)
 root.mainloop()
