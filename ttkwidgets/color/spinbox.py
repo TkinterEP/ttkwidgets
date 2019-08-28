@@ -43,19 +43,25 @@ class Spinbox(tk.Spinbox):
                                relief=kwargs.get("relief", "sunken"),
                                borderwidth=1)
         self.style.configure("%s.spinbox.TFrame" % self.frame,
-                             background="white")
+                             background=self.style.lookup("TSpinbox",
+                                                          "fieldbackground",
+                                                          default='white'))
         self.frame.configure(style="%s.spinbox.TFrame" % self.frame)
         kwargs["relief"] = "flat"
         kwargs["highlightthickness"] = 0
-        kwargs["selectbackground"] = self.style.lookup("TEntry",
+        kwargs["selectbackground"] = self.style.lookup("TSpinbox",
                                                        "selectbackground",
                                                        ("focus",))
-        kwargs["selectbackground"] = self.style.lookup("TEntry",
-                                                       "selectbackground",
-                                                       ("focus",))
-        kwargs["selectforeground"] = self.style.lookup("TEntry",
+        kwargs["selectforeground"] = self.style.lookup("TSpinbox",
                                                        "selectforeground",
                                                        ("focus",))
+        kwargs["background"] = self.style.lookup("TSpinbox",
+                                                 "fieldbackground",
+                                                 default='white')
+        kwargs["foreground"] = self.style.lookup("TSpinbox",
+                                                 "foreground")
+        kwargs["buttonbackground"] = self.style.lookup("TSpinbox",
+                                                       "background")
         tk.Spinbox.__init__(self, self.frame, **kwargs)
         tk.Spinbox.pack(self, padx=1, pady=1)
         self.frame.spinbox = self
