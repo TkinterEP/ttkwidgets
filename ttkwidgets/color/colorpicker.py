@@ -46,9 +46,12 @@ FR = {"Red": "Rouge", "Green": "Vert", "Blue": "Bleu",
       "Cancel": "Annuler", "Color Chooser": "Sélecteur de couleur",
       "Alpha": "Alpha"}
 
-if getdefaultlocale()[0][:2] == 'fr':
-    TR = FR
-else:
+try:
+    if getdefaultlocale()[0][:2] == 'fr':
+        TR = FR
+    else:
+        TR = EN
+except ValueError:
     TR = EN
 
 
