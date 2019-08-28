@@ -97,26 +97,23 @@ class Spinbox(tk.Spinbox):
         self.place_info = self.frame.place_info
         self.place_slaves = self.frame.place_slaves
 
-        self.bind_class("ttkSpinbox", "<FocusIn>", self.focusin, True)
-        self.bind_class("ttkSpinbox", "<FocusOut>", self.focusout, True)
+        self.bind('<1>', lambda e: self.focus_set())
+        self.frame.bind("<FocusIn>", self.focusin)
+        self.frame.bind("<FocusOut>", self.focusout)
 
-    @staticmethod
-    def focusout(event):
+    def focusout(self, event):
         """Change style on focus out events."""
-        w = event.widget.spinbox
-        bc = w.style.lookup("TEntry", "bordercolor", ("!focus",))
-        dc = w.style.lookup("TEntry", "darkcolor", ("!focus",))
-        lc = w.style.lookup("TEntry", "lightcolor", ("!focus",))
-        w.style.configure("%s.spinbox.TFrame" % event.widget, bordercolor=bc,
-                          darkcolor=dc, lightcolor=lc)
+        bc = self.style.lookup("TEntry", "bordercolor", ("!focus",))
+        dc = self.style.lookup("TEntry", "darkcolor", ("!focus",))
+        lc = self.style.lookup("TEntry", "lightcolor", ("!focus",))
+        self.style.configure("%s.spinbox.TFrame" % self.frame, bordercolor=bc,
+                             darkcolor=dc, lightcolor=lc)
 
-    @staticmethod
-    def focusin(event):
+    def focusin(self, event):
         """Change style on focus in events."""
-        w = event.widget.spinbox
-        w.old_value = w.get()
-        bc = w.style.lookup("TEntry", "bordercolor", ("focus",))
-        dc = w.style.lookup("TEntry", "darkcolor", ("focus",))
-        lc = w.style.lookup("TEntry", "lightcolor", ("focus",))
-        w.style.configure("%s.spinbox.TFrame" % event.widget, bordercolor=bc,
-                          darkcolor=dc, lightcolor=lc)
+        self.old_value = self.get()
+        bc = self.style.lookup("TEntry", "bordercolor", ("focus",))
+        dc = self.style.lookup("TEntry", "darkcolor", ("focus",))
+        lc = self.style.lookup("TEntry", "lightcolor", ("focus",))
+        self.style.configure("%s.spinbox.TFrame" % self.frame, bordercolor=bc,
+                             darkcolor=dc, lightcolor=lc)
