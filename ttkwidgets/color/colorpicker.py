@@ -322,6 +322,7 @@ class ColorPicker(tk.Toplevel):
         self.hexa.bind("<Return>", self._update_color_hexa)
         self.hexa.bind("<Control-a>", self._select_all_entry)
 
+        self.hexa.focus_set()
         self.wait_visibility()
         self.lift()
         self.grab_set()
