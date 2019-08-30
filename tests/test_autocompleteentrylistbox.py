@@ -95,13 +95,18 @@ class TestAutocompleteWidgets(BaseWidgetTest):
             self.assertIn(key, keys)
 
         # typing in entry
+        widget.entry.focus_force()
         widget.entry.event_generate('<W>')
         self.assertEqual(widget.get(), 'World')
+        widget.entry.focus_force()
         widget.entry.event_generate('<Control-a>')
+        widget.entry.focus_force()
         widget.entry.event_generate('<Y>')
         self.assertEqual(widget.get(), '')
+        widget.entry.focus_force()
         widget.entry.event_generate('<H>')
         self.assertEqual(widget.get(), 'Hello')
+        widget.entry.focus_force()
         widget.entry.event_generate('<u>')
         self.assertEqual(widget.get(), 'H')
 
