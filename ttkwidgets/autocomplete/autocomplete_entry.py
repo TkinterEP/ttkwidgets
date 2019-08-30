@@ -26,7 +26,7 @@ class AutocompleteEntry(ttk.Entry):
     def __init__(self, master=None, completevalues=None, **kwargs):
         """
         Create an AutocompleteEntry.
-        
+
         :param master: master widget
         :type master: widget
         :param completevalues: autocompletion values
@@ -43,7 +43,7 @@ class AutocompleteEntry(ttk.Entry):
     def set_completion_list(self, completion_list):
         """
         Set a new auto completion list
-        
+
         :param completion_list: completion values
         :type completion_list: list
         """
@@ -56,7 +56,7 @@ class AutocompleteEntry(ttk.Entry):
     def autocomplete(self, delta=0):
         """
         Autocomplete the Entry.
-        
+
         :param delta: 0, 1 or -1: how to cycle through possible hits
         :type delta: int
         """
@@ -85,7 +85,7 @@ class AutocompleteEntry(ttk.Entry):
     def handle_keyrelease(self, event):
         """
         Event handler for the keyrelease event on this widget.
-        
+
         :param event: Tkinter event
         """
         if event.keysym == "BackSpace":
@@ -112,7 +112,7 @@ class AutocompleteEntry(ttk.Entry):
     def handle_return(self, event):
         """
         Function to bind to the Enter/Return key so if Enter is pressed the selection is cleared.
-        
+
         :param event: Tkinter event
         """
         self.icursor(tk.END)
@@ -123,10 +123,7 @@ class AutocompleteEntry(ttk.Entry):
         self.configure(**kwargs)
 
     def configure(self, **kwargs):
-        """
-        Configure widget specific keyword arguments in addition to
-        Combobox keyword arguments.
-        """
+        """Configure widget specific keyword arguments in addition to :class:`ttk.Entry` keyword arguments."""
         if "completevalues" in kwargs:
             self.set_completion_list(kwargs.pop("completevalues"))
         return ttk.Entry.configure(self, **kwargs)
