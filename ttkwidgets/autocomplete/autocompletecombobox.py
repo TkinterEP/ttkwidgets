@@ -4,7 +4,7 @@ License: "Licensed same as original by Mitja Martini or public domain, whichever
 Source: https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html
 
 Edited by RedFantom for ttk and Python 2 and 3 cross-compatibility and <Enter> binding
-Edited by Juliette Monsel to include Tcl code to navigate the dropdown by Paweł Salawa
+Edited by Juliette Monsel to include Tcl code to navigate the dropdown by Pawel Salawa
 (https://wiki.tcl-lang.org/page/ttk%3A%3Acombobox, copyright 2011)
 """
 try:
@@ -37,7 +37,7 @@ class AutocompleteCombobox(ttk.Combobox):
         self._hit_index = 0
         self.position = 0
         # navigate on keypress in the dropdown:
-        # code taken from https://wiki.tcl-lang.org/page/ttk%3A%3Acombobox by Paweł Salawa, copyright 2011
+        # code taken from https://wiki.tcl-lang.org/page/ttk%3A%3Acombobox by Pawel Salawa, copyright 2011
         self.tk.eval("""
 proc ComboListKeyPressed {w key} {
         if {[string length $key] > 1 && [string tolower $key] != $key} {
