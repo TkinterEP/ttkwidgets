@@ -129,6 +129,12 @@ class AutocompleteCombobox(ttk.Combobox):
             return self._completion_list
         return ttk.Combobox.cget(self, key)
 
+    def keys(self):
+        """Return a list of all resource names of this widget."""
+        keys = ttk.Combobox.keys(self)
+        keys.append("completevalues")
+        return keys
+
     def __setitem__(self, key, value):
         self.configure(**{key: value})
 
