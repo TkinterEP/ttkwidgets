@@ -5,9 +5,9 @@ License: GNU GPLv3
 Source: https://github.com/j4321/tkColorPicker
 
 Edited by RedFantom for Python 2/3 cross-compatibility and docstring formatting
-"""
 
-"""
+
+
 tkcolorpicker - Alternative to colorchooser for Tkinter.
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
 
@@ -39,11 +39,17 @@ class GradientBar(tk.Canvas):
         """
         Create a GradientBar.
 
-        Keyword arguments:
-            * parent: parent window
-            * hue: initially selected hue value
-            * variable: IntVar linked to the alpha value
-            * height, width, and any keyword argument accepted by a tkinter Canvas
+        :param parent: parent widget
+        :type parent: widget
+        :param hue: initially selected hue value (between 0 and 360)
+        :type hue: int
+        :param variable: variable linked to the hue value
+        :type variable: IntVar
+        :param height: height of the widget in pixels
+        :type height: int
+        :param width: width of the widget in pixels
+        :type width: int
+        :param kwargs: options to be passed on to the :class:`tk.Canvas` initializer
         """
         tk.Canvas.__init__(self, parent, width=width, height=height, **kwargs)
 
@@ -121,7 +127,16 @@ class GradientBar(tk.Canvas):
         return round2(360 * coords[0] / self.winfo_width())
 
     def set(self, hue):
-        """Set cursor position on the color corresponding to the hue value."""
+        """
+        Set cursor position on the color corresponding to the hue value.
+
+        :param hue: new hue value (between 0 and 360)
+        :type hue: int
+        """
+        if hue > 360:
+            hue = 360
+        elif hue < 0:
+            hue = 0
         x = hue / 360. * self.winfo_width()
         self.coords('cursor', x, 0, x, self.winfo_height())
         self._variable.set(hue)
