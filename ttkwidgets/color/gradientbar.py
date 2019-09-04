@@ -92,7 +92,7 @@ class GradientBar(tk.Canvas):
             line.append(rgb_to_hexa(*hue2col(float(i) / width * 360)))
         line = "{" + " ".join(line) + "}"
         self.gradient.put(" ".join([line for j in range(height)]))
-        self.create_image(0, 0, anchor="nw", tags="gardient",
+        self.create_image(0, 0, anchor="nw", tags="gradient",
                           image=self.gradient)
         self.lower("gradient")
 
