@@ -26,7 +26,7 @@ author = 'ttkwidgets developers'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.10.0'
+release = '0.10.1'
 
 
 # -- Example Generation ------------------------------------------------------
