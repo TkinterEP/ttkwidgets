@@ -50,10 +50,10 @@ class AutocompleteEntryListbox(ttk.Frame):
         self.rowconfigure(1, weight=1)
         self._allow_other_values = allow_other_values
         self._completevalues = completevalues
-        self._validate = self.register(self.validate)
+        validatecmd = self.register(self._validate)
         self.entry = ttk.Entry(self, width=width, justify=justify, font=font,
                                validate='key', exportselection=exportselection,
-                               validatecommand=(self._validate, "%d", "%S", "%i", "%s", "%P"))
+                               validatecommand=(validatecmd, "%d", "%S", "%i", "%s", "%P"))
         f = ttk.Frame(self, style='border.TFrame', padding=1)
         self.listbox = tk.Listbox(f, width=width, font=font,
                                   exportselection=exportselection, selectmode="browse",
@@ -77,6 +77,7 @@ class AutocompleteEntryListbox(ttk.Frame):
         self.listbox.bind('<<ListboxSelect>>', self._update_entry)
         self.listbox.bind("<KeyPress>", self._listbox_keypress)
         self.entry.bind("<Tab>", self._tab)
+        self.entry.bind("<Right>", self._right)
         self.entry.bind("<Down>", self._down)
         self.listbox.bind("<Down>", self._down)
         self.entry.bind("<Up>", self._up)
@@ -88,6 +89,13 @@ class AutocompleteEntryListbox(ttk.Frame):
         """Select all entry content."""
         self.entry.selection_range(0, 'end')
         return "break"
+
+    def _right(self, event):
+        """Move at the end of selected text on right press."""
+        if self.entry.selection_present():
+            self.entry.select_clear()
+            self.entry.icursor("end")
+            return "break"
 
     def _tab(self, event):
         """Move at the end of selected text on tab press."""
@@ -143,7 +151,7 @@ class AutocompleteEntryListbox(ttk.Frame):
         self.listbox.event_generate('<<ListboxSelect>>')
         return "break"
 
-    def validate(self, action, modif, pos, prev_txt, new_txt):
+    def _validate(self, action, modif, pos, prev_txt, new_txt):
         """Complete the text in the entry with values."""
         try:
             sel = self.entry.selection_get()
