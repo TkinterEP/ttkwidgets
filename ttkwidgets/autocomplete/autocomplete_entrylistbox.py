@@ -1,3 +1,8 @@
+"""
+Author: Juliette Monsel
+License: GNU GPLv3
+Source: This repository
+"""
 try:
     import Tkinter as tk
     import ttk
@@ -5,9 +10,6 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 from ttkwidgets import AutoHideScrollbar
-
-# TODO: Write tests
-# TODO: Check docstrings
 
 
 class AutocompleteEntryListbox(ttk.Frame):
