@@ -224,7 +224,13 @@ class AutocompleteEntryListbox(ttk.Frame):
         kwargs.update(kw)
         # completion settings
         self._allow_other_values = kwargs.pop('allow_other_values', self._allow_other_values)
-        self._completevalues = kwargs.pop('completevalues', self._completevalues)
+        if 'completevalues' in kwargs:
+            completevalues = kwargs.pop('completevalues')
+            self._completevalues = completevalues
+            self.listbox.delete(0, 'end')
+            for c in self._completevalues:
+                self.listbox.insert('end', c)
+
         # autohidescrollbar
         autohidescrollbar = isinstance(self._scrollbar, AutoHideScrollbar)
         autohidescrollbar2 = kwargs.pop('autohidescrollbar', autohidescrollbar)

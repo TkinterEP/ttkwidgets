@@ -53,6 +53,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         self.assertEqual(str(widget.entry['font']), 'Arial 20')
         self.assertEqual(str(widget.listbox['font']), 'Arial 20')
         self.assertEqual(widget['completevalues'], ["Hello", "World", "Test"])
+        self.assertEqual(list(widget.listbox.get(0, 'end')), ["Hello", "World", "Test"])
         self.assertFalse(widget._scrollbar.winfo_ismapped())
 
         widget['allow_other_values'] = True
@@ -78,6 +79,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         self.assertEqual(str(widget.entry['font']), 'Arial 10 bold')
         self.assertEqual(str(widget.listbox['font']), 'Arial 10 bold')
         self.assertEqual(widget['completevalues'], ['test'])
+        self.assertEqual(list(widget.listbox.get(0, 'end')), ['test'])
         self.assertTrue(widget._scrollbar.winfo_ismapped())
 
         widget['autohidescrollbar'] = True
