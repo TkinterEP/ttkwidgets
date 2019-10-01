@@ -46,9 +46,12 @@ FR = {"Red": "Rouge", "Green": "Vert", "Blue": "Bleu",
       "Cancel": "Annuler", "Color Chooser": "Sélecteur de couleur",
       "Alpha": "Alpha"}
 
-if getdefaultlocale()[0][:2] == 'fr':
-    TR = FR
-else:
+try:
+    if getdefaultlocale()[0][:2] == 'fr':
+        TR = FR
+    else:
+        TR = EN
+except ValueError:
     TR = EN
 
 
@@ -299,18 +302,27 @@ class ColorPicker(tk.Toplevel):
         s_red.bind('<Return>', self._update_color_rgb)
         s_green.bind('<Return>', self._update_color_rgb)
         s_blue.bind('<Return>', self._update_color_rgb)
+        s_red.bind('<Control-a>', self._select_all_spinbox)
+        s_green.bind('<Control-a>', self._select_all_spinbox)
+        s_blue.bind('<Control-a>', self._select_all_spinbox)
         s_h.bind('<FocusOut>', self._update_color_hsv)
         s_s.bind('<FocusOut>', self._update_color_hsv)
         s_v.bind('<FocusOut>', self._update_color_hsv)
         s_h.bind('<Return>', self._update_color_hsv)
         s_s.bind('<Return>', self._update_color_hsv)
         s_v.bind('<Return>', self._update_color_hsv)
+        s_h.bind('<Control-a>', self._select_all_spinbox)
+        s_s.bind('<Control-a>', self._select_all_spinbox)
+        s_v.bind('<Control-a>', self._select_all_spinbox)
         if alpha:
             s_alpha.bind('<Return>', self._update_alpha)
             s_alpha.bind('<FocusOut>', self._update_alpha)
+            s_alpha.bind('<Control-a>', self._select_all_spinbox)
         self.hexa.bind("<FocusOut>", self._update_color_hexa)
         self.hexa.bind("<Return>", self._update_color_hexa)
+        self.hexa.bind("<Control-a>", self._select_all_entry)
 
+        self.hexa.focus_set()
         self.wait_visibility()
         self.lift()
         self.grab_set()
@@ -322,6 +334,18 @@ class ColorPicker(tk.Toplevel):
         :return: selected color as a (RGB, HSV, HEX) tuple or ""
         """
         return self.color
+
+    @staticmethod
+    def _select_all_spinbox(event):
+        """Select all entry content."""
+        event.widget.selection('range', 0, 'end')
+        return "break"
+
+    @staticmethod
+    def _select_all_entry(event):
+        """Select all entry content."""
+        event.widget.selection_range(0, 'end')
+        return "break"
 
     def _unfocus(self, event):
         """Unfocus palette items when click on bar or square."""

@@ -63,7 +63,7 @@ setup(
     packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color"],
     py_modules=["ttkwidgets"],
     package_data={"ttkwidgets": ["assets/*"]},
-    version="0.10.0",
+    version="0.10.1",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     long_description=long_description,
     author="The ttkwidgets authors",
