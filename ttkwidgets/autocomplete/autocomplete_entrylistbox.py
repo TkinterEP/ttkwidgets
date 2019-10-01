@@ -53,9 +53,13 @@ class AutocompleteEntryListbox(ttk.Frame):
                                validate='key', exportselection=exportselection,
                                validatecommand=(self._validate, "%d", "%S", "%i", "%s", "%P"))
         f = ttk.Frame(self, style='border.TFrame', padding=1)
-        self.listbox = tk.Listbox(f, width=width, justify=justify, font=font,
+        self.listbox = tk.Listbox(f, width=width, font=font,
                                   exportselection=exportselection, selectmode="browse",
                                   highlightthickness=0, relief='flat')
+        try:
+            self.listbox.configure(justify=justify)   # this is an option only for tk >= 8.6.5
+        except tk.TclError:
+            pass
         self.listbox.pack(fill='both', expand=True)
         if autohidescrollbar:
             self._scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
@@ -224,11 +228,18 @@ class AutocompleteEntryListbox(ttk.Frame):
             self._scrollbar.grid(row=1, column=1, sticky='ns')
         # entry/listbox settings
         entry_listbox_kw = {}
-        for key in ['justify', 'font', 'exportselection', 'width']:
+        for key in ['font', 'exportselection', 'width']:
             if key in kwargs:
                 entry_listbox_kw[key] = kwargs.pop(key)
         self.entry.configure(entry_listbox_kw)
         self.listbox.configure(entry_listbox_kw)
+        if 'justify' in kwargs:
+            justify = kwargs.pop('justify')
+            self.entry.configure(justify=justify)
+            try:
+                self.listbox.configure(justify=justify)   # this is an option only for tk >= 8.6.5
+            except tk.TclError:
+                pass
         # frame settings
         ttk.Frame.config(self, kwargs)
 
