@@ -34,6 +34,7 @@ List of all the authors of widgets in this repository. Please note that this lis
   * :class:`~ttkwidgets.TickScale`
   * :class:`~ttkwidgets.AutoHideScrollbar` based on an idea by `Fredrik Lundh <effbot.org/zone/tkinter-autoscrollbar.htm>`_
   * All color widgets: :func:`~ttkwidgets.color.askcolor`, :class:`~ttkwidgets.color.ColorPicker`, :class:`~ttkwidgets.color.GradientBar` and :class:`~ttkwidgets.color.ColorSquare`, :class:`~ttkwidgets.color.LimitVar`, :class:`~ttkwidgets.color.Spinbox`, :class:`~ttkwidgets.color.AlphaBar` and supporting functions in :file:`functions.py`.
+  * :class:`~ttkwidgets.autocomplete.AutocompleteEntryListbox`
   
 - Multiple authors:
 

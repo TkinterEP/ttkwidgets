@@ -11,3 +11,4 @@ ttkwidgets.autocomplete
     
     AutocompleteCombobox
     AutocompleteEntry
+    AutocompleteEntryListbox
