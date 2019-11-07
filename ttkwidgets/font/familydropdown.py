@@ -36,6 +36,7 @@ class FontFamilyDropdown(AutocompleteCombobox):
         self.__callback = callback
         AutocompleteCombobox.__init__(self, master, textvariable=self._font, completevalues=font_families, **kwargs)
         self.bind("<<ComboboxSelected>>", self._on_select)
+        self.bind("<Return>", self._on_select)
 
     def _on_select(self, *args):
         """
