@@ -40,7 +40,7 @@ class FontFamilyListbox(ScrolledListbox):
             self.listbox.insert(index, name)
             self.font_indexes[index] = name
             index += 1
-        self.listbox.bind("<Button-1>", self._on_click)
+        self.listbox.bind("<<ListboxSelect>>", self._on_click)
 
     def _on_click(self, *args):
         """
@@ -60,6 +60,7 @@ class FontFamilyListbox(ScrolledListbox):
         :rtype: None or str
         """
         selection = self.listbox.curselection()
+        print(selection)
         if len(selection) is 0:
             return None
         return self.font_indexes[self.listbox.curselection()[0]]
