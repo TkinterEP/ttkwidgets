@@ -23,14 +23,14 @@ class FontFamilyDropdown(AutocompleteCombobox):
     def __init__(self, master=None, callback=None, **kwargs):
         """
         Create a FontFamilyDropdown.
-        
+
         :param master: master widget
         :type master: widget
         :param callback: callable object with single argument: font family name
         :type callback: function
         :param kwargs: keyword arguments passed on to the :class:`~ttkwidgets.autocomplete.AutocompleteCombobox` initializer
         """
-        font_families = sorted([item for item in font.families()])
+        font_families = sorted(set(font.families()))
         self._fonts = font_families
         self._font = tk.StringVar(master)
         self.__callback = callback
@@ -40,7 +40,7 @@ class FontFamilyDropdown(AutocompleteCombobox):
     def _on_select(self, *args):
         """
         Function bound to event of selection in the Combobox, calls callback if callable
-        
+
         :param args: Tkinter event
         """
         if callable(self.__callback):
@@ -50,7 +50,7 @@ class FontFamilyDropdown(AutocompleteCombobox):
     def selection(self):
         """
         Selection property.
-        
+
         :return: None if no font is selected and font family name if one is selected.
         :rtype: None or str
         """
