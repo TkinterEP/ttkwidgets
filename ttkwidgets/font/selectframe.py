@@ -57,7 +57,7 @@ class FontSelectFrame(ttk.Frame):
     def _on_family(self, name):
         """
         Callback if family is changed.
-        
+
         :param name: font family name
         """
         self._family = name
@@ -66,7 +66,7 @@ class FontSelectFrame(ttk.Frame):
     def _on_size(self, size):
         """
         Callback if size is changed.
-        
+
         :param size: font size int
         """
         self._size = size
@@ -75,7 +75,7 @@ class FontSelectFrame(ttk.Frame):
     def _on_properties(self, properties):
         """
         Callback if properties are changed
-        
+
         :param properties: tuple (bold, italic, underline, overstrike)
         """
         self._bold, self._italic, self._underline, self._overstrike = properties
@@ -89,7 +89,7 @@ class FontSelectFrame(ttk.Frame):
     def __generate_font_tuple(self):
         """
         Generate a font tuple for tkinter widgets based on the user's entries.
-        
+
         :return: font tuple (family_name, size, *options)
         """
         if not self._family:
@@ -109,12 +109,12 @@ class FontSelectFrame(ttk.Frame):
     def font(self):
         """
         Font property.
-        
+
         :return: a :class:`~font.Font` object if family is set, else None
         :rtype: :class:`~font.Font` or None
         """
         if not self._family:
-            return None
+            return None, None
         font_obj = font.Font(family=self._family, size=self._size,
                              weight=font.BOLD if self._bold else font.NORMAL,
                              slant=font.ITALIC if self._italic else font.ROMAN,
