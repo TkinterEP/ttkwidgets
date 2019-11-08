@@ -60,7 +60,6 @@ class FontFamilyListbox(ScrolledListbox):
         :rtype: None or str
         """
         selection = self.listbox.curselection()
-        print(selection)
         if len(selection) is 0:
             return None
         return self.font_indexes[self.listbox.curselection()[0]]
