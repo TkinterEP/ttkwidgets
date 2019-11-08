@@ -32,13 +32,14 @@ class FontSizeDropdown(AutocompleteCombobox):
         values = [str(value) for value in int_values]
         AutocompleteCombobox.__init__(self, master, completevalues=values, **kwargs)
         self.bind("<<ComboboxSelected>>", self._on_click)
+        self.bind("<Return>", self._on_click)
         self.__callback = callback
         self.insert(0, "12")
 
     def _on_click(self, event):
         """
         Function bound to event of selection in the Combobox, calls callback if callable
-        
+
         :param event: Tkinter event
         """
         if callable(self.__callback):
