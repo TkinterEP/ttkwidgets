@@ -44,6 +44,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         self.assertFalse(widget.entry['exportselection'])
         self.assertFalse(widget.listbox['exportselection'])
         self.assertTrue(widget['autohidescrollbar'])
+        self.assertEqual(widget['wpad'], 0)
         self.assertEqual(str(widget['padding'][0]), '2')
         self.assertEqual(str(widget['justify']), 'left')
         self.assertEqual(int(widget['width']), 20)
@@ -59,6 +60,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         widget['allow_other_values'] = True
         widget['justify'] = 'center'
         widget['width'] = 23
+        widget['wpad'] = 4
         widget['padding'] = 5
         widget['font'] = 'Arial 10 bold'
         widget['completevalues'] = ['test']
@@ -71,6 +73,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         self.assertTrue(widget.listbox['exportselection'])
         self.assertFalse(widget['autohidescrollbar'])
         self.assertEqual(widget['justify'], 'center')
+        self.assertEqual(widget['wpad'], 4)
         self.assertEqual(str(widget['padding'][0]), '5')
         self.assertEqual(int(widget['width']), 23)
         self.assertEqual(int(widget.entry['width']), 23)
@@ -93,7 +96,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         self.window.update()
 
         keys = widget.keys()
-        for key in ['completevalues', 'allow_other_values', 'exportselection', 'justify', 'font']:
+        for key in ['completevalues', 'allow_other_values', 'exportselection', 'justify', 'font', 'wpad']:
             self.assertIn(key, keys)
 
         # typing in entry

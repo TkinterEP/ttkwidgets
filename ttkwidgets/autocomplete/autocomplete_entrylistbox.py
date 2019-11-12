@@ -18,7 +18,7 @@ class AutocompleteEntryListbox(ttk.Frame):
     :class:`tk.Listbox` to display the completion list.
     """
     def __init__(self, master=None, completevalues=[], allow_other_values=False,
-                 autohidescrollbar=True, **kwargs):
+                 autohidescrollbar=True, wpad=0, **kwargs):
         """
         Create an Entry + Listbox widget with autocompletion.
 
@@ -37,6 +37,8 @@ class AutocompleteEntryListbox(ttk.Frame):
         :param font: font in entry and listbox
         :param autohidescrollbar: whether to use an :class:`~ttkwidgets.AutoHideScrollbar` or a :class:`ttk.Scrollbar`
         :type autohidescrollbar: bool
+        :param wpad: vertical padding between the entry and the listbox
+        :type wpad: int
         :param kwargs: keyword arguments passed to the :class:`ttk.Frame` initializer
         """
         exportselection = kwargs.pop('exportselection', False)
@@ -50,6 +52,7 @@ class AutocompleteEntryListbox(ttk.Frame):
         self.rowconfigure(1, weight=1)
         self._allow_other_values = allow_other_values
         self._completevalues = completevalues
+        self._wpad = wpad
         validatecmd = self.register(self._validate)
         self.entry = ttk.Entry(self, width=width, justify=justify, font=font,
                                validate='key', exportselection=exportselection,
@@ -68,7 +71,7 @@ class AutocompleteEntryListbox(ttk.Frame):
         else:
             self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
         self.listbox.configure(yscrollcommand=self._scrollbar.set)
-        self.entry.grid(sticky='ew')
+        self.entry.grid(sticky='ew', pady=(0, wpad))
         f.grid(sticky='nsew')
         self._scrollbar.grid(row=1, column=1, sticky='ns')
         for c in self._completevalues:
@@ -200,7 +203,7 @@ class AutocompleteEntryListbox(ttk.Frame):
     def keys(self):
         keys = ttk.Frame.keys(self)
         keys.extend(['completevalues', 'allow_other_values', 'exportselection',
-                     'justify', 'font'])
+                     'justify', 'font', 'wpad'])
         return keys
 
     def get(self):
@@ -214,6 +217,8 @@ class AutocompleteEntryListbox(ttk.Frame):
             return self._completevalues
         elif key == 'autohidescrollbar':
             return isinstance(self._scrollbar, AutoHideScrollbar)
+        elif key == 'wpad':
+            return self._wpad
         elif key in ['justify', 'font', 'exportselection', 'width']:
             return self.entry.cget(key)
         else:
@@ -243,6 +248,10 @@ class AutocompleteEntryListbox(ttk.Frame):
                 self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
             self.listbox.configure(yscrollcommand=self._scrollbar.set)
             self._scrollbar.grid(row=1, column=1, sticky='ns')
+        # padding
+        if 'wpad' in kwargs:
+            self._wpad = kwargs.pop('wpad')
+            self.entry.grid_configure(pady=(0, self._wpad))
         # entry/listbox settings
         entry_listbox_kw = {}
         for key in ['font', 'exportselection', 'width']:
