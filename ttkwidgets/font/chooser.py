@@ -144,11 +144,7 @@ class FontChooser(tk.Toplevel):
             return None, None
         else:
             font_tuple = self.__generate_font_tuple()
-            font_obj = tkfont.Font(family=self._family, size=self._size,
-                                   weight=tkfont.BOLD if self._bold else tkfont.NORMAL,
-                                   slant=tkfont.ITALIC if self._italic else tkfont.ROMAN,
-                                   underline=1 if self._underline else 0,
-                                   overstrike=1 if self._overstrike else 0)
+            font_obj = tkfont.Font(self, font_tuple)
             return font_tuple, font_obj
 
     def _close(self):
