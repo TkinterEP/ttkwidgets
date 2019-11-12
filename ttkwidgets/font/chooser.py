@@ -12,7 +12,7 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
     from tkinter import font
-from .familylistbox import FontFamilyListbox
+from .familyentrylistbox import FontFamilyEntryListbox
 from .sizedropdown import FontSizeDropdown
 from .propertiesframe import FontPropertiesFrame
 
@@ -26,7 +26,7 @@ class FontChooser(tk.Toplevel):
     def __init__(self, master=None, **kwargs):
         """
         Create a FontChooser.
-        
+
         :param master: master window
         :type master: widget
         :param kwargs: keyword arguments passed to :class:`tk.Toplevel` initializer
@@ -37,9 +37,7 @@ class FontChooser(tk.Toplevel):
         self.style = ttk.Style()
         self.style.configure("FontChooser.TLabel", font=("default", 11), relief=tk.SUNKEN, anchor=tk.CENTER)
         self._font_family_header = ttk.Label(self, text="Font family", style="FontChooser.TLabel")
-        self._font_family_list = FontFamilyListbox(self, callback=self._on_family, height=8)
-        self._font_label_variable = tk.StringVar()
-        self._font_label = ttk.Label(self, textvariable=self._font_label_variable, background="white")
+        self._font_family_list = FontFamilyEntryListbox(self, callback=self._on_family, wpad=4, height=8)
         self._font_properties_header = ttk.Label(self, text="Font properties", style="FontChooser.TLabel")
         self._font_properties_frame = FontPropertiesFrame(self, callback=self._on_properties, label=False)
         self._font_size_header = ttk.Label(self, text="Font size", style="FontChooser.TLabel")
@@ -61,8 +59,7 @@ class FontChooser(tk.Toplevel):
     def _grid_widgets(self):
         """Puts all the child widgets in the correct position."""
         self._font_family_header.grid(row=0, column=1, sticky="nswe", padx=5, pady=5)
-        self._font_label.grid(row=1, column=1, sticky="nswe", padx=5, pady=(0, 5))
-        self._font_family_list.grid(row=2, rowspan=3, column=1, sticky="nswe", padx=5, pady=(0, 5))
+        self._font_family_list.grid(row=1, rowspan=4, column=1, sticky="nswe", padx=5, pady=(0, 5))
         self._font_properties_header.grid(row=0, column=2, sticky="nswe", padx=5, pady=5)
         self._font_properties_frame.grid(row=1, rowspan=2, column=2, sticky="we", padx=5, pady=5)
         self._font_size_header.grid(row=3, column=2, sticky="we", padx=5, pady=5)
@@ -74,17 +71,16 @@ class FontChooser(tk.Toplevel):
     def _on_family(self, family):
         """
         Callback if family is changed
-        
+
         :param family: family name
         """
-        self._font_label_variable.set(family)
         self._family = family
         self._on_change()
 
     def _on_size(self, size):
         """
         Callback if size is changed
-        
+
         :param size: int size
         """
         self._size = size
@@ -93,7 +89,7 @@ class FontChooser(tk.Toplevel):
     def _on_properties(self, properties):
         """
         Callback if properties are changed.
-        
+
         :param properties: (bool bold, bool italic, bool underline, bool overstrike)
         """
         self._bold, self._italic, self._underline, self._overstrike = properties
@@ -107,7 +103,7 @@ class FontChooser(tk.Toplevel):
     def __generate_font_tuple(self):
         """
         Generate a font tuple for tkinter widgets based on the user's entries.
-        
+
         :return: font tuple (family_name, size, *options)
         """
         if not self._family:
@@ -127,7 +123,7 @@ class FontChooser(tk.Toplevel):
     def font(self):
         """
         Selected font.
-        
+
         :return: font tuple (family_name, size, \*options), :class:`~font.Font` object
         """
         if self._family is None:
@@ -154,7 +150,7 @@ class FontChooser(tk.Toplevel):
 def askfont():
     """
     Opens a :class:`FontChooser` toplevel to allow the user to select a font
-    
+
     :return: font tuple (family_name, size, \*options), :class:`~font.Font` object
     """
     chooser = FontChooser()
