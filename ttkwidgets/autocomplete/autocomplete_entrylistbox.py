@@ -203,7 +203,7 @@ class AutocompleteEntryListbox(ttk.Frame):
     def keys(self):
         keys = ttk.Frame.keys(self)
         keys.extend(['completevalues', 'allow_other_values', 'exportselection',
-                     'justify', 'font', 'wpad'])
+                     'justify', 'font', 'wpad', 'autohidescrollbar'])
         return keys
 
     def get(self):

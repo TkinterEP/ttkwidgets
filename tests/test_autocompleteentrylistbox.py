@@ -96,7 +96,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         self.window.update()
 
         keys = widget.keys()
-        for key in ['completevalues', 'allow_other_values', 'exportselection', 'justify', 'font', 'wpad']:
+        for key in ['autohidescrollbar', 'completevalues', 'allow_other_values', 'exportselection', 'justify', 'font', 'wpad']:
             self.assertIn(key, keys)
 
         # typing in entry
