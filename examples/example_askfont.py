@@ -11,8 +11,11 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 
+res = (None, None)
+
 def font():
-    res = askfont()
+    global res
+    res = askfont(font=res[0])
     if res[0] is not None:
         label.configure(font=res[0])
     print(res)
