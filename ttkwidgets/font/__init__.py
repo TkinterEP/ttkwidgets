@@ -3,6 +3,7 @@
 from .chooser import askfont, FontChooser
 from .familydropdown import FontFamilyDropdown
 from .familylistbox import FontFamilyListbox
+from .familyentrylistbox import FontFamilyEntryListbox
 from .propertiesframe import FontPropertiesFrame
 from .selectframe import FontSelectFrame
 from .sizedropdown import FontSizeDropdown
