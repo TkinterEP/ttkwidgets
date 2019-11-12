@@ -7,11 +7,11 @@ Source: This repository
 try:
     import Tkinter as tk
     import ttk
-    import tkFont as font
+    import tkFont as tkfont
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
-    from tkinter import font
+    from tkinter import font as tkfont
 from .familyentrylistbox import FontFamilyEntryListbox
 from .sizedropdown import FontSizeDropdown
 from .propertiesframe import FontPropertiesFrame
@@ -130,11 +130,11 @@ class FontChooser(tk.Toplevel):
             return None, None
         else:
             font_tuple = self.__generate_font_tuple()
-            font_obj = font.Font(family=self._family, size=self._size,
-                                 weight=font.BOLD if self._bold else font.NORMAL,
-                                 slant=font.ITALIC if self._italic else font.ROMAN,
-                                 underline=1 if self._underline else 0,
-                                 overstrike=1 if self._overstrike else 0)
+            font_obj = tkfont.Font(family=self._family, size=self._size,
+                                   weight=tkfont.BOLD if self._bold else tkfont.NORMAL,
+                                   slant=tkfont.ITALIC if self._italic else tkfont.ROMAN,
+                                   underline=1 if self._underline else 0,
+                                   overstrike=1 if self._overstrike else 0)
             return font_tuple, font_obj
 
     def _close(self):
