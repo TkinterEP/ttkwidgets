@@ -14,8 +14,20 @@ import os
 if "TRAVIS" not in os.environ:
     class TestFontChooser(BaseWidgetTest):
         def test_fontchooser_init(self):
-            chooser = FontChooser(self.window)
+            chooser = FontChooser(self.window, font='Arial 20 bold underline')
             self.window.update()
+            self.assertEqual(chooser._family, 'Arial')
+            self.assertEqual(chooser._size, 20)
+            self.assertTrue(chooser._bold)
+            self.assertTrue(chooser._underline)
+            self.assertFalse(chooser._italic)
+            self.assertFalse(chooser._overstrike)
+            self.assertEqual(chooser._font_family_list.get(), 'Arial')
+            self.assertEqual(chooser._size_dropdown.get(), '20')
+            self.assertTrue(chooser._font_properties_frame.bold)
+            self.assertTrue(chooser._font_properties_frame.underline)
+            self.assertFalse(chooser._font_properties_frame.italic)
+            self.assertFalse(chooser._font_properties_frame.overstrike)
             chooser._close()
 
         def test_fontchooser_noselection(self):
