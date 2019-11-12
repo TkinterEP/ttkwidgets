@@ -174,6 +174,7 @@ class AutocompleteEntryListbox(ttk.Frame):
                 self.entry.insert(0, l[0].replace("\ ", " "))
                 self.entry.selection_range(index + 1, "end")
                 self.entry.icursor(index + 1)
+                self.event_generate('<<ItemSelect>>')
                 return True
             else:
                 return self._allow_other_values
