@@ -40,6 +40,11 @@ class AutocompleteEntryListbox(ttk.Frame):
         :param wpad: vertical padding between the entry and the listbox
         :type wpad: int
         :param kwargs: keyword arguments passed to the :class:`ttk.Frame` initializer
+
+        **Virtual events**
+
+        The selection of any item, either from the listbox or by typing in the entry, triggers
+        the virtual event :obj:`\<\<ItemSelect\>\>`.
         """
         exportselection = kwargs.pop('exportselection', False)
         width = kwargs.pop('width', None)
