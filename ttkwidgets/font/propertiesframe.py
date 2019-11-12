@@ -22,7 +22,7 @@ class FontPropertiesFrame(ttk.Frame):
     def __init__(self, master=None, callback=None, label=True, fontsize=11, **kwargs):
         """
         Create a FontPropertiesFrame.
-        
+
         :param master: master widget
         :type master: widget
         :param callback: callback with argument
@@ -78,38 +78,54 @@ class FontPropertiesFrame(ttk.Frame):
     def bold(self):
         """
         Bold property.
-        
+
         :return: True if bold is selected
         :rtype: bool
         """
         return self._bold.get()
 
+    @bold.setter
+    def bold(self, value):
+        self._bold.set(value)
+
     @property
     def italic(self):
         """
         Italic property.
-        
+
         :return: True if italic is selected
         :rtype: bool
         """
         return self._italic.get()
 
+    @italic.setter
+    def italic(self, value):
+        self._italic.set(value)
+
     @property
     def underline(self):
         """
         Underline property.
-        
+
         :return: True if underline is selected
         :rtype: bool
         """
         return self._underline.get()
 
+    @underline.setter
+    def underline(self, value):
+        self._underline.set(value)
+
     @property
     def overstrike(self):
         """
         Overstrike property.
-        
+
         :return: True if overstrike is selected
         :rtype: bool
         """
         return self._overstrike.get()
+
+    @overstrike.setter
+    def overstrike(self, value):
+        self._overstrike.set(value)
