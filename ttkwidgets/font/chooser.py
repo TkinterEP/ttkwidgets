@@ -23,19 +23,24 @@ class FontChooser(tk.Toplevel):
     Should only be used through :func:`askfont`.
     """
 
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, font=None, **kwargs):
         """
         Create a FontChooser.
 
         :param master: master window
         :type master: widget
+        :param font: initially selected font
         :param kwargs: keyword arguments passed to :class:`tk.Toplevel` initializer
         """
         tk.Toplevel.__init__(self, master, **kwargs)
         self.wm_title("Choose a font")
         self.resizable(False, False)
+
         self.style = ttk.Style()
         self.style.configure("FontChooser.TLabel", font=("default", 11), relief=tk.SUNKEN, anchor=tk.CENTER)
+
+        font_props = tkfont.Font(self, font=font, size=11).actual()
+
         self._font_family_header = ttk.Label(self, text="Font family", style="FontChooser.TLabel")
         self._font_family_list = FontFamilyEntryListbox(self, callback=self._on_family, wpad=4, height=8)
         self._font_properties_header = ttk.Label(self, text="Font properties", style="FontChooser.TLabel")
@@ -43,17 +48,26 @@ class FontChooser(tk.Toplevel):
         self._font_size_header = ttk.Label(self, text="Font size", style="FontChooser.TLabel")
         self._size_dropdown = FontSizeDropdown(self, callback=self._on_size, width=4)
         self._example_label = tk.Label(self, text="Example", anchor=tk.CENTER, background="white", height=2,
-                                       relief=tk.SUNKEN)
+                                       relief=tk.SUNKEN, font=font)
 
-        self._family = None
-        self._size = 11
-        self._bold = False
-        self._italic = False
-        self._underline = False
-        self._overstrike = False
-        self._font = None
+        # initial values
+        self._family = None if font is None else font_props['family']
+        self._size = font_props['size']
+        self._bold = font_props['weight'] == tkfont.BOLD
+        self._italic = font_props['slant'] == tkfont.ITALIC
+        self._underline = font_props['underline']
+        self._overstrike = font_props['overstrike']
         self._ok_button = ttk.Button(self, text="OK", command=self._close)
         self._cancel_button = ttk.Button(self, text="Cancel", command=self._cancel)
+
+        if font is not None:
+            self._font_family_list.entry.insert(0, font_props['family'])
+        self._size_dropdown.set(self._size)
+        self._font_properties_frame.bold = self._bold
+        self._font_properties_frame.italic = self._italic
+        self._font_properties_frame.underline = self._underline
+        self._font_properties_frame.overstrike = self._overstrike
+
         self._grid_widgets()
 
     def _grid_widgets(self):
@@ -147,12 +161,14 @@ class FontChooser(tk.Toplevel):
         self.destroy()
 
 
-def askfont():
+def askfont(font=None, master=None):
     """
     Opens a :class:`FontChooser` toplevel to allow the user to select a font
 
+    :param font: initially selected font
+
     :return: font tuple (family_name, size, \*options), :class:`~font.Font` object
     """
-    chooser = FontChooser()
+    chooser = FontChooser(master=master, font=font)
     chooser.wait_window()
     return chooser.font
