@@ -84,6 +84,7 @@ class AutocompleteEntryListbox(ttk.Frame):
 
         self.listbox.bind('<<ListboxSelect>>', self._update_entry)
         self.listbox.bind("<KeyPress>", self._listbox_keypress)
+        self.entry.bind("<Return>", self._tab)
         self.entry.bind("<Tab>", self._tab)
         self.entry.bind("<Right>", self._right)
         self.entry.bind("<Down>", self._down)
@@ -106,7 +107,7 @@ class AutocompleteEntryListbox(ttk.Frame):
             return "break"
 
     def _tab(self, event):
-        """Move at the end of selected text on tab press."""
+        """Move at the end of selected text."""
         self.entry.select_clear()
         self.entry.icursor("end")
         return "break"
