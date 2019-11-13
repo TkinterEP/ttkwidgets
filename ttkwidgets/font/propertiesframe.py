@@ -14,7 +14,7 @@ except ImportError:
     from tkinter import font
 
 
-class FontPropertiesFrame(ttk.Frame):
+class FontPropertiesFrame(ttk.Frame, object):
     """
     Simple frame with buttons for Bold, Italic and Underline font types.
     """
