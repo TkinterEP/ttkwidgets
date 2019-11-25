@@ -11,3 +11,6 @@ from ttkwidgets.scaleentry import ScaleEntry
 from ttkwidgets.timeline import TimeLine
 from ttkwidgets.tickscale import TickScale
 from ttkwidgets.table import Table
+from ttkwidgets.popupmenu import PopupMenu
+
+from ttkwidgets.errors import TtkWidgetsError, I18NError
