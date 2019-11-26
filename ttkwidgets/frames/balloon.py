@@ -12,7 +12,6 @@ except ImportError:
 from PIL import Image, ImageTk
 import os
 from ttkwidgets.utilities import get_assets_directory
-from typing import Any, Dict, List, Tuple, Union
 
 
 class Balloon(ttk.Frame):
@@ -20,7 +19,6 @@ class Balloon(ttk.Frame):
 
     def __init__(self, master=None, headertext="Help", text="Some great help is displayed here.", width=200, timeout=1,
                  background="#fef9cd", offset=(2, 2), showheader=True, static=False, **kwargs):
-        # type: (Union[tk.Widget, None], str, str, int, int, str, Tuple[int, int])->None
         """
         Create a Balloon
         
@@ -74,14 +72,12 @@ class Balloon(ttk.Frame):
         self.master.bind("<ButtonPress>", self._on_leave)
 
     def __getitem__(self, key):
-        # type: (Any) -> Any
         return self.cget(key)
 
     def __setitem__(self, key, value):
         self.configure(**{key: value})
 
     def _grid_widgets(self):
-        # type: () -> None
         """Place the widgets in the Toplevel."""
         self._canvas.grid(sticky="nswe")
         if self.__showheader is True:
@@ -89,12 +85,10 @@ class Balloon(ttk.Frame):
         self.text_label.grid(row=3, column=1, sticky="nswe", pady=6, padx=5)
 
     def _on_enter(self, event):
-        # type: (tk.Event) -> None
         """Creates a delayed callback for the :obj:`<Enter>` event."""
         self._id = self.master.after(int(self._timeout * 1000), func=self.show)
 
     def _on_leave(self, event):
-        # type: (tk.Event) -> None
         """Callback for the :obj:`<Leave>` event to destroy the Toplevel."""
         if self._toplevel:
             self._toplevel.destroy()
@@ -104,7 +98,6 @@ class Balloon(ttk.Frame):
             self._id = None
 
     def show(self):
-        # type: () -> None
         """
         Create the Toplevel and its children to show near the cursor
 
@@ -133,7 +126,6 @@ class Balloon(ttk.Frame):
             x + self.__offset[0], y + self.__offset[1]))
 
     def cget(self, key):
-        # type: (str) -> Any
         """
         Query widget option.
 
@@ -161,7 +153,6 @@ class Balloon(ttk.Frame):
             return ttk.Frame.cget(self, key)
 
     def config(self, **kwargs):
-        # type: (Dict[str, Any]) -> None
         """
         Configure resources of the widget.
 
@@ -184,7 +175,6 @@ class Balloon(ttk.Frame):
     configure = config
 
     def keys(self):
-        # type: () -> List[str]
         keys = ttk.Frame.keys(self)
         keys.extend(["headertext", "text", "width", "timeout", "background"])
         return keys
