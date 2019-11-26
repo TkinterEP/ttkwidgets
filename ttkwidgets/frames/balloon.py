@@ -122,6 +122,8 @@ class Balloon(ttk.Frame):
         self._grid_widgets()
         if self.__static is True:
             x, y = self.master.winfo_rootx(), self.master.winfo_rooty()
+            w, h = self.master.winfo_width(), self.master.winfo_height()
+            x, y = x + w, y + h
         else:
             x, y = self.master.winfo_pointerxy()
         self._canvas.update()
