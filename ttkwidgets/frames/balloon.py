@@ -133,7 +133,8 @@ class Balloon(ttk.Frame):
         :type key: str
         :return: value of the option
 
-        To get the list of options for this widget, call the method :meth:`~Balloon.keys`.
+        To get the list of options for this widget, call the method
+        :meth:`~Balloon.keys`.
         """
         if key == "headertext":
             return self.__headertext
@@ -149,6 +150,8 @@ class Balloon(ttk.Frame):
             return self.__offset
         elif key == "showheader":
             return self.__showheader
+        elif key == "static":
+            return self.__static
         else:
             return ttk.Frame.cget(self, key)
 
@@ -156,8 +159,9 @@ class Balloon(ttk.Frame):
         """
         Configure resources of the widget.
 
-        To get the list of options for this widget, call the method :meth:`~Balloon.keys`.
-        See :meth:`~Balloon.__init__` for a description of the widget specific option.
+        To get the list of options for this widget, call the method
+        :meth:`~Balloon.keys`. See :meth:`~Balloon.__init__` for a
+        description of the widget specific option.
         """
         self.__headertext = kwargs.pop("headertext", self.__headertext)
         self.__text = kwargs.pop("text", self.__text)
@@ -176,5 +180,5 @@ class Balloon(ttk.Frame):
 
     def keys(self):
         keys = ttk.Frame.keys(self)
-        keys.extend(["headertext", "text", "width", "timeout", "background"])
+        keys.extend(["headertext", "text", "width", "timeout", "background", "offset", "showheader", "static"])
         return keys
