@@ -78,6 +78,8 @@ def hook_ttk_widgets(updater, options):
 
     def configure(self, *args, **kwargs):
         for widget_options in args + (kwargs,):  # Loop over all sets of options available
+            if widget_options is None:
+                continue
             for option, _ in options.items():
                 current = getter(self, option)
                 value = widget_options.pop(option, current)
