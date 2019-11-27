@@ -34,6 +34,7 @@ def hook_ttk_widgets(updater, options):
     :return: Name of the attribute created to store values
     :rtype: str
     """
+    NULL = object()
 
     assert len(options) > 0
 
@@ -55,12 +56,14 @@ def hook_ttk_widgets(updater, options):
 
     def setter(self, option, value):
         """Store an option on the embedded object and then call updater"""
-        setattr(getattr(self, name.lower()), option, value)
-        updater(self, option, value)
+        current = getter(self, option)
+        if current != value:
+            setattr(getattr(self, name.lower()), option, value)
+            updater(self, option, value)
 
     def getter(self, option):
         """Retrieve an option value from the embedded object"""
-        return getattr(getattr(self, name.lower()), option, options[option])
+        return getattr(getattr(self, name.lower()), option, NULL)
 
     def __init__(self, *args):
         master, widget, widget_options = args
