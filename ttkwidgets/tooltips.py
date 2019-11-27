@@ -23,65 +23,57 @@ try:
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
+from ttkwidgets.hook import hook_ttk_widgets, generate_hook_name, is_hooked
 from ttkwidgets.frames import Balloon
 
 
-DEFAULTS = {}
+OPTIONS = {"tooltip": None, "tooltip_options": {}}
+NAME = generate_hook_name(OPTIONS)
 
 
 def update_defaults(defaults):
     # type: (dict) -> None
-    global DEFAULTS
-    DEFAULTS.update(defaults)
+    global OPTIONS
+    OPTIONS["tooltip_options"] = defaults
 
 
-class ToolTippableWidget(ttk.Widget):
-    def __init__(self, *args):
-        master, widget_type, kwargs = args
-        self._tooltip = kwargs.pop("tooltip", None)
-        self._tooltip_options = DEFAULTS.copy()
-        self._tooltip_options.update(kwargs.pop("tooltip_options", {}))
-        ttk.Widget._init__original(self, master, widget_type, kwargs)
-        self.__widget = None
-        self._update_tooltip()
-
-    def configure(self, *args, **kwargs):
-        self._tooltip = kwargs.pop("tooltip", None)
-        self._tooltip_options.update(kwargs.pop("tooltip_options", {}))
-        self._update_tooltip()
-        return ttk.Widget._configure_original(self, *args, **kwargs)
-
-    def cget(self, key):
-        if key == "tooltip":
-            return self._tooltip
-        elif key == "tooltip_options":
-            return self._tooltip_options
-        return ttk.Widget._cget_original(self, key)
-
-    def config(self, *args, **kwargs):
-        return self.configure(*args, **kwargs)
-
-    def _update_tooltip(self):
-        self._tooltip_options["text"] = self._tooltip
-        if self._tooltip is None and self.__widget is not None:
-            self.__widget.destroy()
-        elif self._tooltip is not None and self.__widget is not None:
-            self.__widget.configure(**self._tooltip_options)
-        elif not isinstance(self, Balloon):  # Balloons may not have Balloons -> recursion
-            self.__widget = Balloon(self, **self._tooltip_options)
+def tooltip_updater(self, option, value):
+    # type: (tk.Widget, str, (str, dict)) -> None
+    """Update the tooltip held on a widget"""
+    holder = getattr(self, NAME.lower())
+    tooltip_widget = getattr(holder, "tooltip_widget", None)
+    if option == "tooltip":
+        tooltip_tooltip_updater(self, holder, tooltip_widget, value)
+    elif option == "tooltip_options":
+        tooltip_options_updater(self, holder, tooltip_widget, value)
+    else:
+        raise RuntimeError("Invalid option passed to tooltip_updater")
 
 
-if ttk.Widget.__init__ is not ToolTippableWidget.__init__:
+def tooltip_tooltip_updater(self, holder, tooltip_widget, tooltip):
+    # type: ((tk.Widget, ttk.Widget), object, (Balloon, None), (str, None)) -> None
+    """Update the 'tooltip' option of a widget by updating tooltip text"""
+    if tooltip_widget is None and tooltip is not None:
+        # Create a new tooltip
+        options = OPTIONS["tooltip_options"].copy()
+        options["text"] = tooltip
+        options.update(getattr(holder, "tooltip_options", {}))
+        tooltip_widget = Balloon(self, **options)
+    elif tooltip_widget is not None and tooltip is None:
+        # Destroy existing tooltip
+        tooltip_widget.destroy()
+        tooltip_widget = None
+    else:
+        # Update existing tooltip
+        tooltip_widget.configure(text=tooltip)
+    setattr(holder, "tooltip_widget", tooltip_widget)
 
-    # Save the original functions
-    ttk.Widget._init__original = ttk.Widget.__init__
-    ttk.Widget._configure_original = ttk.Widget.configure
-    ttk.Widget._config_original = ttk.Widget.config
-    ttk.Widget._cget_original = ttk.Widget.cget
 
-    # Apply the modified functions
-    ttk.Widget.__init__ = ToolTippableWidget.__init__
-    ttk.Widget.configure = ToolTippableWidget.configure
-    ttk.Widget.config = ToolTippableWidget.config
-    ttk.Widget.cget = ToolTippableWidget.cget
-    ttk.Widget._update_tooltip = ToolTippableWidget._update_tooltip
+def tooltip_options_updater(self, holder, tooltip_widget, options):
+    """Update the options of a tooltip widget held on a widget"""
+    pass
+
+
+if not is_hooked(OPTIONS):
+    hook_ttk_widgets(tooltip_updater, OPTIONS)
+
