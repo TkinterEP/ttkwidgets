@@ -55,8 +55,6 @@ def hook_ttk_widgets(updater, options):
 
     def setter(self, option, value):
         """Store an option on the embedded object and then call updater"""
-        if value == getter(self, option):
-            return
         setattr(getattr(self, name.lower()), option, value)
         updater(self, option, value)
 
