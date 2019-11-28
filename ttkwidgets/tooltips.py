@@ -13,9 +13,6 @@ arguments upon widget initialization.
 
 The default options for the Balloon widget for the program may also be
 changed by using the update_defaults function.
-
-# TODO: Convert current implementation to a mixin
-# TODO: Apply mixin to tkWidget also
 """
 try:
     import Tkinter as tk
@@ -33,6 +30,14 @@ NAME = generate_hook_name(OPTIONS)
 
 def update_defaults(defaults):
     # type: (dict) -> None
+    """
+    Update the default options applied to the tooltip of a widget
+
+    Updating the default options of the hook is no longer possible after
+    the hook has been setup, but the :meth:`tooltip_updater` applies
+    the default options first to all tooltips and only overwrites them
+    if custom options have been given for the tooltip.
+    """
     global OPTIONS
     OPTIONS["tooltip_options"] = defaults
 
@@ -71,6 +76,7 @@ def tooltip_tooltip_updater(self, holder, tooltip_widget, tooltip):
 
 def tooltip_options_updater(self, holder, tooltip_widget, options):
     """Update the options of a tooltip widget held on a widget"""
+    # TODO: Implementation of this function
     pass
 
 
