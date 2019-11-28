@@ -133,7 +133,7 @@ def hook_ttk_widgets(updater, options):
 
     def keys(self):
         """Return an updated list of keys with the custom options"""
-        keys = getattr(self, name).original_keys()
+        keys = getattr(self, name).original_keys(self)
         keys.extend(options.keys())
         return keys
 
