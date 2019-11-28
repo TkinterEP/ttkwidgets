@@ -93,7 +93,8 @@ class TestScaleEntry(BaseWidgetTest):
                 'takefocus', 'cursor', 'style', 'class', 'scalewidth', 'orient',
                 'entrywidth', 'from', 'to', 'compound', 'entryscalepad']
         keys.sort()
-        self.assertEqual(scale.keys(), keys)
+        widget_keys = scale.keys()
+        self.assertTrue(all(key in widget_keys for key in keys))
         self.assertEqual(scale['orient'], tk.VERTICAL)
         self.assertEqual(scale['scalewidth'], 100)
         self.assertEqual(scale['entrywidth'], 4)
