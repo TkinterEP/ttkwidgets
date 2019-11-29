@@ -7,10 +7,10 @@ from ttkwidgets.scrolledlistbox import ScrolledListbox
 from ttkwidgets.debugwindow import DebugWindow
 from ttkwidgets.checkboxtreeview import CheckboxTreeview
 from ttkwidgets.itemscanvas import ItemsCanvas
-from ttkwidgets.scaleentry import ScaleEntry
 from ttkwidgets.timeline import TimeLine
 from ttkwidgets.tickscale import TickScale
 from ttkwidgets.table import Table
 from ttkwidgets.popupmenu import PopupMenu
+from ttkwidgets.entries import ScaleEntry, KeybindingEntry, PlaceholderEntry, SelectFolderEntry
 
 from ttkwidgets.errors import TtkWidgetsError, I18NError
