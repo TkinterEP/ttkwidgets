@@ -20,6 +20,7 @@ Copyright (C) The Python Team
 Copyright (C) Mitja Martini 2008
 Copyright (C) Russell Adams 2011
 Copyright (C) Juliette Monsel 2017
+Copyright (C) Dogeek 2019
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -60,7 +61,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 setup(
     name="ttkwidgets",
-    packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color"],
+    packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color",
+              "ttkwidgets.base_widgets", "ttkwidgets.bitmap_assets", "ttkwidgets.photo_assets"],
     py_modules=["ttkwidgets"],
     package_data={"ttkwidgets": ["assets/*"]},
     version="0.11.0",
@@ -70,8 +72,7 @@ setup(
     url="https://www.github.com/RedFantom/ttkwidgets",
     download_url="https://www.github.com/RedFantom/ttkwidgets/releases",
     license="AGPL",
-    classifiers=["Programming Language :: Python :: 2.7",
-                 "Programming Language :: Python :: 3",
+    classifiers=["Programming Language :: Python :: 3",
                  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"],
     install_requires=["pillow"]
 )
