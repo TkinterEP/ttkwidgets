@@ -39,8 +39,8 @@ class ToggledFrame(ttk.Frame):
         ttk.Frame.__init__(self, master, **kwargs)
         self._open = False
         self.__checkbutton_var = tk.BooleanVar()
-        self._open_image = ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), "open.png")))
-        self._closed_image = ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), "closed.png")))
+        self._open_image = ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), "photo", "open.png")))
+        self._closed_image = ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), "photo", "closed.png")))
         self._checkbutton = ttk.Checkbutton(self, style="Toolbutton", command=self.toggle,
                                             variable=self.__checkbutton_var, text=text, compound=compound,
                                             image=self._closed_image, width=width)

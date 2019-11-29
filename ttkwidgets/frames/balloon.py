@@ -45,7 +45,7 @@ class Balloon(ttk.Frame):
         # The image was found here:
         # https://www.iconfinder.com/icons/26486/balloon_help_information_icon#size=16
         # Under CC Attribution License
-        self._image = Image.open(os.path.join(get_assets_directory(), "balloon.png"))
+        self._image = Image.open(os.path.join(get_assets_directory(), "photo", "balloon.png"))
         self._photo_image = ImageTk.PhotoImage(self._image, master=self)
         self.__background = background
         self.__headertext = headertext

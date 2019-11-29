@@ -16,7 +16,7 @@ from PIL import ImageTk, Image
 from ttkwidgets.utilities import get_assets_directory, os
 
 
-IM_DRAG = os.path.join(get_assets_directory(), "drag.png")
+IM_DRAG = os.path.join(get_assets_directory(), "photo", "drag.png")
 
 
 class Table(ttk.Treeview):
