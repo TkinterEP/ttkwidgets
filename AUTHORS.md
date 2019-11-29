@@ -8,7 +8,7 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `ScrolledListbox`
   * `FontChooser`, based on an idea by [Nelson Brochado](https://www.github.com/nbro)
   * `FontSelectFrame`
-  * `Balloon`
+  * `Tooltip`
   * `ItemsCanvas`
   * `TimeLine`
 - The Python Team
@@ -27,6 +27,8 @@ This file contains a list of all the authors of widgets in this repository. Plea
 - [Dogeek](https://github.com/Dogeek)
   * `move_widget` and `copy_widget`, based on [cjolly's](https://stackoverflow.com/users/1036289/cjolly) [stackoverflow answer](https://stackoverflow.com/questions/6285648/can-you-change-a-widgets-parent-in-python-tkinter)
   * `get_bitmap`
+  * `get_average_character_width`
+  * `Widget`
   * `PopupMenu`
 - Multiple authors:
   * `ScaleEntry` (RedFantom and Juliette Monsel)
