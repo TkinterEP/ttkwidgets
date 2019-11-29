@@ -109,13 +109,13 @@ class DirTree(ttk.Frame):
             elif ptype == 'file':
                 mimetype = mimetypes.guess_type(fname)[0].split("/")[0]
                 if mimetype == "image":
-                    img = get_bitmap("image")
+                    img = get_bitmap("imagefile")
                 elif mimetype == "video":
-                    img = get_bitmap("video")
+                    img = get_bitmap("moviefile")
                 elif mimetype == "audio":
-                    img = get_bitmap("audio")
+                    img = get_bitmap("musicfile")
                 else:
-                    img = get_bitmap("text")
+                    img = get_bitmap("textfile")
                 self.images.append(img)
                 self.tree.item(id_, image=self.images[-1])
 
