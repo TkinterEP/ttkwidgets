@@ -24,5 +24,9 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `AutoHideScrollbar` based on an idea by [Fredrik Lundh](effbot.org/zone/tkinter-autoscrollbar.htm)
   * All color widgets: `askcolor`, `ColorPicker`, `GradientBar` and `ColorSquare`, `LimitVar`, `Spinbox`, `AlphaBar` and supporting functions in `functions.py`.
   * `AutocompleteEntryListbox`
+- [Dogeek](https://github.com/Dogeek)
+  * `move_widget` and `copy_widget`, based on [cjolly's](https://stackoverflow.com/users/1036289/cjolly) [stackoverflow answer](https://stackoverflow.com/questions/6285648/can-you-change-a-widgets-parent-in-python-tkinter)
+  * `get_bitmap`
+  * `PopupMenu`
 - Multiple authors:
   * `ScaleEntry` (RedFantom and Juliette Monsel)
