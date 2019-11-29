@@ -31,7 +31,7 @@ class DirTree(ttk.Frame):
 
     @path.setter
     def path(self, ppath):
-        self._path = ppath
+        self._path = ppath or os.getcwd()
         dir_ = os.path.abspath(self._path).replace('\\', '/')
         self._name = dir_.split("/")[-1]
 
