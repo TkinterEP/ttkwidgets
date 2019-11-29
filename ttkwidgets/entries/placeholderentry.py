@@ -1,3 +1,9 @@
+"""
+Author: Dogeek
+License: GNU GPLv3
+Source: This repository
+"""
+
 import tkinter as tk
 import tkinter.ttk as ttk
 

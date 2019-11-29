@@ -1,4 +1,9 @@
-# Copyright (c) RedFantom 2017
+"""
+Author: RedFantom & Dogeek
+License: GNU GPLv3
+Source: This repository
+"""
+
 import os
 from PIL import Image, ImageTk
 import tkinter as tk
