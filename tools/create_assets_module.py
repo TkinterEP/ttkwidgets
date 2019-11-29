@@ -37,7 +37,7 @@ def get_bitmap_file_contents(path, mask_suffix):
     code += varname + " = "
     with open(os.path.join(*filepath, filename)) as f:
         code += '"""\n' + "".join([line for line in f]) + '"""\n'
-    code += "\n{varname}_mask = "
+    code += f"\n{varname}_mask = "
     with open(os.path.join(*filepath, mask_filename)) as f:
         code += '"""\n' + "".join([line for line in f]) + '"""\n'
     return varname, code

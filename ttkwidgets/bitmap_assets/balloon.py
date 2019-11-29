@@ -7,7 +7,7 @@ static unsigned char balloon_bits[] = {
    0xf0, 0x0f, 0x00, 0x0e, 0x00, 0x0c, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+balloon_mask = """
 #define balloon_mask_width 16
 #define balloon_mask_height 16
 static unsigned char balloon_mask_bits[] = {

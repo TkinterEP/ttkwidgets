@@ -7,7 +7,7 @@ static unsigned char arrow_right_bits[] = {
    0x80, 0x01, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+arrow_right_mask = """
 #define arrow_right_mask_width 16
 #define arrow_right_mask_height 16
 static unsigned char arrow_right_mask_bits[] = {

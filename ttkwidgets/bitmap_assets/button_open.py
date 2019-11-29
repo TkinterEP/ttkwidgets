@@ -7,7 +7,7 @@ static unsigned char button_open_bits[] = {
    0x82, 0x41, 0x02, 0x40, 0xfe, 0x7f, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+button_open_mask = """
 #define button_open_mask_width 16
 #define button_open_mask_height 16
 static unsigned char button_open_mask_bits[] = {

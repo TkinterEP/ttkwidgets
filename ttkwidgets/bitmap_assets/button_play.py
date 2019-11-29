@@ -7,7 +7,7 @@ static unsigned char button_play_bits[] = {
    0x70, 0x00, 0x30, 0x00, 0x10, 0x00, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+button_play_mask = """
 #define button_play_mask_width 16
 #define button_play_mask_height 16
 static unsigned char button_play_mask_bits[] = {

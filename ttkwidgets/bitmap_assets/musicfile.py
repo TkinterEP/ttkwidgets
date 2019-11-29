@@ -7,7 +7,7 @@ static unsigned char musicfile_bits[] = {
    0x1f, 0x0e, 0x1f, 0x00, 0x1f, 0x00, 0x0e, 0x00 };
 """
 
-{varname}_mask = """
+musicfile_mask = """
 #define musicfile_mask_width 16
 #define musicfile_mask_height 16
 static unsigned char musicfile_mask_bits[] = {

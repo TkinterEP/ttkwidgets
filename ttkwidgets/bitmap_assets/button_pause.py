@@ -7,7 +7,7 @@ static unsigned char button_pause_bits[] = {
    0x60, 0x0c, 0x60, 0x0c, 0x60, 0x0c, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+button_pause_mask = """
 #define button_pause_mask_width 16
 #define button_pause_mask_height 16
 static unsigned char button_pause_mask_bits[] = {

@@ -1,10 +1,12 @@
 # Copyright (c) RedFantom 2017
 import os
 from PIL import Image, ImageTk
+import tkinter as tk
 import textwrap
 import string
 
-from ttkwidgets.errors import I18NError
+from ttkwidgets.errors import I18NError, AssetNotFoundError, AssetMaskNotFoundError
+import ttkwidgets.bitmap_assets
 
 
 def get_assets_directory():
@@ -15,9 +17,30 @@ def open_icon(icon_name):
     return ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), icon_name)))
 
 
-
-def get_bitmap(bitmap_name):
-    pass
+def get_bitmap(bitmap_name, has_mask=True, **kwargs):
+    """
+    Gets a tkinter.BitmapImage from the ttkwidgets.bitmap_assets submodule.
+    
+    :param bitmap_name: name of the bitmap to get from the ttkwidgets.bitmap_assets submodule
+    :type bitmap_name: str
+    :param has_mask: boolean that defines if the selected bitmap has a mask
+    :type has_mask: bool
+    :param **kwargs: dictionary of keyword arguments to pass to tkinter.BitmapImage()
+    :type kwargs: dict
+    
+    :returns: Bitmap image constructed from the data in bitmap_assets
+    :raises: ttkwidgets.errors.AssetNotFoundError if the bitmap can't be found
+    :raises: ttkwidgets.errors.AssetMaskNotFoundError if the bitmap has a mask, and the mask can't be found.
+    """
+    bitmask = kwargs.pop("maskdata", None) or bitmap_name + "_mask"
+    if bitmap_name not in ttkwidgets.bitmap_assets.__dict__:
+        raise AssetNotFoundError("Asset {} was not found in module 'ttkwidgets.bitmap_assets'".format(bitmap_name))
+    if bitmask not in ttkwidgets.bitmap_assets.__dict__ and has_mask:
+        raise AssetMaskNotFoundError("Asset mask {} was not found in module 'ttkwidgets.bitmap_assets'".format(bitmask))
+    
+    return tk.BitmapImage(data=ttkwidgets.bitmap_assets.__dict__[bitmap_name],
+                          maskdata=ttkwidgets.bitmap_assets.__dict__[bitmask],
+                          **kwargs)
 
 
 def auto_scroll(sbar, first, last):

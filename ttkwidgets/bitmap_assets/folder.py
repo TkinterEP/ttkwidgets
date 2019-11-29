@@ -7,5 +7,5 @@ static unsigned char folder_bits[] = {
    0x01, 0x40, 0x01, 0x40, 0xfe, 0x7f, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+folder_mask = """
 """
