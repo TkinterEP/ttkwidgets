@@ -14,7 +14,7 @@ def get_assets_directory():
 
 
 def open_icon(icon_name):
-    return ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), icon_name)))
+    return ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), "photo", icon_name)))
 
 
 def get_bitmap(bitmap_name, has_mask=True, **kwargs):
