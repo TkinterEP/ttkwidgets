@@ -1,5 +1,5 @@
 import tkinter.ttk as ttk
-from ttkwidgets.base_widgets.balloon import Balloon
+from .tooltip import Tooltip
 
 
 class Widget(ttk.Widget):

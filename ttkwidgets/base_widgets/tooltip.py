@@ -3,26 +3,23 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter.ttk as ttk
-    import tkinter as tk
+
+import tkinter.ttk as ttk
+import tkinter as tk
 from PIL import Image, ImageTk
 import os
 from ttkwidgets.utilities import get_assets_directory
 
 
-class Balloon(ttk.Frame):
-    """Simple help hover balloon."""
+class Tooltip(ttk.Frame):
+    """Simple help hover Tooltip."""
 
     def __init__(self, master=None, headertext="Help", text="Some great help is displayed here.", width=200, timeout=1,
-                 background="#fef9cd", offset=(2, 2), showheader=True, static=False, **kwargs):
+                 background="#fef9cd", offset=(2, 2), showheader=False, static=False, **kwargs):
         """
-        Create a Balloon
+        Create a Tooltip
         
-        :param master: widget to bind the Balloon to
+        :param master: widget to bind the Tooltip to
         :type master: widget
         :param headertext: text to show in window header
         :type headertext: str
@@ -30,16 +27,16 @@ class Balloon(ttk.Frame):
         :type text: str
         :param width: width of the window
         :type width: int
-        :param timeout: timeout in seconds to wait until the Balloon is shown
+        :param timeout: timeout in seconds to wait until the Tooltip is shown
         :type timeout: float
-        :param background: background color of the Balloon
+        :param background: background color of the Tooltip
         :type background: str
         :param offset: The offset from the mouse position the Ballon shows up
         :type offset: Tuple[int, int]
         :param showheader: Whether to display the header with image
         :type showheader: bool
         :param static: Whether to display the tooltip with static
-            position. When the position is set to static, the balloon
+            position. When the position is set to static, the Tooltip
             will always appear an offset from the bottom right corner of
             the widget.
         :type static: bool
@@ -70,6 +67,7 @@ class Balloon(ttk.Frame):
         self.master.bind("<Enter>", self._on_enter)
         self.master.bind("<Leave>", self._on_leave)
         self.master.bind("<ButtonPress>", self._on_leave)
+        self.master.event_add("<<TooltipActivate>>", "<Double-Button-1>")
 
     def __getitem__(self, key):
         return self.cget(key)
@@ -102,7 +100,7 @@ class Balloon(ttk.Frame):
         Create the Toplevel and its children to show near the cursor
 
         This is the callback for the delayed :obj:`<Enter>` event
-        (see :meth:`~Balloon._on_enter`).
+        (see :meth:`~Tooltip._on_enter`).
         """
         self._toplevel = tk.Toplevel(self.master)
         self._canvas = tk.Canvas(self._toplevel, background=self.__background)
@@ -134,7 +132,7 @@ class Balloon(ttk.Frame):
         :return: value of the option
 
         To get the list of options for this widget, call the method
-        :meth:`~Balloon.keys`.
+        :meth:`~Tooltip.keys`.
         """
         if key == "headertext":
             return self.__headertext
@@ -160,7 +158,7 @@ class Balloon(ttk.Frame):
         Configure resources of the widget.
 
         To get the list of options for this widget, call the method
-        :meth:`~Balloon.keys`. See :meth:`~Balloon.__init__` for a
+        :meth:`~Tooltip.keys`. See :meth:`~Tooltip.__init__` for a
         description of the widget specific option.
         """
         self.__headertext = kwargs.pop("headertext", self.__headertext)
