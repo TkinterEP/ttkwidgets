@@ -31,11 +31,17 @@ class DirTree(ttk.Frame):
 
     @path.setter
     def path(self, ppath):
+        """ 
+        Setter for the path property. 
+        
+        :param ppath: path string or None. If None, defaults to os.getcwd()
+        """
         self._path = ppath or os.getcwd()
         dir_ = os.path.abspath(self._path).replace('\\', '/')
         self._name = dir_.split("/")[-1]
 
     def init_treeview(self):
+        """ Inits the treeview with scrollbars, headings, and style. """
         self.vsb = ttk.Scrollbar(master=self, orient="vertical")
         self.hsb = ttk.Scrollbar(master=self, orient="horizontal")
         style = ttk.Style()
@@ -80,6 +86,12 @@ class DirTree(ttk.Frame):
         self.images = []
 
     def populate_tree(self, node=""):
+        """
+        Populates the tree recursively with all the files and folders from the given path.
+        
+        :param node: treeview node to start with (internally used, it starts with "", which is the 
+                     root node of the treeview)
+        """
         if self.tree.set(node, "type") != 'directory':
             return
 
@@ -120,19 +132,29 @@ class DirTree(ttk.Frame):
                 self.tree.item(id_, image=self.images[-1])
 
     def sort_tree(self, node, col="type", reverse=False):
+        """
+        Sorts the tree
+        
+        :param node: node of the tree to move
+        :param col: ("type") column to sort the tree by
+        :param reverse: (False) if the sorting should be in reversed order or not.
+        """
         items = [(self.tree.set(k, col), k) for k in self.tree.get_children(node)]
         items.sort(reverse=reverse)
         for index, (_, k) in enumerate(items):
             self.tree.move(k, node, index)
 
     def clear_tree(self):
+        """
+        Clears all data from the tree.
+        """
         self.tree.delete(*self.tree.get_children(''))
 
     def populate_roots(self):
         """
         Populates the treeview with the directory's files.
 
-        :return: None
+        :returns: None
         """
         dir_ = os.path.abspath(self._path).replace('\\', '/')
         node = self.tree.insert('', 'end',
