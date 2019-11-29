@@ -28,5 +28,8 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `move_widget` and `copy_widget`, based on [cjolly's](https://stackoverflow.com/users/1036289/cjolly) [stackoverflow answer](https://stackoverflow.com/questions/6285648/can-you-change-a-widgets-parent-in-python-tkinter)
   * `get_bitmap`
   * `PopupMenu`
+  * `KeybindingEntry`
+  * `PlaceholderEntry`
+  * `SelectFolderEntry`
 - Multiple authors:
   * `ScaleEntry` (RedFantom and Juliette Monsel)
