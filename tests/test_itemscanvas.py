@@ -66,7 +66,7 @@ class TestItemsCanvas(BaseWidgetTest):
 
     def test_itemscanvas_background(self):
         canvas = ItemsCanvas()
-        path = os.path.join(get_assets_directory(), "open.png")
+        path = os.path.join(get_assets_directory(), "photo", "open.png")
         img = ImageTk.PhotoImage(Image.open(path))
         canvas.set_background(image=img)
         self.window.update()
