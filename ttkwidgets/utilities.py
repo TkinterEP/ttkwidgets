@@ -17,8 +17,6 @@ def open_icon(icon_name):
     return ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), icon_name)))
 
 
-<<<<<<< Updated upstream
-=======
 def get_bitmap(bitmap_name, has_mask=True, **kwargs):
     """
     Gets a tkinter.BitmapImage from the ttkwidgets.bitmap_assets submodule.
@@ -45,7 +43,6 @@ def get_bitmap(bitmap_name, has_mask=True, **kwargs):
                           **kwargs)
 
 
->>>>>>> Stashed changes
 def auto_scroll(sbar, first, last):
     """
     Hide and show scrollbar as needed.
