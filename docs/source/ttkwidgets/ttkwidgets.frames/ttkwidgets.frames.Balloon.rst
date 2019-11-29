@@ -1,9 +1,9 @@
-Balloon
+Tooltip
 =======
 
 .. currentmodule:: ttkwidgets.frames
 
-.. autoclass:: Balloon
+.. autoclass:: Tooltip
    :show-inheritance:
    :members:
    
