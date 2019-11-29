@@ -7,7 +7,7 @@ static unsigned char button_close_bits[] = {
    0x1c, 0x38, 0x0e, 0x70, 0x06, 0x60, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+button_close_mask = """
 #define button_close_mask_width 16
 #define button_close_mask_height 16
 static unsigned char button_close_mask_bits[] = {

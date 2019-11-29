@@ -7,7 +7,7 @@ static unsigned char imagefile_bits[] = {
    0x02, 0x40, 0xfc, 0x3f, 0x00, 0x00, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+imagefile_mask = """
 #define imagefile_mask_width 16
 #define imagefile_mask_height 16
 static unsigned char imagefile_mask_bits[] = {

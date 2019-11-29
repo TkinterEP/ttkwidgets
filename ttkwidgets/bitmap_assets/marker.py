@@ -8,7 +8,7 @@ static unsigned char marker_bits[] = {
    0xfc, 0x3f, 0xf8, 0x1f, 0xe0, 0x07 };
 """
 
-{varname}_mask = """
+marker_mask = """
 #define marker_mask_width 16
 #define marker_mask_height 21
 static unsigned char marker_mask_bits[] = {

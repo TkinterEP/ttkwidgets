@@ -7,7 +7,7 @@ static unsigned char zoom_out_bits[] = {
    0xf8, 0x7f, 0xe0, 0xf9, 0x00, 0xf0, 0x00, 0xe0 };
 """
 
-{varname}_mask = """
+zoom_out_mask = """
 #define zoom_out_mask_width 16
 #define zoom_out_mask_height 16
 static unsigned char zoom_out_mask_bits[] = {

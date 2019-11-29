@@ -7,7 +7,7 @@ static unsigned char textfile_bits[] = {
    0x06, 0x40, 0xe6, 0x4f, 0x06, 0x40, 0xfc, 0x3f };
 """
 
-{varname}_mask = """
+textfile_mask = """
 #define textfile_mask_width 16
 #define textfile_mask_height 16
 static unsigned char textfile_mask_bits[] = {

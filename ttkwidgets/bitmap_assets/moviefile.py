@@ -7,7 +7,7 @@ static unsigned char moviefile_bits[] = {
    0xfc, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+moviefile_mask = """
 #define moviefile_mask_width 16
 #define moviefile_mask_height 16
 static unsigned char moviefile_mask_bits[] = {

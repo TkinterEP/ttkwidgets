@@ -7,7 +7,7 @@ static unsigned char drag_bits[] = {
    0xe0, 0x01, 0xc0, 0x00 };
 """
 
-{varname}_mask = """
+drag_mask = """
 #define drag_mask_width 14
 #define drag_mask_height 14
 static unsigned char drag_mask_bits[] = {

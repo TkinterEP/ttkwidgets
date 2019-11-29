@@ -7,7 +7,7 @@ static unsigned char volume_icon_bits[] = {
    0x60, 0x20, 0x40, 0x20, 0x00, 0x10, 0x00, 0x00 };
 """
 
-{varname}_mask = """
+volume_icon_mask = """
 #define volume_icon_mask_width 16
 #define volume_icon_mask_height 16
 static unsigned char volume_icon_mask_bits[] = {
