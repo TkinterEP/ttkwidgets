@@ -13,5 +13,6 @@ from ttkwidgets.tickscale import TickScale
 from ttkwidgets.table import Table
 from ttkwidgets.popupmenu import PopupMenu
 from ttkwidgets.dirtreewidget import DirTree
+from ttkwidgets.videoplayer import VideoPlayer
 
 from ttkwidgets.errors import TtkWidgetsError, I18NError, AssetNotFoundError, AssetMaskNotFoundError
