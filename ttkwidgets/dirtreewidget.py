@@ -45,21 +45,21 @@ class DirTree(ttk.Frame):
         self.vsb = ttk.Scrollbar(master=self, orient="vertical")
         self.hsb = ttk.Scrollbar(master=self, orient="horizontal")
         style = ttk.Style()
-        style.configure("Custom.Treeview")
-        style.configure("Custom.Treeview.Heading",
+        style.configure("DirTree.Treeview")
+        style.configure("DirTree.Treeview.Heading",
                         relief='flat')
-        style.element_create("Custom.Treeheading.border", "from", "default")
-        style.layout("Custom.Treeview.Heading", [
-            ("Custom.Treeheading.cell", {'sticky': 'nswe'}),
-            ("Custom.Treeheading.border", {'sticky': 'nswe', 'children': [
-                ("Custom.Treeheading.padding", {'sticky': 'nswe', 'children': [
-                    ("Custom.Treeheading.image", {'side': 'right', 'sticky': ''}),
-                    ("Custom.Treeheading.text", {'sticky': 'we'})
+        # style.element_create("DirTree.Treeheading.border", "from", "default")
+        style.layout("DirTree.Treeview.Heading", [
+            ("DirTree.Treeheading.cell", {'sticky': 'nswe'}),
+            ("DirTree.Treeheading.border", {'sticky': 'nswe', 'children': [
+                ("DirTree.Treeheading.padding", {'sticky': 'nswe', 'children': [
+                    ("DirTree.Treeheading.image", {'side': 'right', 'sticky': ''}),
+                    ("DirTree.Treeheading.text", {'sticky': 'we'})
                 ]})
             ]}),
         ])
-        style.layout("Custom.Treeview", [('Custom.Treeview.treearea', {'sticky': 'nswe'})])
-        style.map("Custom.Treeview.Heading",
+        style.layout("DirTree.Treeview", [('DirTree.Treeview.treearea', {'sticky': 'nswe'})])
+        style.map("DirTree.Treeview.Heading",
                   relief=[('active', 'groove'), ('pressed', 'sunken')])
         self.tree = ttk.Treeview(self,
                                  columns=("fullpath", "type", "size"),
@@ -68,7 +68,7 @@ class DirTree(ttk.Frame):
                                  selectmode="browse",
                                  yscrollcommand=lambda f, l: auto_scroll(self.vsb, f, l),
                                  xscrollcommand=lambda f, l: auto_scroll(self.hsb, f, l),
-                                 style='Custom.Treeview',
+                                 style='DirTree.Treeview',
                                  )
 
         self.tree.heading("#0", text="Directory Structure", anchor='w')
