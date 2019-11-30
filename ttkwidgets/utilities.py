@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (c) RedFantom 2017
 import os
 from PIL import Image, ImageTk
