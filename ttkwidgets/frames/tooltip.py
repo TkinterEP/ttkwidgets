@@ -67,9 +67,14 @@ class Tooltip(ttk.Frame):
         self.master = master
         self._id = None
         self._timeout = timeout
-        self.master.bind("<Enter>", self._on_enter)
-        self.master.bind("<Leave>", self._on_leave)
-        self.master.bind("<ButtonPress>", self._on_leave)
+
+        self._bind_to_master()
+
+    def _bind_to_master(self):
+        """Bind the Balloon widget to the master widget's events"""
+        self.master.bind("<Enter>", self._on_enter, "add")
+        self.master.bind("<Leave>", self._on_leave, "add")
+        self.master.bind("<ButtonPress>", self._on_leave, "add")
 
     def __getitem__(self, key):
         return self.cget(key)
