@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (c) RedFantom 2017
 import os
 from PIL import Image, ImageTk
@@ -65,9 +67,9 @@ def auto_scroll(sbar, first, last):
 def get_root_widget(widget):
     """
     Gets the root widget from any child widget.
-    
+
     :param widget: tkinter.Widget to get the root widget from.
-    
+
     :return: root widget
     """
     while widget.master is not None:
@@ -78,7 +80,7 @@ def get_root_widget(widget):
 def i18n(text, dst_lang=None, wrapping=0):
     """
     Translates a text from a source lang to another.
-    
+
     :param text: (required) source text to translate
     :param dst_lang: (default: None) dictionary mapping {src:dst} from source
                      lang to destination lang. Use tkinterpp.utils.get_i18n_dict to
@@ -91,7 +93,7 @@ def i18n(text, dst_lang=None, wrapping=0):
     """
     if dst_lang is None:
         return text if wrapping <= 0 else textwrap.wrap(text, wrapping)
-    
+
     if isinstance(dst_lang, dict):
         dst_text = dst_lang.get(text, text)
         if wrapping > 0:
@@ -104,14 +106,14 @@ def i18n(text, dst_lang=None, wrapping=0):
 def get_i18n_dict(file_path):
     """
     Gets a tkinterpp.utils.i18n compatible dictionary from a file.
-    
+
     The file should be formatted as such :
-    
+
     "Original language text" : "texte dans la langue originale"
     "Another string" : "Une autre chaîne de caractères"
-    
+
     and so on.
-    
+
     :param file_path: a path to the file to load
     :return: dict of <src>:<dst> pairs to use in i18n function.
     """
@@ -127,7 +129,7 @@ def get_i18n_dict(file_path):
 def get_widget_type(widget):
     """
     Gets the type of a given widget
-    
+
     :param widget: widget to get the type of
     :return: string of the type of the widget
     """
@@ -141,57 +143,56 @@ def get_widget_type(widget):
 def get_widget_options(widget):
     """
     Gets the options from a widget
-    
+
     :param widget: tkinter.Widget instance to get the config options from
     :return: dict of options that you can pass on to widget.config()
     """
     return {
-        key: value for key, value in zip(widget.keys(), 
+        key: value for key, value in zip(widget.keys(),
                                          [widget.cget(k) for k in widget.keys()]
-                                         )
-            }
+                                         )}
 
 
 def copy_widget(widget, new_parent, level=0):
     """
     Recursive function that copies a widget to a new parent.
-    
+
     Ported to python from this tcl code :
     https://stackoverflow.com/questions/6285648/can-you-change-a-widgets-parent-in-python-tkinter
-    
+
     :param widget: widget to copy (tkinter.Widget instance)
     :param new_parent: new widget to parent to.
     :param level: (default: 0) current level of the recursive algorithm
-    
+
     :return: tkinter.Widget instance, the copied widget.
     """
     rv = widget.__class__(master=new_parent, **get_widget_options(widget))
     for b in widget.bind():
         script = widget.bind(b)
-        #TODO: bind the script to the new widget (rv)
+        # TODO: bind the script to the new widget (rv)
         # set type [ getWidgetType $w ]
-        # set name [ string trimright $newparent.[lindex [split $w "." ] end ] "." ]  
+        # set name [ string trimright $newparent.[lindex [split $w "." ] end ] "." ]
         # set retval [ $type $name {*}[ getConfigOptions $w ] ]
         # foreach b [ bind $w ] {
-        #     puts "bind $retval $b [subst { [bind $w $b ] } ] " 
-        #     bind $retval $b  [subst { [bind $w $b ] } ]  
-        # } 
-    
+        #     puts "bind $retval $b [subst { [bind $w $b ] } ] "
+        #     bind $retval $b  [subst { [bind $w $b ] } ]
+        # }
+
     if level > 0:
-        if widget.grid_info(): # if geometry manager is grid
+        if widget.grid_info():  # if geometry manager is grid
             temp = widget.grid_info()
             del temp['in']
             rv.grid(**temp)
-        elif widget.place_info(): # if geometry manager is place
+        elif widget.place_info():  # if geometry manager is place
             temp = widget.place_info()
             del temp['in']
             rv.place(**temp)
-        else: # if geometry manager is pack
+        else:  # if geometry manager is pack
             temp = widget.pack_info()
             del temp['in']
             rv.pack(**temp)
     level += 1
-    if widget.pack_slaves(): # subwidgets are using the pack() geometry manager
+    if widget.pack_slaves():  # subwidgets are using the pack() geometry manager
         for child in widget.pack_slaves():
             copy_widget(child, rv, level)
     else:
@@ -203,10 +204,10 @@ def copy_widget(widget, new_parent, level=0):
 def move_widget(widget, new_parent):
     """
     Moves widget to new_parent
-    
+
     :param widget: widget to move
     :param new_parent: new parent for the widget
-    
+
     :return: moved widget reference
     """
     rv = copy_widget(widget, new_parent)

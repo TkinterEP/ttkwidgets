@@ -61,8 +61,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 setup(
     name="ttkwidgets",
-    packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color",
-              "ttkwidgets.base_widgets", "ttkwidgets.bitmap_assets", "ttkwidgets.photo_assets"],
+    packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color", 
+              "ttkwidgets.bitmap_assets", "ttkwidgets.photo_assets"],
     py_modules=["ttkwidgets"],
     package_data={"ttkwidgets": ["assets/*"]},
     version="0.11.0",
