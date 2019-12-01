@@ -1,25 +1,18 @@
 #! /usr/bin/python3
 # -*- coding: utf-8 -*-
+
 """
-PyTkEditor - Python IDE
 Copyright 2018-2019 Juliette Monsel <j_4321 at protonmail dot com>
+Copyright 2019 Dogeek
 
-PyTkEditor is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Adapted from PyTkEditor - Python IDE's Notebook widget by
+Juliette Monsel. Adapted by Dogeek <https://github.com/Dogeek>
 
-PyTkEditor is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+PyTkEditor is distributed with the GNU GPL license.
 
 Notebook with draggable / scrollable tabs
 """
+
 from tkinter import ttk
 import tkinter as tk
 from PIL import Image, ImageTk
