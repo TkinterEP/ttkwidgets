@@ -86,7 +86,7 @@ class _Debounce:
         # this will be used for underlying bind methods
         if not hasattr(self, '_base'):
             for base in self.__class__.__bases__:
-                if base.__name__ != 'Debounce':
+                if base.__name__ != '_Debounce':
                     self._base = base
                     break
         # for instance bindings
