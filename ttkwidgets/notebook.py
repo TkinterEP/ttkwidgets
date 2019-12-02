@@ -15,6 +15,7 @@ Notebook with draggable / scrollable tabs
 
 from tkinter import ttk
 import tkinter as tk
+from ttkwidgets.utilities import parse_geometry, coordinates_in_box, move_widget
 
 
 class Tab(ttk.Frame):
@@ -176,6 +177,9 @@ class Notebook(ttk.Frame):
 
             tabdrag: boolean (default True)
                 whether to enable dragging of tab labels
+            
+            drag_to_toplevel : boolean (default tabdrag)
+                whether to enable dragging tabs to Toplevel windows
 
             tabmenu: boolean (default True)
                 whether to display a menu showing the tab labels in alphabetical order
@@ -197,15 +201,19 @@ class Notebook(ttk.Frame):
                   valid for method index)
 
         """
+        self._init_kwargs = kwargs.copy()
 
         self._closebutton = bool(kwargs.pop('closebutton', True))
         self._closecommand = kwargs.pop('closecommand', self.forget)
         self._tabdrag = bool(kwargs.pop('tabdrag', True))
+        self._drag_to_toplevel = bool(kwargs.pop('drag_to_toplevel', self._tabdrag))
         self._tabmenu = bool(kwargs.pop('tabmenu', True))
+        dont_setup_style = bool(kwargs.pop('dont_setup_style', False))
 
         ttk.Frame.__init__(self, master, class_='Notebook', padding=(0, 0, 0, 1),
                            **kwargs)
-        self.setup_style()
+        if not dont_setup_style:
+            self.setup_style()
 
         self.rowconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
@@ -223,6 +231,7 @@ class Notebook(ttk.Frame):
         self._nb_tab = 0
         self.current_tab = -1
         self._dragged_tab = None
+        self._toplevels = []
 
         style = ttk.Style(self)
         bg = style.lookup('TFrame', 'background')
@@ -534,8 +543,14 @@ class Notebook(ttk.Frame):
         if self._dragged_tab:
             self._dragged_tab.unbind_all('<Motion>')
             self._dragged_tab.grid(**self._dummy_frame.grid_info())
-            self._dragged_tab = None
             self._dummy_frame.grid_forget()
+
+            if self._drag_to_toplevel:
+                end_pos_in_widget = coordinates_in_box((event.x_root, event.y_root),
+                                        parse_geometry(self.winfo_toplevel().winfo_geometry()))
+                if not end_pos_in_widget:
+                    self.move_to_toplevel(self._dragged_tab)
+            self._dragged_tab = None
 
     def _menu_insert(self, tab, text):
         menu = []
@@ -628,6 +643,8 @@ class Notebook(ttk.Frame):
             return self._tabmenu
         elif key == 'tabdrag':
             return self._tabdrag
+        elif key == 'drag_to_toplevel':
+            return self._drag_to_toplevel
         else:
             return ttk.Frame.cget(self, key)
 
@@ -641,6 +658,8 @@ class Notebook(ttk.Frame):
         :type closecommand: callable
         :param tabdrag: Enable/disable tab dragging and reordering
         :type tabdrag: bool
+        :param drag_to_toplevel: Enable/disable tab dragging to toplevel windows
+        :type drag_to_toplevel: bool
         :param **kw: Other keyword arguments as expected by ttk.Notebook
         """
         if cnf:
@@ -657,6 +676,8 @@ class Notebook(ttk.Frame):
             tab_kw['closecommand'] = self._closecommand
         if 'tabdrag' in kwargs:
             self._tabdrag = bool(kwargs.pop('tabdrag'))
+        if 'drag_to_toplevel' in kwargs:
+            self._drag_to_toplevel = bool(kwargs.pop('drag_to_toplevel'))
         if 'tabmenu' in kwargs:
             self._tabmenu = bool(kwargs.pop('tabmenu'))
             if self._tabmenu:
@@ -855,6 +876,15 @@ class Notebook(ttk.Frame):
         self._tab_menu.delete(self._tab_menu_entries[tab])
         del self._tab_menu_entries[tab]
         self._resize()
+
+    def move_to_toplevel(self, tab):
+        tl = tk.Toplevel(self)
+        nb = Notebook(tl, dont_setup_style=True, **self._init_kwargs)
+        move_widget(tab, nb)
+        nb.add(tab)
+        nb.grid()
+        self._toplevels.append(tl)
+        tl.mainloop()
 
     def select(self, tab_id=None):
         """Select tab TAB_ID. If TAB_ID is None, return currently selected tab."""

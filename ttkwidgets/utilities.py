@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 import tkinter as tk
 import textwrap
 import string
+import re
 
 from ttkwidgets.errors import I18NError, AssetNotFoundError, AssetMaskNotFoundError
 import ttkwidgets.bitmap_assets
@@ -126,6 +127,7 @@ def get_i18n_dict(file_path):
             rv[key] = value
     return rv
 
+
 def get_widget_type(widget):
     """
     Gets the type of a given widget
@@ -139,6 +141,7 @@ def get_widget_type(widget):
     else:
         class_ = class_.lower()
     return class_
+
 
 def get_widget_options(widget):
     """
@@ -213,3 +216,48 @@ def move_widget(widget, new_parent):
     rv = copy_widget(widget, new_parent)
     widget.destroy()
     return rv
+
+
+def parse_geometry(geometry):
+    """
+    Parses a tkinter geometry string into a 4-tuple (x, y, width, height)
+    
+    :param geometry: a tkinter geometry string in the format (wxh+x+y)
+    :type geometry: str
+    :returns: 4-tuple (x, y, width, height)
+    :rtype: tuple
+    """
+    match = re.search(r'(\d+)x(\d+)\+(\d+)\+(\d+)', geometry)
+    return ( int(match.group(3)), int(match.group(4)),  
+             int(match.group(1)), int(match.group(2)))
+
+
+def coordinates_in_box(coords, bbox, include_edges=True):
+    """
+    Checks whether coords are inside bbox
+    
+    :param coords: 2-tuple of coordinates x, y
+    :type coords: tuple
+    :param bbox: 4-tuple (x, y, width, height) of a bounding box
+    :type bbox: tuple
+    :param include_edges: default True whether to include the edges
+    :type include_edges: bool
+    :returns: whether coords is inside bbox
+    :rtype: bool
+    :raises: ValueError if length of bbox or coords do not match the specifications
+    """
+    if len(coords) != 2:
+        raise ValueError("Coords argument is supposed to be of length 2")
+    if len(bbox) != 4:
+        raise ValueError("Bbox argument is supposed to be of length 4")
+    
+    x, y = coords
+    xmin, ymin, width, height = bbox
+    xmax, ymax = xmin + width, ymin + height
+    if include_edges:
+        xmin = max(xmin - 1, 0)
+        xmax += 1
+        ymin = max(ymin - 1, 0)
+        ymax += 1
+    return xmin < x < xmax and ymin < y < ymax
+    
