@@ -207,8 +207,8 @@ class Notebook(ttk.Frame):
         self._drag_to_toplevel = bool(kwargs.pop('drag_to_toplevel', self._tabdrag))
         self._tabmenu = bool(kwargs.pop('tabmenu', True))
 
-        ttk.Frame.__init__(self, master, class_='Notebook', padding=(0, 0, 0, 1),
-                           **kwargs)
+        ttk.Frame.__init__(self, master, class_='Notebook', padding=(0, 0, 0, 1), **kwargs)
+
         if not Notebook._initialized:
             self.setup_style()
 
@@ -874,7 +874,7 @@ class Notebook(ttk.Frame):
 
     def move_to_toplevel(self, tab):
         tl = tk.Toplevel(self)
-        nb = Notebook(tl, dont_setup_style=True, **self._init_kwargs)
+        nb = Notebook(tl, **self._init_kwargs)
         move_widget(tab, nb)
         nb.add(tab)
         nb.grid()
