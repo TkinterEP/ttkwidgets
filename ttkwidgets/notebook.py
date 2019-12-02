@@ -80,6 +80,9 @@ class Tab(ttk.Frame):
                        height=self.frame.winfo_reqheight() + 6)
 
     def closecommand(self):
+        """
+        Calls the closecommand callback with the tab index as an argument
+        """
         self._closecommand(self.tab_nb)
 
     def state(self, *args):
@@ -311,6 +314,23 @@ class Notebook(ttk.Frame):
                     fg="black", fieldbg="white", lightcolor="#ededed", darkcolor="##cfcdc8",
                     bordercolor="#888888", focusbordercolor="#5e5e5e", selectbg="#c1c1c1",
                     selectfg="black", unselectfg="#999999", disabledfg='#999999', disabledbg="#dddddd"):
+        """
+        Setups the style for the notebook.
+        :param bg: 
+        :param activebg: 
+        :param pressedbg: 
+        :param fg:
+        :param fieldbg:
+        :param lightcolor:
+        :param darkcolor:
+        :param bordercolor:
+        :param focusbordercolor:
+        :param selectbg:
+        :param selectfb:
+        :param unselectfg:
+        :param disabledfg:
+        :param disabledbg:
+        """
         theme = {'bg': bg,
                 'activebg': activebg,
                 'pressedbg': pressedbg,
@@ -591,6 +611,7 @@ class Notebook(ttk.Frame):
 
     @property
     def current_tab(self):
+        """ Gets the current tab """
         return self._current_tab
 
     @current_tab.setter
@@ -611,6 +632,17 @@ class Notebook(ttk.Frame):
             return ttk.Frame.cget(self, key)
 
     def configure(self, cnf=None, **kw):
+        """
+        Configures this Notebook widget.
+        
+        :param closebutton: If a close button should show on the tabs
+        :type closebutton: bool
+        :param closecommand: A callable to call when the tab is closed, takes one argument, the tab_id
+        :type closecommand: callable
+        :param tabdrag: Enable/disable tab dragging and reordering
+        :type tabdrag: bool
+        :param **kw: Other keyword arguments as expected by ttk.Notebook
+        """
         if cnf:
             kwargs = cnf.copy()
             kwargs.update(kw)
@@ -648,12 +680,12 @@ class Notebook(ttk.Frame):
         Add widget (or redisplay it if it was hidden) in the notebook and return
         the tab index.
 
-        * text: tab label
-        * image: tab image
-        * compound: how the tab label and image are organized
-        * sticky: for the widget inside the notebook
-        * padding: padding (int) around the widget in the notebook
-        * state: state ('normal' or 'disabled') of the tab
+        :param text: tab label
+        :param image: tab image
+        :param compound: how the tab label and image are organized
+        :param sticky: for the widget inside the notebook
+        :param padding: padding (int) around the widget in the notebook
+        :param state: state ('normal' or 'disabled') of the tab
         """
         # Todo: underline
         name = str(widget)
