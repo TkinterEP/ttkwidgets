@@ -15,17 +15,21 @@ Notebook with draggable / scrollable tabs
 
 from tkinter import ttk
 import tkinter as tk
-from PIL import Image, ImageTk
-from io import BytesIO
 
 
 class Tab(ttk.Frame):
     """Notebook tab."""
     def __init__(self, master=None, tab_nb=0, **kwargs):
+        """
+        :param master: parent widget
+        :param tab_nb: tab index
+        :param **kwargs: keyword arguments for ttk::Frame widgets
+        """
         ttk.Frame.__init__(self, master, class_='Notebook.Tab',
                            style='Notebook.Tab', padding=1)
         self._state = kwargs.pop('state', 'normal')
         self.tab_nb = tab_nb
+        self.hovering_tab = False
         self._closebutton = kwargs.pop('closebutton', True)
         self._closecommand = kwargs.pop('closecommand', None)
         self.frame = ttk.Frame(self, style='Notebook.Tab.Frame')
@@ -50,6 +54,22 @@ class Tab(ttk.Frame):
             raise ValueError("state option should be 'normal' or 'disabled'")
 
         self.bind('<ButtonRelease-2>', self._b2_press)
+        self.bind('<Enter>', self._on_enter_tab)
+        self.bind('<Leave>', self._on_leave_tab)
+        self.bind('<MouseWheel>', self._on_mousewheel)
+    
+    def _on_mousewheel(self, event):
+        if self.hovering_tab:
+            if event.delta > 0:
+                self.master.master.select_prev(True)
+            else:
+                self.master.master.select_next(True)
+
+    def _on_enter_tab(self, event):
+        self.hovering_tab = True
+    
+    def _on_leave_tab(self, event):
+        self.hovering_tab = False
 
     def _b2_press(self, event):
         if self.identify(event.x, event.y):
@@ -856,15 +876,3 @@ class Notebook(ttk.Frame):
     def tabs(self):
         """Return the tuple of visible tab ids in the order of display."""
         return tuple(self._visible_tabs)
-
-
-if __name__ == '__main__':
-    root = tk.Tk()
-    gui = Notebook(root)
-    frames = [tk.Frame(gui) for i in range(10)]
-    for i, w in enumerate(frames):
-        tk.Canvas(w, width=300, height=300).grid(sticky="nswe")
-        gui.add(w, text="Frame " + str(i))
-        w.grid()
-    gui.grid()
-    root.mainloop()

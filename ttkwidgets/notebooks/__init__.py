@@ -1,4 +1,0 @@
-from ttkwidgets.notebook import Notebook
-
-from ttkwidgets.closeable_notebook import CloseableNotebook
-from ttkwidgets.draggable_notebook import DraggableNotebook
