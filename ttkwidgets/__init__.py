@@ -15,3 +15,5 @@ from ttkwidgets.popupmenu import PopupMenu
 from ttkwidgets.dirtreewidget import DirTree
 
 from ttkwidgets.errors import TtkWidgetsError, I18NError, AssetNotFoundError, AssetMaskNotFoundError
+
+from ttkwidgets.frames import DebouncedFrame, DebouncedTk, DebouncedToplevel
