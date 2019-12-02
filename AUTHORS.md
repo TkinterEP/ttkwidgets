@@ -29,7 +29,6 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `get_bitmap`
   * `PopupMenu`
   * `DirTree`
-  * `DraggableNotebook`
-  * `CloseableNotebook`
 - Multiple authors:
   * `ScaleEntry` (RedFantom and Juliette Monsel)
+  * `Notebook` (Dogeek and Juliette Monsel)
