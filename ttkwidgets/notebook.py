@@ -208,11 +208,10 @@ class Notebook(ttk.Frame):
         self._tabdrag = bool(kwargs.pop('tabdrag', True))
         self._drag_to_toplevel = bool(kwargs.pop('drag_to_toplevel', self._tabdrag))
         self._tabmenu = bool(kwargs.pop('tabmenu', True))
-        dont_setup_style = bool(kwargs.pop('dont_setup_style', False))
 
         ttk.Frame.__init__(self, master, class_='Notebook', padding=(0, 0, 0, 1),
                            **kwargs)
-        if not dont_setup_style:
+        if not Notebook._initialized:
             self.setup_style()
 
         self.rowconfigure(1, weight=1)
@@ -312,6 +311,7 @@ class Notebook(ttk.Frame):
         self.bind_all('<ButtonRelease-1>', self._on_click)
 
         self.config = self.configure
+        Notebook._initialized = True
 
     def __getitem__(self, key):
         return self.cget(key)
@@ -341,35 +341,35 @@ class Notebook(ttk.Frame):
         :param disabledbg:
         """
         theme = {'bg': bg,
-                'activebg': activebg,
-                'pressedbg': pressedbg,
-                'fg': fg,
-                'fieldbg': fieldbg,
-                'lightcolor': lightcolor,
-                'darkcolor': darkcolor,
-                'bordercolor': bordercolor,
-                'focusbordercolor': focusbordercolor,
-                'selectbg': selectbg,
-                'selectfg': selectfg,
-                'unselectedfg': unselectfg,
-                'disabledfg': disabledfg,
-                'disabledbg': disabledbg}
+                 'activebg': activebg,
+                 'pressedbg': pressedbg,
+                 'fg': fg,
+                 'fieldbg': fieldbg,
+                 'lightcolor': lightcolor,
+                 'darkcolor': darkcolor,
+                 'bordercolor': bordercolor,
+                 'focusbordercolor': focusbordercolor,
+                 'selectbg': selectbg,
+                 'selectfg': selectfg,
+                 'unselectedfg': unselectfg,
+                 'disabledfg': disabledfg,
+                 'disabledbg': disabledbg}
 
         self.images = (
             tk.PhotoImage("img_close", data='''
                 R0lGODlhCAAIAMIBAAAAADs7O4+Pj9nZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
                 d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
                 5kEJADs=
-                '''),
+                ''', master=self),
             tk.PhotoImage("img_closeactive", data='''
                 R0lGODlhCAAIAMIEAAAAAP/SAP/bNNnZ2cbGxsbGxsbGxsbGxiH5BAEKAAQALAAA
                 AAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU5kEJADs=
-                '''),
+                ''', master=self),
             tk.PhotoImage("img_closepressed", data='''
                 R0lGODlhCAAIAMIEAAAAAOUqKv9mZtnZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
                 d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
                 5kEJADs=
-            ''')
+                ''', master=self)
         )
         
         for seq in self.bind_class('TButton'):
@@ -448,10 +448,7 @@ class Notebook(ttk.Frame):
                      'lightcolor': [('pressed', theme['darkcolor'])],
                      'darkcolor': [('pressed', theme['lightcolor'])]})
         style.map('Notebook.Tab',
-                  **{'ba.ckground': [('selected', '!disabled', theme['activebg'])]})
-
-        style.configure('Left.Notebook.TButton', padding=0)
-        style.configure('Right.Notebook.TButton', padding=0)
+                  **{'background': [('selected', '!disabled', theme['activebg'])]})
 
         style.configure('TNotebook.Tab', background=theme['bg'],
                         foreground=theme['unselectedfg'])
@@ -547,7 +544,7 @@ class Notebook(ttk.Frame):
 
             if self._drag_to_toplevel:
                 end_pos_in_widget = coordinates_in_box((event.x_root, event.y_root),
-                                        parse_geometry(self.winfo_toplevel().winfo_geometry()))
+                                                       parse_geometry(self.winfo_toplevel().winfo_geometry()))
                 if not end_pos_in_widget:
                     self.move_to_toplevel(self._dragged_tab)
             self._dragged_tab = None
