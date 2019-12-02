@@ -7,9 +7,9 @@ class MainWindow(ttk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.nb = Notebook(self)
-        self.frames = [tk.Frame(self) for i in range(10)]
+        colors = ['red', 'blue', 'green', 'yellow', 'cyan', 'magenta', 'black', 'white', 'purple', 'brown']
+        self.frames = [tk.Frame(self, width=300, height=300, bg=color) for i, color in enumerate(colors)]
         for i, w in enumerate(self.frames):
-            tk.Canvas(w, width=300, height=300).grid(sticky="nswe")
             self.nb.add(w, text="Frame " + str(i))
             w.grid()
         self.nb.grid()

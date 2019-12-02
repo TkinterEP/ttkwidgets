@@ -876,7 +876,7 @@ class Notebook(ttk.Frame):
 
     def move_to_toplevel(self, tab):
         tl = tk.Toplevel(self)
-        nb = Notebook(tl, dont_setup_style=True, **self._init_kwargs)
+        nb = Notebook(tl, **self._init_kwargs)
         move_widget(tab, nb)
         nb.add(tab)
         nb.grid()
