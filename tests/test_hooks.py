@@ -28,7 +28,7 @@ class TestHooks(TestCase):
             return
         self.assertEquals(value, self.expected[option], "Invalid value for {}: {}".format(option, value))
         self.updated = True
-        self.expected.clear()
+        del self.expected[option]
 
     def second_updater(self, widget, option, value):
         if option not in self.second_expected:
@@ -40,12 +40,12 @@ class TestHooks(TestCase):
     def has_been_updated(self):
         updated = self.updated
         self.updated = False
-        return updated
+        return updated and len(self.expected) == 0
 
     def has_been_second_updated(self):
         updated = self.second_updated
         self.second_updated = False
-        return updated
+        return updated and len(self.expected) == 0
 
     def test_basic_hook(self):
         self.expected = {"tooltip": "Hello World"}
@@ -98,6 +98,40 @@ class TestHooks(TestCase):
         self.assertTrue(self.has_been_second_updated())
 
         self.assertTrue("hook1" in button.keys() and "hook2" in button.keys())
+
+    def test_multi_option_hooks_cget_config_keys_overwrite(self):
+        options = {"hookx": "Default X", "hooky": "Default Y"}
+        self.expected = {"hookx": "Default X", "hooky": "Option Y"}
+
+        hook_ttk_widgets(self.basic_updater, options)
+        self.assertTrue(is_hooked(options))
+        self.assertTrue(is_hooked({"hookx": None}))
+        self.assertTrue(is_hooked({"hooky": None}))
+
+        button = ttk.Button(hooky="Option Y")
+
+        self.assertTrue(self.has_been_updated())
+        self.assertTrue("hooky" in button.keys())
+        self.assertTrue("hookx" in button.keys())
+        self.assertEqual("Default X", button.cget("hookx"))
+        self.assertEqual("Option Y", button.cget("hooky"))
+
+        self.expected = {"hookx": "Option X"}
+        button.configure(hookx="Option X", command=self.window.destroy)
+        self.assertTrue(self.has_been_updated())
+
+        self.assertEqual("Option X", button.cget("hookx"))
+        self.assertEqual("Option Y", button.cget("hooky"))
+        self.assertIsNotNone(button.cget("command"))
+
+        self.assertRaises(RuntimeError, lambda: hook_ttk_widgets(self.basic_updater, options))
+        self.assertRaises(RuntimeError, lambda: hook_ttk_widgets(None, {"hookx": "New Default X"}))
+
+        options["hookx"] = "New Default X"
+        hook_ttk_widgets(None, options)
+        self.expected = options.copy()
+        ttk.Button()
+        self.assertTrue(self.has_been_updated())
 
     def tearDown(self):
         self.window.destroy()

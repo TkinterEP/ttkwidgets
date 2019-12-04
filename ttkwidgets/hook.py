@@ -26,7 +26,11 @@ except ImportError:
 
 def is_hooked(options):
     # type: (dict) -> bool
-    """Return whether a class is hooked for the given options"""
+    """Return whether a class is hooked for any of the given options"""
+    for hookname in [hook for hook in dir(ttk.Widget) if hook.startswith("WidgetHook_")]:
+        hookoptions = getattr(ttk.Widget, hookname).defaults
+        if any(option in hookoptions for option in options):
+            return True
     return hasattr(ttk.Widget, generate_hook_name(options))
 
 
@@ -73,8 +77,13 @@ def hook_ttk_widgets(updater, options):
     # Create a unique name so that multiple hooks do not interfere
     name = generate_hook_name(options)
     # Check to see if the hook already exists
-    if hasattr(ttk.Widget, name):
-        return name  # Hook already installed
+    if hasattr(ttk.Widget, name):  # Hook already exists, will be updated
+        if updater is not None:
+            raise RuntimeError("Invalid parameter: Updater may not be changed after hook creation")
+        getattr(ttk.Widget, name).defaults = options.copy()
+        return name
+    elif is_hooked(options):
+        raise RuntimeError("Invalid options: Cannot replace full hook with partial hook")
 
     # Create a class with the original functions
     class OriginalFunctions(object):
@@ -83,6 +92,7 @@ def hook_ttk_widgets(updater, options):
         original_configure = ttk.Widget.configure
         original_cget = ttk.Widget.cget
         original_keys = ttk.Widget.keys
+        defaults = options
 
     # Move the OriginalFunctions class to the target class
     setattr(ttk.Widget, name, OriginalFunctions)
@@ -102,7 +112,7 @@ def hook_ttk_widgets(updater, options):
         """Catch initialization and pop all the custom options"""
         master, widget, widget_options = args
         # Pop all the options, taking default values first
-        values = options.copy()
+        values = getattr(self, name).defaults.copy()
         for (option, default) in options.items():
             value = widget_options.pop(option, default)
             values[option] = value
