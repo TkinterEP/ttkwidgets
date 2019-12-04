@@ -21,7 +21,8 @@ class NodeView(tk.Canvas):
         self.bind('<B1-Motion>', self._on_node_drag)
 
     def create_node(self, coords, node_name, node_data=None, node_connections=None,
-                    tags=None, state=tk.NORMAL, text_anchor=tk.NW):
+                    tags=None, state=tk.NORMAL, text_anchor=tk.NW, output_connections=1,
+                    input_connections=1):
         """
         Creates a Node on the NodeView Canvas.
         
@@ -43,15 +44,40 @@ class NodeView(tk.Canvas):
             tags = []
         tags.append(node_name)
         tags.append("nodeitem")
+        elements_ids = []
         rectangle_bbox = list(coords) + [coords[0] + 60, coords[1] + 30]
-        text_pos = [coords[0] + 8, coords[1] + 1]
+        LEFT, TOP, RIGHT, BOTTOM = rectangle_bbox
+        
+        text_pos = [LEFT + 8, TOP + 1]
+        
         rectangle_id = self.create_rectangle(rectangle_bbox, tags=tags,
                                              state=state)
+        elements_ids.append(Element(rectangle_id, rectangle_bbox))
         text_id = self.create_text(text_pos, state=state, text=node_name, 
                                    anchor=text_anchor)
+        elements_ids.append(Element(text_id, text_pos))
+        for i in range(output_connections):
+            c_a = 5  # Size of the side of the rectangle
+            c_bbox = [RIGHT, # x1
+                      TOP + ((i + 1) * (c_a + 1)), # y1 
+                      RIGHT + c_a, # x2
+                      TOP + ((i + 1) * (c_a + 1)) + c_a] # y2
+            cid = self.create_rectangle(c_bbox, tags=tags, state=state,
+                                        fill="black")
+            elements_ids.append(Element(cid, c_bbox))
+
+        for i in range(input_connections):
+            c_a = 5  # Size of the side of the rectangle
+            c_bbox = [LEFT - c_a, # x1
+                      TOP + ((i + 1) * (c_a + 1)), # y1 
+                      LEFT, # x2
+                      TOP + ((i + 1) * (c_a + 1)) + c_a] # y2
+            cid = self.create_rectangle(c_bbox, tags=tags, state=state,
+                                        fill="black")
+            elements_ids.append(Element(cid, c_bbox))
+        
         self.nodes[node_name] = {"variable": NodeVar(node_name, node_data, node_connections),
-                                 "element_ids": [Element(rectangle_id, rectangle_bbox),
-                                                 Element(text_id, text_pos)],
+                                 "element_ids": elements_ids.copy(),
                                  "bezier_ids": []}
         return node_name
 
@@ -64,11 +90,19 @@ class NodeView(tk.Canvas):
         for e in self.nodes[node]["element_ids"]:
             eid = e.id
             coords = e.coords.copy()
-            coords[0] = coords[0] + event.x
-            coords[1] = coords[1] + event.y
             if len(coords) == 4:
-                coords[2] = coords[2] + event.x
-                coords[3] = coords[3] + event.y
+                w = coords[2] - coords[0]
+                h = coords[3] - coords[1]
+            else:
+                w = 0
+                h = 0
+            x = event.x - w // 2
+            y = event.y - h // 2
+            if len(coords) == 4:
+                coords[2] = x + w
+                coords[3] = y + h
+            coords[0] = x
+            coords[1] = y
             self.coords(eid, *coords)
 
     def _create_connection(self, event, node=None):
