@@ -20,6 +20,11 @@ class TestConfig(BaseWidgetTest):
         config.load()
         config.path = 'tests/testfiles/test_save.json'
         config.save()
+    
+    def test_path_setting(self):
+        config = Config('tests/testfiles/test.json')
+        with self.assertRaises(TypeError):
+            config.path = 1
 
     def test_config_variable_type(self):
         config = Config('tests/testfiles/test.json')

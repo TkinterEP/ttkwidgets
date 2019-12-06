@@ -72,11 +72,24 @@ class Config:
             if serializer is None:
                 serializer = JSONSerializer
             self.serializer = serializer()
-            self.path = pathlib.Path(path)
+            self._path = path
             self.data = {}
         
         def __getitem__(self, item):
             return self.data[item]
+        
+        @property
+        def path(self):
+            return self._path
+        
+        @path.setter
+        def path(self, value):
+            if isinstance(value, str):
+                self._path = pathlib.Path(value)
+            elif isinstance(value, pathlib.Path):
+                self._path = value
+            else:
+                raise TypeError("Config.path attribute must be a string or pathlib.Path instance.")
         
         def load(self):
             with self.path.open('r') as f:
