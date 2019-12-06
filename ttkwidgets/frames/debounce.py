@@ -102,7 +102,10 @@ class _Debounce:
         # get the current bind tags
         bindtags = list(self.bindtags())
         # add our custom bind tag before the origional bind tag
-        index = bindtags.index(self._base.__name__)
+        try:
+            index = bindtags.index(self._base.__name__)
+        except ValueError:
+            index = bindtags.index("T" + self._base.__name__)
         bindtags.insert(index, self.__class__.__name__)
         # save the bind tags back to the widget
         self.bindtags(tuple(bindtags))
