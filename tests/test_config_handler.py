@@ -32,7 +32,7 @@ class TestConfig(BaseWidgetTest):
     def test_config_variable_value(self):
         config = Config('tests/testfiles/test.json')
         config.load()
-        self.assertEquals(config['integer'], 1)
-        self.assertEquals(config['floating_point'], 2.5)
-        self.assertEquals(config['string'], 'string')
-        self.assertEquals(config['boolean'], True)
+        self.assertEquals(config['integer'].get(), 1)
+        self.assertEquals(config['floating_point'].get(), 2.5)
+        self.assertEquals(config['string'].get(), 'string')
+        self.assertEquals(config['boolean'].get(), True)
