@@ -29,6 +29,8 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `get_bitmap`
   * `PopupMenu`
   * `DirTree`
+  * `DebouncedFrame`, `DebouncedTk` and `DebouncedToplevel`
+  * `Config`, `ConfigSerializer`, `JSONSerializer` objects to store configuration options.
 - Multiple authors:
   * `ScaleEntry` (RedFantom and Juliette Monsel)
   * `Notebook` (Dogeek and Juliette Monsel)

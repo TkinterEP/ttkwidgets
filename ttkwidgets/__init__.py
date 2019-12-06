@@ -16,3 +16,6 @@ from ttkwidgets.dirtreewidget import DirTree
 from ttkwidgets.notebook import Notebook
 
 from ttkwidgets.errors import TtkWidgetsError, I18NError, AssetNotFoundError, AssetMaskNotFoundError
+
+from ttkwidgets.frames import DebouncedFrame, DebouncedTk, DebouncedToplevel
+from ttkwidgets.config_handler import Config, ConfigSerializer, JSONSerializer
