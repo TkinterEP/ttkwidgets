@@ -3,6 +3,7 @@
 from ttkwidgets import Config
 from tests import BaseWidgetTest
 import tkinter as tk
+import pathlib
 
 
 class TestConfig(BaseWidgetTest):
@@ -23,6 +24,7 @@ class TestConfig(BaseWidgetTest):
     
     def test_path_setting(self):
         config = Config('tests/testfiles/test.json')
+        self.assertIsInstance(config.path, pathlib.Path)
         with self.assertRaises(TypeError):
             config.path = 1
 

@@ -72,7 +72,7 @@ class Config:
             if serializer is None:
                 serializer = JSONSerializer
             self.serializer = serializer()
-            self._path = path
+            self.path = path
             self.data = {}
         
         def __getitem__(self, item):
