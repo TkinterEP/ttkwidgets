@@ -21,8 +21,8 @@ def all_release(event):
     print("all_release:\t%s\t%s" % (event.widget, event.keysym))
 
 root = tk.Tk()
-frame = DebouncedFrame(root, width=100, height=100, bg='red', takefocus=True)
-frame2 = DebouncedFrame(root, width=100, height=100, bg='blue', takefocus=True)
+frame = DebouncedFrame(root, width=100, height=100, takefocus=True)
+frame2 = DebouncedFrame(root, width=100, height=100, takefocus=True)
 frame.bind("<KeyPress-a>", instance_press, False)
 frame.bind("<KeyRelease-a>", instance_release, False)
 frame.bind("<KeyPress-s>", instance_press)
