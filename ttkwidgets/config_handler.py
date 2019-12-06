@@ -79,11 +79,11 @@ class Config:
             return self.data[item]
         
         def load(self):
-            with open(self.path) as f:
+            with self.path.open('r') as f:
                 self.data = self.serializer.deserialize(f)
         
         def save(self):
-            with open(self.path, "w") as f:
+            with self.path.open('w') as f:
                 self.serializer.serialize(f, self.data)
 
     def __new__(cls, *args, **kwargs):
