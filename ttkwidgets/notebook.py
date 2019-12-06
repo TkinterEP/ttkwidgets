@@ -450,11 +450,8 @@ class Notebook(ttk.Frame):
         style.map('Notebook.Tab',
                   **{'background': [('selected', '!disabled', theme['activebg'])]})
 
-        style.configure('TNotebook.Tab', background=theme['bg'],
-                        foreground=theme['unselectedfg'])
-        style.map('TNotebook.Tab',
-                  **{'background': [('selected', '!disabled', theme['activebg'])],
-                     'foreground': [('selected', '!disabled', theme['fg'])]})
+        style.configure('Left.Notebook.TButton', padding=0)
+        style.configure('Right.Notebook.TButton', padding=0)
 
     def _on_configure(self, event=None):
         self.update_idletasks()
