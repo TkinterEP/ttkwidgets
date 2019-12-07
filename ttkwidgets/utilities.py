@@ -19,7 +19,8 @@ def get_widget_options(widget):
     :param widget: tkinter.Widget instance to get the config options from
     :return: dict of options that you can pass on to widget.config()
     """
-    return {key: widget.cget(key) for key in widget.keys()}
+    default = {key: widget.__class__(widget.master).cget(key) for key in widget.keys()}
+    return {key: widget.cget(key) for key in widget.keys() if default.get(key) not in (widget.cget(key), None)}
 
 
 def copy_widget(widget, new_parent, level=0):
@@ -118,7 +119,6 @@ def coords_in_box(coords, bbox, include_edges=True, bbox_is_x1y1x2y2=False):
     :rtype: bool
     :raises: ValueError if length of bbox or coords do not match the specifications
     """
-    
     if len(coords) != 2:
         raise ValueError("Coords argument is supposed to be of length 2")
     if len(bbox) != 4:
