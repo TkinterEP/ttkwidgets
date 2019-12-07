@@ -101,7 +101,7 @@ def parse_geometry(geometry):
              int(match.group(1)), int(match.group(2)))
 
 
-def coordinates_in_box(coords, bbox, include_edges=True):
+def coords_in_box(coords, bbox, include_edges=True):
     """
     Checks whether coords are inside bbox
 

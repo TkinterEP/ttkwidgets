@@ -15,7 +15,7 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
-from ttkwidgets.utilities import move_widget, parse_geometry, coordinates_in_box
+from ttkwidgets.utilities import move_widget, parse_geometry, coords_in_box
 
 
 class Tab(ttk.Frame):
@@ -538,8 +538,8 @@ class Notebook(ttk.Frame):
             self._dummy_frame.grid_forget()
 
             if self._drag_to_toplevel:
-                end_pos_in_widget = coordinates_in_box((event.x_root, event.y_root),
-                                                       parse_geometry(self.winfo_toplevel().winfo_geometry()))
+                end_pos_in_widget = coords_in_box((event.x_root, event.y_root),
+                                                  parse_geometry(self.winfo_toplevel().winfo_geometry()))
                 if not end_pos_in_widget:
                     self.move_to_toplevel(self._dragged_tab)
             self._dragged_tab = None

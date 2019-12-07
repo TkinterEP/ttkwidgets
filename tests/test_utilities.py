@@ -1,6 +1,6 @@
 # Copyright (c) Dogeek 2019
 # For license see LICENSE
-from ttkwidgets.utilities import move_widget, parse_geometry, coordinates_in_box
+from ttkwidgets.utilities import move_widget, parse_geometry, coords_in_box
 from tests import BaseWidgetTest
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -54,11 +54,11 @@ class TestUtilities(BaseWidgetTest):
     
     def test_coordinates_in_box(self):
         with self.assertRaises(ValueError):
-            coordinates_in_box((1, ), (1, 1, 3, 3))
+            coords_in_box((1,), (1, 1, 3, 3))
         
         with self.assertRaises(ValueError):
-            coordinates_in_box((1, 1), (1, 1, 3, 3, 4))
+            coords_in_box((1, 1), (1, 1, 3, 3, 4))
         
-        self.assertTrue(coordinates_in_box((1, 1), (0, 0, 2, 2)))
-        self.assertFalse(coordinates_in_box((1, 1), (1, 1, 2, 2), include_edges=False))
-        self.assertTrue(coordinates_in_box((0, 0), (-1, -1, 1, 1)))
+        self.assertTrue(coords_in_box((1, 1), (0, 0, 2, 2)))
+        self.assertFalse(coords_in_box((1, 1), (1, 1, 2, 2), include_edges=False))
+        self.assertTrue(coords_in_box((0, 0), (-1, -1, 1, 1)))
