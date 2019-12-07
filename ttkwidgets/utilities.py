@@ -19,12 +19,11 @@ def get_widget_options(widget):
     :param widget: tkinter.Widget instance to get the config options from
     :return: dict of options that you can pass on to widget.config()
     """
-    options = {}
-    for key in widget.keys():
-        value = widget.cget(key)
-        if value not in ("", None):
-            options[key] = value
-    return options
+    base = widget.__class__(widget.master)
+    keys = widget.keys()
+    default = {key: base.cget(key) for key in widget.keys()}
+    values = [widget.cget(key) for key in keys]
+    return {key: value for key, value in zip(keys, values) if value not in {default[key], None}}
 
 
 def copy_widget(widget, new_parent, level=0):
