@@ -1,9 +1,10 @@
 environment:
   matrix:
-    - PYTHON: "C:\\PYTHON27"
     - PYTHON: "C:\\PYTHON34"
     - PYTHON: "C:\\PYTHON35"
     - PYTHON: "C:\\PYTHON36"
+    - PYTHON: "C:\\PYTHON37"
+    - PYTHON: "C:\\PYTHON38"
 install:
   - "%PYTHON%\\python.exe -m pip install codecov coverage nose mock pynput"
 build: off
