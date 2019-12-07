@@ -6,7 +6,6 @@ Source: This repository
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
 import tkinter as tk
 from tkinter import ttk
-from tkinter import font
 
 
 class FontPropertiesFrame(ttk.Frame):
