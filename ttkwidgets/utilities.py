@@ -51,6 +51,7 @@ def copy_widget(widget, new_parent, level=0):
     rv = widget.__class__(master=new_parent, **get_widget_options(widget))
     for b in widget.bind():
         script = widget.bind(b)
+        rv.bind(b, script)  # Not sure it will work tho
         # TODO: bind the script to the new widget (rv)
         # set type [ getWidgetType $w ]
         # set name [ string trimright $newparent.[lindex [split $w "." ] end ] "." ]
