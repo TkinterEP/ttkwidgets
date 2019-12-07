@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Author: Dogeek
-Copyright (c) 2019 Dogeek
-"""
+# Copyright (c) Dogeek 2019
+# For license see LICENSE
 from ttkwidgets import Notebook
 from tests import BaseWidgetTest
 
