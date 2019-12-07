@@ -13,8 +13,8 @@ PyTkEditor is distributed with the GNU GPL license.
 Notebook with draggable / scrollable tabs
 """
 
-from tkinter import ttk
 import tkinter as tk
+from tkinter import ttk
 from ttkwidgets.utilities import move_widget, parse_geometry, coordinates_in_box
 
 
