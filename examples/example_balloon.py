@@ -3,12 +3,8 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
 from ttkwidgets.frames import Balloon
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 
 window = tk.Tk()

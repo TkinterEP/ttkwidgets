@@ -4,12 +4,8 @@
 # For license see LICENSE
 
 from ttkwidgets.color import askcolor
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 from PIL import Image, ImageTk
 
 

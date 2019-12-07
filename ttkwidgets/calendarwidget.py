@@ -3,14 +3,9 @@ Author: The Python Team
 License: The Python License
 Source: http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py
 """
-try:
-    import Tkinter as tk
-    import ttk
-    import tkFont
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
-    from tkinter import font as tkFont
+import tkinter as tk
+from tkinter import ttk
+from tkinter import font
 import calendar
 
 
@@ -124,14 +119,14 @@ class Calendar(ttk.Frame):
         self._calendar.tag_configure('header', background='grey90')
         self._calendar.insert('', 'end', values=cols, tag='header')
         # adjust its columns width
-        font = tkFont.Font()
+        font = font.Font()
         maxwidth = max(font.measure(col) for col in cols)
         for col in cols:
             self._calendar.column(col, width=maxwidth, minwidth=maxwidth,
                                   anchor='e')
 
     def __setup_selection(self, sel_bg, sel_fg):
-        self._font = tkFont.Font()
+        self._font = font.Font()
         self._canvas = canvas = tk.Canvas(self._calendar,
                                           background=sel_bg, borderwidth=0, highlightthickness=0)
         canvas.text = canvas.create_text(0, 0, fill=sel_fg, anchor='w')

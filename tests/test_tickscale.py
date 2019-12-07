@@ -2,12 +2,8 @@
 # For license see LICENSE
 from ttkwidgets import TickScale
 from tests import BaseWidgetTest
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 
 class TestTickScale(BaseWidgetTest):

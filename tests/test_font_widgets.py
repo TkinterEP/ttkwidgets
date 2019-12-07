@@ -2,12 +2,8 @@
 # For license see LICENSE
 from ttkwidgets.font import FontChooser, FontSelectFrame
 from tests import BaseWidgetTest
-try:
-    import Tkinter as tk
-    import tkFont as font
-except ImportError:
-    import tkinter as tk
-    from tkinter import font
+import tkinter as tk
+from tkinter import font
 import os
 
 

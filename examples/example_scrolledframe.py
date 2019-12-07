@@ -4,12 +4,8 @@
 # For license see LICENSE
 
 from ttkwidgets.frames import ScrolledFrame
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 window = tk.Tk()
 frame = ScrolledFrame(window, compound=tk.RIGHT, canvasheight=200)

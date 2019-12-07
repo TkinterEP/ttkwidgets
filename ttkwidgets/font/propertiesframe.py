@@ -4,14 +4,9 @@ License: GNU GPLv3
 Source: This repository
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
-try:
-    import Tkinter as tk
-    import ttk
-    import tkFont as font
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
-    from tkinter import font
+import tkinter as tk
+from tkinter import ttk
+from tkinter import font
 
 
 class FontPropertiesFrame(ttk.Frame):

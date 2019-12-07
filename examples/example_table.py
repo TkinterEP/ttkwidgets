@@ -4,12 +4,8 @@
 # For license see LICENSE
 
 from ttkwidgets import Table
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 root = tk.Tk()
 

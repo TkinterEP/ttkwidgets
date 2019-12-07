@@ -3,12 +3,8 @@ Author: Juliette Monsel
 License: GNU GPLv3
 Source: This repository
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    from tkinter import ttk
-    import tkinter as tk
+import tkinter as tk
+from tkinter import ttk
 
 
 class TickScale(ttk.Frame):

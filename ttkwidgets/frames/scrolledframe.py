@@ -6,12 +6,8 @@ Source: This repository
 # The following sites were used for reference in the creation of this file:
 # http://code.activestate.com/recipes/578894-mousewheel-binding-to-scrolling-area-tkinter-multi/
 # http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 from ttkwidgets import AutoHideScrollbar
 
 

@@ -3,10 +3,7 @@
 from ttkwidgets import Calendar
 from tests import BaseWidgetTest
 import calendar
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 
 
 class TestCalendar(BaseWidgetTest):

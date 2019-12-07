@@ -4,10 +4,7 @@
 # For license see LICENSE
 
 from ttkwidgets import Calendar
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 
 def validate():
     sel = calendar.selection

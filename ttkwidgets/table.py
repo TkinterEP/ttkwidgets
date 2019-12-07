@@ -6,12 +6,8 @@ Source: This repository
 
 Table made out of a Treeview with possibility to drag rows and columns and to sort columns.
 """
-try:
-    import tkinter as tk
-    from tkinter import ttk
-except ImportError:
-    import Tkinter as tk
-    import ttk
+import tkinter as tk
+from tkinter import ttk
 from PIL import ImageTk, Image
 from ttkwidgets.utilities import get_assets_directory, os
 
