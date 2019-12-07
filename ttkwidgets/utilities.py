@@ -44,11 +44,16 @@ def copy_widget(widget, new_parent, level=0):
     Ported to python from this tcl code :
     https://stackoverflow.com/questions/6285648/can-you-change-a-widgets-parent-in-python-tkinter
 
-    :param widget: widget to copy (tkinter.Widget instance)
+    :param widget: widget to copy
+    :type widget: tkinter.Widget
     :param new_parent: new widget to parent to.
+    :type new_parent: tkinter.Widget
     :param level: (default: 0) current level of the recursive algorithm
+    :type level: int
 
-    :return: tkinter.Widget instance, the copied widget.
+    :return: the copied widget.
+    :rtype: tkinter.Widget
+    :raises: RuntimeError if the root from the widget and the new parent are divergent.
     """
     if get_root_widget(widget) is not get_root_widget(new_parent):
         raise RuntimeError("Widget {} has not the same root as new parent {}".format(widget.__class__.__name__, new_parent.__class__.__name__))
@@ -94,9 +99,15 @@ def move_widget(widget, new_parent):
     Moves widget to new_parent
 
     :param widget: widget to move
-    :param new_parent: new parent for the widget
+    :type widget: tkinter.Widget
+    :param new_parent: new widget to parent to.
+    :type new_parent: tkinter.Widget
+    :param level: (default: 0) current level of the recursive algorithm
+    :type level: int
 
-    :return: moved widget reference
+    :return: the moved widget reference.
+    :rtype: tkinter.Widget
+    :raises: RuntimeError if the root from the widget and the new parent are divergent.
     """
     rv = copy_widget(widget, new_parent)
     widget.destroy()
@@ -132,6 +143,7 @@ def coords_in_box(coords, bbox, include_edges=True, bbox_is_x1y1x2y2=False):
     :param bbox_is_x1y1x2y2: default False whether the bbox is in 
                     (x, y, width, height) or (x1, y1, x2, y2) format
     :type bbox_is_x1y1x2y2: bool
+    
     :returns: whether coords is inside bbox
     :rtype: bool
     :raises: ValueError if length of bbox or coords do not match the specifications
