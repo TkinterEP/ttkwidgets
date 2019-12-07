@@ -93,8 +93,10 @@ def parse_geometry(geometry):
     :returns: 4-tuple (x, y, width, height)
     :rtype: tuple
     """
-    match = re.search(r'(\d+)x(\d+)\+(\d+)\+(\d+)', geometry)
-    return ( int(match.group(3)), int(match.group(4)),
+    match = re.search(r'(\d+)x(\d+)(\+|-)(\d+)(\+|-)(\d+)', geometry)
+    xmod = -1 if match.group(3) == '-' else 1
+    ymod = -1 if match.group(5) == '-' else 1
+    return ( xmod * int(match.group(4)), ymod * int(match.group(6)),
              int(match.group(1)), int(match.group(2)))
 
 
