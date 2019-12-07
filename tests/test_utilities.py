@@ -1,6 +1,6 @@
 # Copyright (c) Dogeek 2019
 # For license see LICENSE
-from ttkwidgets.utilities import move_widget, parse_geometry
+from ttkwidgets.utilities import move_widget, parse_geometry, coordinates_in_box
 from tests import BaseWidgetTest
 try:
     import Tkinter as tk
@@ -55,3 +55,14 @@ class TestUtilities(BaseWidgetTest):
         self.assertEqual(g, (1, 1, 1, 1))
         g = parse_geometry('1x1-1-1')
         self.assertEqual(g, (1, 1, -1, -1))
+
+    def test_coordinates_in_box(self):
+        with self.assertRaises(ValueError):
+            coordinates_in_box((1, ), (1, 1, 3, 3))
+        
+        with self.assertRaises(ValueError):
+            coordinates_in_box((1, 1), (1, 1, 3, 3, 4))
+        
+        self.assertTrue(coordinates_in_box((1, 1), (0, 0, 2, 2)))
+        self.assertFalse(coordinates_in_box((1, 1), (1, 1, 2, 2), include_edges=False))
+        self.assertTrue(coordinates_in_box((0, 0), (-1, -1, 1, 1)))
