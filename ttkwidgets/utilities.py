@@ -101,7 +101,7 @@ def parse_geometry(geometry):
              int(match.group(1)), int(match.group(2)))
 
 
-def coordinates_in_box(coords, bbox, include_edges=True):
+def coordinates_in_box(coords, bbox, include_edges=True, bbox_is_x1y1x2y2=False):
     """
     Checks whether coords are inside bbox
 
@@ -111,6 +111,9 @@ def coordinates_in_box(coords, bbox, include_edges=True):
     :type bbox: tuple
     :param include_edges: default True whether to include the edges
     :type include_edges: bool
+    :param bbox_is_x1y1x2y2: default False whether the bbox is in 
+                    (x, y, width, height) or (x1, y1, x2, y2) format
+    :type bbox_is_x1y1x2y2: bool
     :returns: whether coords is inside bbox
     :rtype: bool
     :raises: ValueError if length of bbox or coords do not match the specifications
@@ -121,11 +124,13 @@ def coordinates_in_box(coords, bbox, include_edges=True):
         raise ValueError("Bbox argument is supposed to be of length 4")
 
     x, y = coords
-    xmin, ymin, width, height = bbox
-    xmax, ymax = xmin + width, ymin + height
+    if bbox_is_x1y1x2y2:
+        xmin, ymin, xmax, ymax = bbox
+    else:
+        xmin, ymin, width, height = bbox
+        xmax, ymax = xmin + width, ymin + height
+        
     if include_edges:
-        xmin = max(xmin - 1, 0)
-        xmax += 1
-        ymin = max(ymin - 1, 0)
-        ymax += 1
-    return xmin < x < xmax and ymin < y < ymax
+        return xmin <= x <= xmax and ymin <= y <= ymax
+    else:
+        return xmin < x < xmax and ymin < y < ymax
