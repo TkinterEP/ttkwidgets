@@ -1,5 +1,9 @@
-import tkinter as tk
-import tkinter.ttk as ttk
+try:
+    import tkinter as tk
+    from tkinter import ttk
+except ImportError:
+    import Tkinter as tk
+    import ttk
 from ttkwidgets import Notebook
 
 
