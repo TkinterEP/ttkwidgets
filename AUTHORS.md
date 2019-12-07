@@ -24,5 +24,6 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `AutoHideScrollbar` based on an idea by [Fredrik Lundh](effbot.org/zone/tkinter-autoscrollbar.htm)
   * All color widgets: `askcolor`, `ColorPicker`, `GradientBar` and `ColorSquare`, `LimitVar`, `Spinbox`, `AlphaBar` and supporting functions in `functions.py`.
   * `AutocompleteEntryListbox`
+  * [`Notebook`](https://github.com/j4321/PyTkEditor/blob/master/pytkeditorlib/notebook.py), modified by [Dogeek](https://github.com/Dogeek)
 - Multiple authors:
   * `ScaleEntry` (RedFantom and Juliette Monsel)
