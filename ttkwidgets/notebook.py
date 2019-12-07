@@ -1,6 +1,3 @@
-#! /usr/bin/python3
-# -*- coding: utf-8 -*-
-
 """
 Copyright 2018-2019 Juliette Monsel <j_4321 at protonmail dot com>
 Copyright 2019 Dogeek
@@ -871,12 +868,9 @@ class Notebook(ttk.Frame):
 
     def move_to_toplevel(self, tab):
         tl = tk.Toplevel(self)
-        nb = Notebook(tl, **self._init_kwargs)
-        move_widget(tab, nb)
-        nb.add(tab)
-        nb.grid()
+        move_widget(tab, tl)
+        tab.grid()
         self._toplevels.append(tl)
-        tl.mainloop()
 
     def select(self, tab_id=None):
         """Select tab TAB_ID. If TAB_ID is None, return currently selected tab."""
