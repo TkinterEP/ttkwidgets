@@ -24,7 +24,7 @@ class Tab(ttk.Frame):
         """
         :param master: parent widget
         :param tab_nb: tab index
-        :param **kwargs: keyword arguments for ttk::Frame widgets
+        :param **kwargs: keyword arguments for ttk::Label widgets
         """
         ttk.Frame.__init__(self, master, class_='Notebook.Tab',
                            style='Notebook.Tab', padding=1)
@@ -737,7 +737,7 @@ class Notebook(ttk.Frame):
 
     def insert(self, where, widget, **kwargs):
         """
-        Insert WIDEGT at the position given by WHERE in the notebook.
+        Insert WIDGET at the position given by WHERE in the notebook.
 
         For keyword options, see add method.
         """
