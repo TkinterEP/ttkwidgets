@@ -1,6 +1,6 @@
 # Copyright (c) Dogeek 2019
 # For license see LICENSE
-from ttkwidgets.utilities import move_widget, parse_geometry, coords_in_box
+from ttkwidgets.utilities import move_widget, parse_geometry, coords_in_box, get_widget_options, get_root_widget
 from tests import BaseWidgetTest
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -9,6 +9,24 @@ import tkinter.ttk as ttk
 class TestUtilities(BaseWidgetTest):
     def _dummy_bind(self, event):
         pass
+    
+    def test_get_widget_options(self):
+        label = ttk.Label(self.window, takefocus=True)
+        cnf = get_widget_options(label)
+        self.assertDictEqual(cnf, {"takefocus": 1})
+    
+    def test_get_root_widget(self):
+        root = tk.Tk()
+        frame = ttk.Frame(root)
+        label = ttk.Label(frame)
+        self.assertIs(get_root_widget(label), root)
+    
+    def test_move_widget_uncommon_roots(self):
+        root1 = tk.Tk()
+        root2 = tk.Tk()
+        label = ttk.Label(root1)
+        with self.assertRaises(RuntimeError):
+            move_widget(label, root2)
     
     def test_move_widget(self):
         label = ttk.Label(self.window)

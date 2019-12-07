@@ -12,6 +12,20 @@ def open_icon(icon_name):
     return ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), icon_name)))
 
 
+def get_root_widget(widget):
+    """
+    Returns the root widget from a widget.
+    
+    :param widget: Widget to start the iteration from
+    :type widget: tkinter.Widget
+    :returns: root widget
+    :rtype: tk.Tk
+    """
+    root = widget
+    while root.master is not None:
+        root = root.master
+    return root
+
 def get_widget_options(widget):
     """
     Gets the options from a widget
@@ -36,6 +50,9 @@ def copy_widget(widget, new_parent, level=0):
 
     :return: tkinter.Widget instance, the copied widget.
     """
+    if get_root_widget(widget) is not get_root_widget(new_parent):
+        raise RuntimeError("Widget {} has not the same root as new parent {}".format(widget.__class__.__name__, new_parent.__class__.__name__))
+    
     rv = widget.__class__(master=new_parent, **get_widget_options(widget))
     for b in widget.bind():
         script = widget.bind(b)
