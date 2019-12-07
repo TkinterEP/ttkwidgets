@@ -50,7 +50,7 @@ class TestTickScale(BaseWidgetTest):
                 'tickinterval',
                 'showvalue',
                 'digits']
-        self.assertEqual(sorted(scale.keys()), sorted(keys))
+        self.assertTrue(all(key in scale.keys() for key in keys))
 
         scale.config(from_=-1)
         self.window.update()
