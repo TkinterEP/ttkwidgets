@@ -101,7 +101,7 @@ def parse_geometry(geometry):
              int(match.group(1)), int(match.group(2)))
 
 
-def coordinates_in_box(coords, bbox, include_edges=True, bbox_is_x1y1x2y2=False):
+def coords_in_box(coords, bbox, include_edges=True, bbox_is_x1y1x2y2=False):
     """
     Checks whether coords are inside bbox
 
@@ -118,6 +118,7 @@ def coordinates_in_box(coords, bbox, include_edges=True, bbox_is_x1y1x2y2=False)
     :rtype: bool
     :raises: ValueError if length of bbox or coords do not match the specifications
     """
+    
     if len(coords) != 2:
         raise ValueError("Coords argument is supposed to be of length 2")
     if len(bbox) != 4:
