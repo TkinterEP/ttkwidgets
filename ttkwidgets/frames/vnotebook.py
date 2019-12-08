@@ -301,20 +301,3 @@ class VNotebook(ttk.Frame):
         if to_activate == len(self._tab_ids):
             to_activate = 0
         self.activate(self._tab_ids[to_activate])
-
-
-if __name__ == '__main__':
-    from ttkthemes import ThemedTk
-    root = ThemedTk()
-    root.set_theme("radiance")
-    notebook = VNotebook(root, compound=tk.RIGHT)
-    notebook.add(ttk.Scale(notebook), text="Scale")
-    notebook.add(ttk.Button(notebook, text="Destroy", command=root.destroy), text="Button")
-    frame = ttk.Frame(notebook)
-    id = notebook.add(frame, text="Hidden")
-    def callback():
-        notebook.hide(id)
-    ttk.Button(frame, command=callback, text="Hide").grid()
-    notebook.enable_traversal()
-    notebook.grid(row=1)
-    root.mainloop()
