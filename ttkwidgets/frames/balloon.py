@@ -15,20 +15,26 @@ from ttkwidgets.utilities import get_assets_directory
 
 
 class Balloon(ttk.Frame):
-    """
-    Simple help hover balloon
-    """
+    """Simple help hover balloon."""
 
     def __init__(self, master=None, headertext="Help", text="Some great help is displayed here.", width=200, timeout=1,
                  background="#fef9cd", **kwargs):
         """
-        :param master: widget to bind to
+        Create a Balloon.
+        
+        :param master: widget to bind the Balloon to
+        :type master: widget
         :param headertext: text to show in window header
+        :type headertext: str
         :param text: text to show as help text
+        :type text: str
         :param width: width of the window
-        :param timeout: timeout in seconds (can be float) to wait until Balloon is shown
-        :param background: background color of the help Balloon
-        :param kwargs: keyword arguments for Frame creation
+        :type width: int
+        :param timeout: timeout in seconds to wait until the Balloon is shown
+        :type timeout: float
+        :param background: background color of the Balloon
+        :type background: str
+        :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
         self._toplevel = None
@@ -58,23 +64,17 @@ class Balloon(ttk.Frame):
         self.configure(**{key: value})
 
     def _grid_widgets(self):
-        """
-        Place the widgets in the Toplevel
-        """
+        """Place the widgets in the Toplevel."""
         self._canvas.grid(sticky="nswe")
         self.header_label.grid(row=1, column=1, sticky="nswe", pady=5, padx=5)
         self.text_label.grid(row=3, column=1, sticky="nswe", pady=6, padx=5)
 
     def _on_enter(self, event):
-        """
-        Creates a delayed callback for the <Enter> event
-        """
+        """Creates a delayed callback for the :obj:`<Enter>` event."""
         self._id = self.master.after(int(self._timeout * 1000), func=self.show)
 
     def _on_leave(self, event):
-        """
-        Callback for the <Leave> event to destroy the Toplevel
-        """
+        """Callback for the :obj:`<Leave>` event to destroy the Toplevel."""
         if self._toplevel:
             self._toplevel.destroy()
             self._toplevel = None
@@ -84,8 +84,9 @@ class Balloon(ttk.Frame):
 
     def show(self):
         """
-        Callback for the delayed <Enter> event (see _on_enter) to create the Toplevel widget and its child widgets to
-        show in the spot of the cursor.
+        Create the Toplevel widget and its child widgets to show in the spot of the cursor.
+
+        This is the callback for the delayed :obj:`<Enter>` event (see :meth:`~Balloon._on_enter`). 
         """
         self._toplevel = tk.Toplevel(self.master)
         self._canvas = tk.Canvas(self._toplevel, background=self.__background)
@@ -103,6 +104,15 @@ class Balloon(ttk.Frame):
                                                          x + 2, y + 2))
 
     def cget(self, key):
+        """
+        Query widget option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
+
+        To get the list of options for this widget, call the method :meth:`~Balloon.keys`.
+        """
         if key == "headertext":
             return self.__headertext
         elif key == "text":
@@ -117,6 +127,12 @@ class Balloon(ttk.Frame):
             return ttk.Frame.cget(self, key)
 
     def config(self, **kwargs):
+        """
+        Configure resources of the widget.
+
+        To get the list of options for this widget, call the method :meth:`~Balloon.keys`.
+        See :meth:`~Balloon.__init__` for a description of the widget specific option.
+        """
         self.__headertext = kwargs.pop("headertext", self.__headertext)
         self.__text = kwargs.pop("text", self.__text)
         self.__width = kwargs.pop("width", self.__width)
@@ -127,8 +143,7 @@ class Balloon(ttk.Frame):
             self.show()
         ttk.Frame.config(self, **kwargs)
 
-    def configure(self, **kwargs):
-        self.config(**kwargs)
+    configure = config
 
     def keys(self):
         keys = ttk.Frame.keys(self)

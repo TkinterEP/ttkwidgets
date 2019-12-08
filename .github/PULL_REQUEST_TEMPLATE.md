@@ -16,4 +16,4 @@ A short description of this particular widget.
 - [ ] Widget is covered by unitttests in `/tests`
 - [ ] Widget includes required assets files
 - [ ] Reference to widget in `AUTHORS.md`
-
+- [ ] Entry in sphinx documentation

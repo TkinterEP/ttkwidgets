@@ -12,3 +12,5 @@ from ttkwidgets.timeline import TimeLine
 from ttkwidgets.tickscale import TickScale
 
 from ttkwidgets.frames import VNotebook
+from ttkwidgets.table import Table
+

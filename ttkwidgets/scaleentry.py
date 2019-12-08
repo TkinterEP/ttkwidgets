@@ -18,15 +18,26 @@ class ScaleEntry(ttk.Frame):
     def __init__(self, master=None, scalewidth=50, entrywidth=5, from_=0, to=50,
                  orient=tk.HORIZONTAL, compound=tk.RIGHT, entryscalepad=0, **kwargs):
         """
+        Create a ScaleEntry.
+        
         :param master: master widget
+        :type master: widget
         :param scalewidth: width of the Scale in pixels
+        :type scalewidth: int
         :param entrywidth: width of the Entry in characters
-        :param from_: start value of the scale
+        :type entrywidth: int
+        :param from\_: start value of the scale
+        :type from\_: int
         :param to: end value of the scale
-        :param orient: scale orientation. Supports tk.HORIZONTAL and VERTICAL
-        :param compound: side the Entry must be on. Supports tk.LEFT, RIGHT, TOP and BOTTOM
+        :type to: int
+        :param orient: scale orientation. Supports :obj:`tk.HORIZONTAL` and :obj:`tk.VERTICAL`
+        :type orient: str
+        :param compound: side the Entry must be on. Supports :obj:`tk.LEFT`,
+                         :obj:`tk.RIGHT`, :obj:`tk.TOP` and :obj:`tk.BOTTOM`
+        :type compound: str
         :param entryscalepad: space between the entry and the scale
-        :param kwargs: keyword arguments passed on to Frame initializer
+        :type entryscalepad: int
+        :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
         if compound is not tk.RIGHT and compound is not tk.LEFT and compound is not tk.TOP and \
@@ -47,9 +58,7 @@ class ScaleEntry(ttk.Frame):
         self._grid_widgets()
 
     def _grid_widgets(self):
-        """
-        Puts the widgets in the correct position based on self.__compound
-        """
+        """Put the widgets in the correct position based on self.__compound."""
         orient = str(self._scale.cget('orient'))
         self._scale.grid(row=2, column=2, sticky='ew' if orient == tk.HORIZONTAL else 'ns',
                          padx=(0, self.__entryscalepad) if self.__compound is tk.RIGHT else
@@ -77,9 +86,9 @@ class ScaleEntry(ttk.Frame):
 
     def _on_entry(self, event):
         """
-        Callback for the Entry widget, sets the Scale variable to the appropriate value
+        Callback for the Entry widget, sets the Scale variable to the appropriate value.
+        
         :param event: Tkinter event
-        :return: None
         """
         contents = self._entry.get()
         if contents == "":
@@ -93,9 +102,9 @@ class ScaleEntry(ttk.Frame):
 
     def _on_scale(self, event):
         """
-        Callback for the Scale widget, inserts an int value into the Entry
+        Callback for the Scale widget, inserts an int value into the Entry.
+
         :param event: Tkinter event
-        :return:
         """
         self._entry.delete(0, tk.END)
         self._entry.insert(0, str(self._variable.get()))
@@ -114,6 +123,15 @@ class ScaleEntry(ttk.Frame):
         return keys
 
     def cget(self, key):
+        """
+        Query widget option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
+
+        To get the list of options for this widget, call the method :meth:`~ScaleEntry.keys`.
+        """
         if key == 'scalewidth':
             return self._scale.cget('length')
         elif key == 'from':
@@ -133,17 +151,31 @@ class ScaleEntry(ttk.Frame):
 
     def cget_entry(self, key):
         """
-        Wrapper around the Entry widget's cget function for the user
+        Query the Entry widget's option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
         """
         return self._entry.cget(key)
 
     def cget_scale(self, key):
         """
-        Wrapper around the Scale widget's cget function for the user
+        Query the Scale widget's option.
+
+        :param key: option name
+        :type key: str
+        :return: value of the option
         """
         return self._scale.cget(key)
 
     def configure(self, cnf={}, **kw):
+        """
+        Configure resources of the widget.
+
+        To get the list of options for this widget, call the method :meth:`~ScaleEntry.keys`.
+        See :meth:`~ScaleEntry.__init__` for a description of the widget specific option.
+        """
         kw.update(cnf)
         reinit = False
         if 'scalewidth' in kw:
@@ -184,21 +216,16 @@ class ScaleEntry(ttk.Frame):
         if reinit:
             self._grid_widgets()
 
-    def config(self, cnf={}, **kw):
-        self.configure(cnf, **kw)
+    config = configure
 
     def config_entry(self, cnf={}, **kwargs):
-        """
-        Wrapper around the Entry widget's config function for the user
-        """
+        """Configure resources of the Entry widget."""
         self._entry.config(cnf, **kwargs)
 
     def config_scale(self, cnf={}, **kwargs):
-        """
-        Wrapper around the Scale widget's config function for the user
-        """
+        """Configure resources of the Scale widget."""
         self._scale.config(cnf, **kwargs)
-        # udpate self._variable limits in case the ones of the scale have changed
+        # Update self._variable limits in case the ones of the scale have changed
         self._variable.configure(high=self._scale['to'],
                                  low=self._scale['from'])
         if 'orient' in cnf or 'orient' in kwargs:
@@ -206,15 +233,11 @@ class ScaleEntry(ttk.Frame):
 
     @property
     def value(self):
-        """
-        Get the value of the LimitedIntVar instance of the class
-        """
+        """Get the value of the :class:`LimitedIntVar` instance of the class."""
         return self._variable.get()
 
     class LimitedIntVar(tk.IntVar):
-        """
-        Subclass of tk.IntVar that allows limits in the value of the variable stored
-        """
+        """Subclass of :class:`tk.IntVar` that allows limits in the value of the variable stored."""
         def __init__(self, low, high):
             self._low = low
             self._high = high
@@ -231,9 +254,16 @@ class ScaleEntry(ttk.Frame):
 
         def set(self, value):
             """
-            Set a new value, but check whether it is in limits first. If not, return False and set the new value to
-            either be the minimum (if value is smaller than the minimum) or the maximum (if the value is larger than
-            the maximum). Both str and int are supported as value types, as long as the str contains an int.
+            Set a new value.
+
+            Check whether value is in limits first. If not, return False and set
+            the new value to either be the minimum (if value is smaller than the
+            minimum) or the maximum (if the value is larger than the maximum).
+            Both str and int are supported as value types, as long as the str
+            contains an int.
+
+            :param value: new value
+            :type value: int
             """
             if not isinstance(value, int):
                 raise TypeError("value can only be of int type")
