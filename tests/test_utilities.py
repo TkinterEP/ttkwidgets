@@ -18,7 +18,7 @@ class TestUtilities(BaseWidgetTest):
         label = ttk.Label(self.window)
         tl = tk.Toplevel(self.window)
         label = move_widget(label, tl)
-        self.assertTrue(label.winfo_parent() == '.' + tl.winfo_name())
+        self.assertTrue(label.winfo_parent() == tl.winfo_parent() + '.' + tl.winfo_name())
 
     def test_move_widget_pack(self):
         label = ttk.Label(self.window)
@@ -26,7 +26,7 @@ class TestUtilities(BaseWidgetTest):
         tl = tk.Toplevel(self.window)
         label = move_widget(label, tl)
         label.pack()
-        self.assertTrue(label.winfo_parent() == '.' + tl.winfo_name())
+        self.assertTrue(label.winfo_parent() == tl.winfo_parent() + '.' + tl.winfo_name())
         self.assertIn(label, tl.pack_slaves())
 
     def test_move_widget_grid(self):
@@ -35,7 +35,7 @@ class TestUtilities(BaseWidgetTest):
         tl = tk.Toplevel(self.window)
         label = move_widget(label, tl)
         label.grid()
-        self.assertTrue(label.winfo_parent() == '.' + tl.winfo_name())
+        self.assertTrue(label.winfo_parent() == tl.winfo_parent() + '.' + tl.winfo_name())
         self.assertIn(label, tl.grid_slaves())
 
     def test_move_widget_place(self):
@@ -44,7 +44,7 @@ class TestUtilities(BaseWidgetTest):
         tl = tk.Toplevel(self.window)
         label = move_widget(label, tl)
         label.place()
-        self.assertTrue(label.winfo_parent() == '.' + tl.winfo_name())
+        self.assertTrue(label.winfo_parent() == tl.winfo_parent() + '.' + tl.winfo_name())
         self.assertIn(label, tl.place_slaves())
 
     def test_move_widget_with_binding(self):
@@ -54,7 +54,7 @@ class TestUtilities(BaseWidgetTest):
         tl = tk.Toplevel(self.window)
         label = move_widget(label, tl)
         label.pack()
-        self.assertTrue(label.winfo_parent() == '.' + tl.winfo_name())
+        self.assertTrue(label.winfo_parent() == tl.winfo_parent() + '.' + tl.winfo_name())
         self.assertIn('<Enter>', label.bind())
 
     def test_move_widget_with_binding_on_parent(self):
@@ -64,7 +64,7 @@ class TestUtilities(BaseWidgetTest):
         tl = tk.Toplevel(self.window)
         label = move_widget(label, tl)
         label.pack()
-        self.assertTrue(label.winfo_parent() == '.' + tl.winfo_name())
+        self.assertTrue(label.winfo_parent() == tl.winfo_parent() + '.' + tl.winfo_name())
         self.assertIn('<Enter>', tl.bind())
     
     def test_parse_geometry(self):
