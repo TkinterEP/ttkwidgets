@@ -21,6 +21,7 @@ class Tab(ttk.Frame):
         :param master: parent widget
         :param tab_nb: tab index
         :param **kwargs: keyword arguments for ttk::Label widgets
+        :raises: ValueError if state is not one of 'normal' or 'disabled'
         """
         ttk.Frame.__init__(self, master, class_='Notebook.Tab',
                            style='Notebook.Tab', padding=1)
@@ -155,29 +156,6 @@ class Notebook(ttk.Frame):
     def __init__(self, master=None, **kwargs):
         """
         Create a Notebook widget with parent master.
-
-        STANDARD OPIONS
-
-            class, cursor, style, takefocus
-
-        WIDGET-SPECIFIC OPTIONS
-
-            closebutton: boolean (default True)
-                whether to display a close button on the tabs
-
-            closecommand: function or None (default Notebook.forget)
-                command executed when the close button of a tab is pressed,
-                the tab index is passed in argument.
-
-            tabdrag: boolean (default True)
-                whether to enable dragging of tab labels
-            
-            drag_to_toplevel : boolean (default tabdrag)
-                whether to enable dragging tabs to Toplevel windows
-
-            tabmenu: boolean (default True)
-                whether to display a menu showing the tab labels in alphabetical order
-
         TAB OPTIONS
 
             state, sticky, padding, text, image, compound
@@ -193,7 +171,26 @@ class Notebook(ttk.Frame):
                   currently-selected tab
                 * The string "end", which returns the number of tabs (only
                   valid for method index)
-
+        
+        :param closebutton: whether to display a close button on the tabs (default True)
+        :type closebutton: bool
+        :param closecommand: command executed when the close button of a tab is pressed,
+                        the tab index is passed in argument.
+        :type closecommand: callable
+        :param tabdrag: whether to enable dragging of tab labels
+        :type tabdrag: bool
+        :param drag_to_toplevel: whether to enable dragging tabs to Toplevel windows
+        :type drag_to_toplevel: bool
+        :param tabmenu: whether to display a menu showing the tab labels in alphabetical order
+        :type tabmenu: bool
+        :param class_: class name to apply to this widget
+        :type class_: str
+        :param cursor: which cursor type to show when hovering this widget
+        :type cursor: str
+        :param style: style name to apply to this widget
+        :type style: str
+        :param takefocus: whether this widget can take the focus using <Tab>
+        :type takefocus: bool
         """
         self._init_kwargs = kwargs.copy()
 
