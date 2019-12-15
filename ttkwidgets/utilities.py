@@ -1,7 +1,9 @@
 """
 Author: The ttkwidgets authors
-License: GNU GPLv3
-Source: The ttkwidgets repository
+License: GNU GPLv3, as in LICENSE.md
+Copyright (c) 2016-2019 The ttkwidgets authors
+
+For author details, see AUTHORS.md
 """
 import os
 from PIL import Image, ImageTk
@@ -55,16 +57,9 @@ def copy_widget(widget, new_parent, level=0):
     """
     rv = widget.__class__(master=new_parent, **get_widget_options(widget))
     for b in widget.bind():
+        widget._tclCommands = None  # Preserve bound functions
         script = widget.bind(b)
-        rv.bind(b, script)  # Not sure it will work tho
-        # TODO: bind the script to the new widget (rv)
-        # set type [ getWidgetType $w ]
-        # set name [ string trimright $newparent.[lindex [split $w "." ] end ] "." ]
-        # set retval [ $type $name {*}[ getConfigOptions $w ] ]
-        # foreach b [ bind $w ] {
-        #     puts "bind $retval $b [subst { [bind $w $b ] } ] "
-        #     bind $retval $b  [subst { [bind $w $b ] } ]
-        # }
+        rv.bind(b, script)
 
     if level > 0:
         if widget.grid_info():  # if geometry manager is grid
