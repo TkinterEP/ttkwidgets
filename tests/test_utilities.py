@@ -69,6 +69,17 @@ class TestUtilities(BaseWidgetTest):
         self.assertNotIn(label, self.window.place_slaves())
         self.assertGeometryInfoEquals(info, label.place_info())
 
+    def test_move_widget_none(self):
+        label = ttk.Label(self.window)
+        self.assertFalse(label.place_info() is True)
+        self.assertFalse(label.grid_info() is True)
+        self.assertRaises(tk.TclError, label.pack_info)
+        tl = tk.Toplevel(self.window)
+        label = move_widget(label, tl, preserve_geometry=True)
+        self.assertFalse(label.place_info() is True)
+        self.assertFalse(label.grid_info() is True)
+        self.assertRaises(tk.TclError, label.pack_info)
+
     def test_move_widget_with_binding(self):
         label = ttk.Label(self.window)
         label.bind('<Enter>', self._dummy_bind)
