@@ -60,7 +60,6 @@ def copy_widget(widget, new_parent, level=0):
         widget._tclCommands = None  # Preserve bound functions
         script = widget.bind(b)
         rv.bind(b, script)
-
     if level > 0:
         if widget.grid_info():  # if geometry manager is grid
             temp = widget.grid_info()
@@ -75,6 +74,7 @@ def copy_widget(widget, new_parent, level=0):
             del temp['in']
             rv.pack(**temp)
     level += 1
+
     if widget.pack_slaves():  # subwidgets are using the pack() geometry manager
         for child in widget.pack_slaves():
             copy_widget(child, rv, level)
@@ -84,16 +84,21 @@ def copy_widget(widget, new_parent, level=0):
     return rv
 
 
-def move_widget(widget, new_parent):
+def move_widget(widget, new_parent, preserve_geometry=False):
     """
     Moves widget to new_parent
 
     :param widget: widget to move
+    :type widget: tk.Widget
     :param new_parent: new parent for the widget
+    :type new_parent: tk.Widget
+    :param preserve_geometry: Whether to preserve the geometry of the
+        widget in the old parent into the new parent
+    :type preserve_geometry: bool
 
     :return: moved widget reference
     """
-    rv = copy_widget(widget, new_parent)
+    rv = copy_widget(widget, new_parent, level=preserve_geometry)
     widget.destroy()
     return rv
 
