@@ -59,6 +59,8 @@ def copy_widget(widget, new_parent, level=0):
 
     :return: tkinter.Widget instance, the copied widget.
     """
+    if widget.tk is not new_parent.tk:
+        raise RuntimeError("Widget may not be copied into new Tk instance")
     rv = widget.__class__(master=new_parent, **get_widget_options(widget))
     for b in widget.bind():
         widget._tclCommands = None  # Preserve bound functions
