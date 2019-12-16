@@ -7,6 +7,11 @@ from tkinter import ttk
 
 
 class TestUtilities(BaseWidgetTest):
+    def assertGeometryInfoEquals(self, info1, info2):
+        info1.pop("in", None)
+        info2.pop("in", None)
+        self.assertEquals(info1, info2)
+
     def setUp(self):
         BaseWidgetTest.setUp(self)
         self._dummy_flag = False
@@ -33,30 +38,36 @@ class TestUtilities(BaseWidgetTest):
 
     def test_move_widget_pack(self):
         label = ttk.Label(self.window)
-        label.pack()
+        label.pack(side=tk.LEFT)
+        info = label.pack_info()
         tl = tk.Toplevel(self.window)
-        label = move_widget(label, tl)
-        label.pack()
+        label = move_widget(label, tl, preserve_geometry=True)
         self.assertIsChild(label, tl)
         self.assertIn(label, tl.pack_slaves())
+        self.assertNotIn(label, self.window.pack_slaves())
+        self.assertGeometryInfoEquals(info, label.pack_info())
 
     def test_move_widget_grid(self):
         label = ttk.Label(self.window)
-        label.grid()
+        label.grid(row=1, column=1)
+        info = label.grid_info()
         tl = tk.Toplevel(self.window)
-        label = move_widget(label, tl)
-        label.grid()
+        label = move_widget(label, tl, preserve_geometry=True)
         self.assertIsChild(label, tl)
-        self.assertIn(label, tl.grid_slaves())
+        self.assertIn(label, tl.grid_slaves(row=1, column=1))
+        self.assertNotIn(label, self.window.grid_slaves(row=1, column=1))
+        self.assertGeometryInfoEquals(info, label.grid_info())
 
     def test_move_widget_place(self):
         label = ttk.Label(self.window)
-        label.place()
+        label.place(x=0, y=10)
+        info = label.place_info()
         tl = tk.Toplevel(self.window)
-        label = move_widget(label, tl)
-        label.place()
+        label = move_widget(label, tl, preserve_geometry=True)
         self.assertIsChild(label, tl)
         self.assertIn(label, tl.place_slaves())
+        self.assertNotIn(label, self.window.place_slaves())
+        self.assertGeometryInfoEquals(info, label.place_info())
 
     def test_move_widget_with_binding(self):
         label = ttk.Label(self.window)
@@ -118,6 +129,60 @@ class TestUtilities(BaseWidgetTest):
         move_widget(widget, tk.Toplevel())
         self.window.event_generate("<Enter>")
         self.assertHasBeenInvoked()
+
+    def test_move_widget_with_children_pack(self):
+        frame = ttk.Frame(self.window)
+        label = ttk.Label(frame)
+        parent = tk.Toplevel()
+        label.pack(side=tk.BOTTOM)
+        info = label.pack_info()
+        frame.pack(expand=True)
+
+        frame = move_widget(frame, parent)
+        self.assertTrue(len(frame.pack_slaves()) == 1)
+        label2 = frame.nametowidget(frame.pack_slaves()[0])
+        self.assertTrue(label is not label2)
+
+        self.assertGeometryInfoEquals(info, label2.pack_info())
+        self.assertRaises(tk.TclError, label.pack_info)
+        self.assertRaises(tk.TclError, frame.pack_info)  # Frame is not packed
+        self.assertIn(label2, frame.pack_slaves())
+
+    def test_move_widget_with_children_grid(self):
+        frame = ttk.Frame(self.window)
+        label = ttk.Label(frame)
+        parent = tk.Toplevel()
+        label.grid(row=1, column=1)
+        info = label.grid_info()
+        frame.grid(row=1, column=1)
+
+        frame = move_widget(frame, parent)
+        self.assertTrue(len(frame.grid_slaves()) == 1)
+        label2 = frame.nametowidget(frame.grid_slaves()[0])
+        self.assertTrue(label is not label2)
+
+        self.assertGeometryInfoEquals(info, label2.grid_info())
+        self.assertRaises(tk.TclError, label.grid_info)
+        self.assertTrue(len(frame.grid_info()) == 0)  # Frame is not in grid
+        self.assertIn(label2, frame.grid_slaves())
+
+    def test_move_widget_with_children_place(self):
+        frame = ttk.Frame(self.window)
+        label = ttk.Label(frame)
+        parent = tk.Toplevel()
+        label.place(x=53, y=13)
+        info = label.place_info()
+        frame.place(x=100, y=10)
+
+        frame = move_widget(frame, parent)
+        self.assertTrue(len(frame.place_slaves()) == 1)
+        label2 = frame.nametowidget(frame.place_slaves()[0])
+        self.assertTrue(label is not label2)
+
+        self.assertGeometryInfoEquals(info, label2.place_info())
+        self.assertRaises(tk.TclError, label.place_info)
+        self.assertTrue(len(frame.place_info()) == 0)
+        self.assertIn(label2, frame.place_slaves())
 
     def test_parse_geometry(self):
         g = parse_geometry('1x1+1+1')
