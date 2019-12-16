@@ -8,6 +8,10 @@ For author details, see AUTHORS.md
 import os
 from PIL import Image, ImageTk
 import re
+try:
+    import Tkinter as tk
+except ImportError:
+    import tkinter as tk
 
 
 def get_assets_directory():
@@ -61,6 +65,10 @@ def copy_widget(widget, new_parent, level=0):
         script = widget.bind(b)
         rv.bind(b, script)
     if level > 0:
+        try:
+            pack_info = widget.pack_info()
+        except tk.TclError:
+            pack_info = {}
         if widget.grid_info():  # if geometry manager is grid
             temp = widget.grid_info()
             del temp['in']
@@ -69,10 +77,12 @@ def copy_widget(widget, new_parent, level=0):
             temp = widget.place_info()
             del temp['in']
             rv.place(**temp)
-        else:  # if geometry manager is pack
+        elif pack_info:  # if geometry manager is pack
             temp = widget.pack_info()
             del temp['in']
             rv.pack(**temp)
+        else:  # No geometry manager configured
+            pass
     level += 1
 
     if widget.pack_slaves():  # subwidgets are using the pack() geometry manager
