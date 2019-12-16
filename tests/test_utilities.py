@@ -195,6 +195,11 @@ class TestUtilities(BaseWidgetTest):
         self.assertTrue(len(frame.place_info()) == 0)
         self.assertIn(label2, frame.place_slaves())
 
+    def test_move_widget_to_new_tk(self):
+        label = tk.Label(self.window)
+        window = tk.Tk()
+        self.assertRaises(RuntimeError, move_widget, label, window)
+
     def test_parse_geometry(self):
         g = parse_geometry('1x1+1+1')
         self.assertEqual(g, (1, 1, 1, 1))
@@ -210,4 +215,4 @@ class TestUtilities(BaseWidgetTest):
 
         self.assertTrue(coords_in_box((1, 1), (0, 0, 2, 2)))
         self.assertFalse(coords_in_box((1, 1), (1, 1, 2, 2), include_edges=False))
-        self.assertTrue(coords_in_box((0, 0), (-1, -1, 1, 1), bbox_is_x1y1x2y2=True))
+        self.assertTrue(coords_in_box((0, 0), (-1, -1, 1, 1), bbox_is_x1y1x02y2=True))
