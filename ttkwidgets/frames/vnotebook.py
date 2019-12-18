@@ -11,10 +11,10 @@ from tkinter.font import Font
 
 class VNotebook(ttk.Frame):
     """
-    Notebook with Vertical tabs. Does not actually use the Notebook
-    widget, but a set of Toolbutton-styles Radiobuttons to select a
-    Frame of a set. Provides an interface that functions the same as a
-    normal Notebook widget.
+    Notebook with vertical tabs. Does not actually use the 
+    :class:`ttk.Notebook` widget, but a set of Toolbutton-styles 
+    Radiobuttons to select a Frame of a set. Provides an interface that 
+    behaves like a normal :class:`ttk.Notebook` widget.
     """
 
     options = [
@@ -41,11 +41,17 @@ class VNotebook(ttk.Frame):
 
     def __init__(self, master, **kwargs):
         """
+        Create a VNotebook.
+        
         :param cursor: Cursor set upon hovering Buttons
+        :type cursor: str
         :param padding: Amount of pixels between the Buttons
+        :type padding: int
         :param compound: Location of the Buttons
+        :type compound: str
         :param callback: Callback called upon change of Frame
-        :param kwargs: Passed on to ttk.Frame initializer
+        :type callback: callable
+        :param kwargs: Passed on to :class:`ttk.Frame` initializer
         """
         # Argument processing
         self._cursor = kwargs.pop("cursor", "default")
@@ -78,12 +84,12 @@ class VNotebook(ttk.Frame):
         self.grid_widgets()
 
     def init_widgets(self):
-        """Initialize child widgets"""
+        """Initialize child widgets."""
         self._buttons_frame = ttk.Frame(self)
         self._separator = ttk.Separator(self)
 
     def grid_widgets(self):
-        """Put child widgets in place"""
+        """Put child widgets in place."""
         horizontal = self._compound in (tk.BOTTOM, tk.TOP)
         if horizontal is True:
             sticky = "sw" if self._compound == tk.BOTTOM else "nw"
@@ -118,7 +124,7 @@ class VNotebook(ttk.Frame):
         self._grid_tabs()
 
     def grid_forget_widgets(self):
-        """Remove child widgets from grid"""
+        """Remove child widgets from grid."""
         self._buttons_frame.grid_forget()
         if self.__current_tab is not None:
             self.__current_tab.grid_forget()
@@ -126,7 +132,7 @@ class VNotebook(ttk.Frame):
             button.grid_forget()
 
     def _grid_tabs(self):
-        """Organize tab buttons"""
+        """Organize tab buttons."""
         for button in self._tab_buttons.values():
             button.grid_forget()
         for index, tab_id in enumerate(self._tab_ids):
@@ -144,14 +150,17 @@ class VNotebook(ttk.Frame):
     def add(self, child, **kwargs):
         """
         Create new tab in the notebook and append it to the end.
-        :param child: Child widget, such as a ttk.Frame
-        :param kwargs: Keyword arguments to create tab with. Supports
-            all arguments supported by tab() function, and in addition
-            supports:
-            :param id: ID for the newly added Tab. If the ID is not
-                given, one is generated automatically.
-            :param index: Position of the new Notebook
+        
+        :param child: Child widget, such as a :class:`ttk.Frame`
+        :param kwargs: Keyword arguments to create tab with. 
+            Supports all arguments supported by :meth:`VNotebook.tab` 
+            function, and in addition supports:
+            
+                :param id: ID for the newly added Tab. If the ID is not given, one is generated automatically.
+                :param index: Position of the new Tab.
+            
         :return: ID for the new Tab
+        :rtype: int
         """
         tab_id = kwargs.pop("id", hash(child))
         self._tab_buttons[tab_id] = ttk.Radiobutton(
@@ -167,12 +176,12 @@ class VNotebook(ttk.Frame):
         return tab_id
 
     def insert(self, index, child, **kwargs):
-        """add() alias with non-optional where argument"""
+        """:meth:`VNotebook.add` alias with non-optional index argument."""
         kwargs.update({"index": index})
         return self.add(child, **kwargs)
 
     def enable_traversal(self, enable=True):
-        """Setup keybinds for CTRL-TAB to switch tabs"""
+        """Setup keybinds for CTRL-TAB to switch tabs."""
         if enable is True:
             func = "bind"
             args = ("<Control-Tab>", self._switch_tab,)
@@ -184,11 +193,11 @@ class VNotebook(ttk.Frame):
         return enable
 
     def disable_traversal(self):
-        """Alias of self.enable_traversal(enable=False)"""
+        """Alias of :obj:`VNotebook.enable_traversal(enable=False)`."""
         return self.enable_traversal(enable=False)
 
     def forget(self, child):
-        """Remove a child by widget or tab_id"""
+        """Remove a child by widget or tab_id."""
         tab_id = self.get_id_for_tab(child)
         self._tab_buttons[tab_id].destroy()
         del self._tab_buttons[tab_id]
@@ -197,7 +206,7 @@ class VNotebook(ttk.Frame):
         self._grid_tabs()
 
     def hide(self, child, hide=True):
-        """Hide or unhide a Tab"""
+        """Hide or unhide a Tab."""
         tab_id = self.get_id_for_tab(child)
         self._hidden[tab_id] = hide
         if tab_id == self.active and len(self._tab_ids) != 1:
@@ -205,11 +214,11 @@ class VNotebook(ttk.Frame):
         self.grid_widgets()
 
     def show(self, child):
-        """Alias for hide(hide=False)"""
+        """Alias for :obj:`VNotebook.hide(hide=False)`"""
         return self.hide(child, hide=False)
 
     def index(self, child):
-        """Return zero-indexed index value of a child OR tab_id"""
+        """Return zero-indexed index value of a child or tab_id."""
         return self._tab_ids.index(self.get_id_for_tab(child))
 
     def tab(self, tab_id, option=None, **kwargs):
@@ -232,31 +241,31 @@ class VNotebook(ttk.Frame):
         self._grid_tabs()
 
     def tab_configure(self, tab_id, **kwargs):
-        """configure alias for self.tab"""
+        """Configure alias for :meth:`VNotebook.tab`"""
         return self.tab(tab_id, **kwargs)
 
     def tab_cget(self, tab_id, key):
-        """cget alias for self.tab"""
+        """cget alias for :meth:`VNotebook.tab`"""
         return self.tab(tab_id, option=key)
 
     @property
     def tabs(self):
-        """Return list of tab IDs"""
+        """Return list of tab IDs."""
         return self._tab_ids.copy()
 
     def config(self, **kwargs):
-        """Alias for self.configure"""
+        """Alias for :meth:`VNotebook.configure`"""
         return self.configure(**kwargs)
 
     def configure(self, **kwargs):
-        """Change settings for the widget"""
+        """Change settings for the widget."""
         for option in self.options:
             attr = "_{}".format(option)
             setattr(self, attr, kwargs.pop(option, getattr(self, attr)))
         return ttk.Frame.configure(**kwargs)
 
     def cget(self, key):
-        """Return current value for a setting"""
+        """Return current value for a setting."""
         if key in self.options:
             return getattr(self, "_{}".format(key))
         return ttk.Frame.cget(self, key)
@@ -268,7 +277,7 @@ class VNotebook(ttk.Frame):
         return self.configure(**{key: value})
 
     def activate(self, tab_id):
-        """Activate a new Tab in the Notebook"""
+        """Activate a new Tab in the notebook."""
         if self.active is not None:
             self.__current_tab.grid_forget()
         self.__current_tab = self._tab_frames[tab_id]
@@ -276,24 +285,24 @@ class VNotebook(ttk.Frame):
         self._variable.set(tab_id)
 
     def activate_index(self, index):
-        """Activate Tab by zero-indexed value"""
+        """Activate Tab by zero-indexed value."""
         return self.activate(self._tab_ids[index])
 
     @property
     def active(self):
-        """Return tab_id for currently active Tab"""
+        """Return tab_id for currently active Tab."""
         if self.__current_tab is None:
             return None
         return self.get_id_for_tab(self.__current_tab)
 
     def get_id_for_tab(self, child):
-        """Return tab_id for child, which can be tab_id or Widget"""
+        """Return tab_id for child, which can be tab_id or widget."""
         if child in self._tab_ids:
             return child
         return {widget: tab_id for tab_id, widget in self._tab_frames.items()}[child]
 
     def _switch_tab(self, event):
-        """Callback for CTRL-TAB"""
+        """Callback for CTRL-TAB."""
         if self.active is None:
             self.activate(self._tab_ids[0])
             return
