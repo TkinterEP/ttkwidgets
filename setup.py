@@ -14,7 +14,7 @@ A collection of widgets for Tkinter's ttk extensions by various authors
 License
 -------
 
-ttkwidgets: A collection of widgets for Tkinter's ttk extensions by various authors 
+ttkwidgets: A collection of widgets for Tkinter's ttk extensions by various authors
 Copyright (C) RedFantom 2017
 Copyright (C) The Python Team
 Copyright (C) Mitja Martini 2008
@@ -47,15 +47,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .. |Codecov| image:: https://codecov.io/gh/RedFantom/ttkwidgets/branch/master/graph/badge.svg
     :alt: Code Coverage
     :target: https://codecov.io/gh/RedFantom/ttkwidgets
-    
+
 .. |Pypi| image:: https://badge.fury.io/py/ttkwidgets.svg
     :alt: PyPI version
     :target: https://badge.fury.io/py/ttkwidgets
-    
+
 .. |License| image:: https://img.shields.io/badge/License-GPL%20v3-blue.svg
     :alt: License: GPL v3
     :target: http://www.gnu.org/licenses/gpl-3.0
-    
+
 """
 
 setup(
@@ -73,5 +73,5 @@ setup(
     classifiers=["Programming Language :: Python :: 2.7",
                  "Programming Language :: Python :: 3",
                  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"],
-    install_requires=["pillow", "ttkthemes"]
+    install_requires=["pillow"]
 )

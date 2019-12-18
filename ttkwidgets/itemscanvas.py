@@ -15,15 +15,15 @@ from PIL import Image, ImageTk
 
 class ItemsCanvas(ttk.Frame):
     """
-    A :class:`ttk.Frame` containing a Canvas upon which text items can be placed with a coloured background. 
-    
+    A :class:`ttk.Frame` containing a Canvas upon which text items can be placed with a coloured background.
+
     The items can be moved around and deleted. A background can also be set.
     """
 
     def __init__(self, *args, **kwargs):
         """
         Create an ItemsCanvas.
-        
+
         :param canvaswidth: width of the canvas in pixels
         :type canvaswidth: int
         :param canvasheight: height of the canvas in pixels
@@ -77,7 +77,7 @@ class ItemsCanvas(ttk.Frame):
         Callback for the press of the left mouse button.
 
         Selects a new item and sets its highlightcolor.
-        
+
         :param event: Tkinter event
         """
         self.current_coords = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
@@ -132,7 +132,7 @@ class ItemsCanvas(ttk.Frame):
     def right_press(self, event):
         """
         Callback for the right mouse button event to pop up the correct menu.
-        
+
         :param event: Tkinter event
         """
         self.set_current()
@@ -153,7 +153,7 @@ class ItemsCanvas(ttk.Frame):
                  highlightcolor="blue"):
         """
         Add a new item on the Canvas.
-        
+
         :param text: text to display
         :type text: str
         :param font: font of the text
@@ -189,7 +189,7 @@ class ItemsCanvas(ttk.Frame):
     def set_background(self, image=None, path=None, resize=True):
         """
         Set the background image of the Canvas.
-        
+
         :param image: background image
         :type image: PhotoImage
         :param path: background image path
@@ -227,17 +227,17 @@ class ItemsCanvas(ttk.Frame):
 
         To get the list of options for this widget, call the method :meth:`~ItemsCanvas.keys`.
         """
-        if key is "canvaswidth":
+        if key == "canvaswidth":
             return self._canvaswidth
-        elif key is "canvasheight":
+        elif key == "canvasheight":
             return self._canvasheight
-        elif key is "function_new":
+        elif key == "function_new":
             return self._function_new
-        elif key is "callback_add":
+        elif key == "callback_add":
             return self._callback_add
-        elif key is "callback_del":
+        elif key == "callback_del":
             return self._callback_del
-        elif key is "callback_move":
+        elif key == "callback_move":
             return self._callback_move
         else:
             ttk.Frame.cget(self, key)

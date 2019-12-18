@@ -1,4 +1,3 @@
-from ttkthemes import ThemedTk
 from ttkwidgets import VNotebook
 import tkinter.ttk as ttk
 import tkinter as tk
@@ -8,8 +7,7 @@ def callback():
     notebook.hide(id_)
 
 
-root = ThemedTk()
-root.set_theme("radiance")
+root = tk.Tk()
 notebook = VNotebook(root, compound=tk.RIGHT)
 notebook.add(ttk.Scale(notebook), text="Scale")
 notebook.add(ttk.Button(notebook, text="Destroy", command=root.destroy), text="Button")
