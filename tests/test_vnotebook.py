@@ -22,7 +22,7 @@ class TestVNotebook(TestCase):
         VNotebook(self.window).grid()
         self.window.update()
 
-    def add_test_frame(self, notebook, **kwargs):
+    def _add_test_frame(self, notebook, **kwargs):
         notebook.grid()
         frame = ttk.Frame(notebook)
         ttk.Scale(frame).grid()
@@ -31,7 +31,7 @@ class TestVNotebook(TestCase):
 
     def test_add(self):
         notebook = VNotebook(self.window)
-        self.add_test_frame(notebook)
+        self._add_test_frame(notebook)
         self.window.update()
 
     def test_compound(self):
@@ -41,7 +41,7 @@ class TestVNotebook(TestCase):
 
     def test_index(self):
         notebook = VNotebook(self.window)
-        self.add_test_frame(notebook)
+        self._add_test_frame(notebook)
         frame = ttk.Frame(notebook)
         notebook.insert(0, frame)
         self.assertEqual(notebook.tabs[0], notebook.get_id_for_tab(frame))
@@ -49,8 +49,8 @@ class TestVNotebook(TestCase):
 
     def test_enable_traversal(self):
         notebook = VNotebook(self.window)
-        self.add_test_frame(notebook)
-        self.add_test_frame(notebook)
+        self._add_test_frame(notebook)
+        self._add_test_frame(notebook)
         notebook.enable_traversal()
         active = notebook.active
         notebook._switch_tab(None)
@@ -58,14 +58,14 @@ class TestVNotebook(TestCase):
 
     def test_tab_config(self):
         notebook = VNotebook(self.window)
-        id = self.add_test_frame(notebook)
+        id = self._add_test_frame(notebook)
         notebook.tab_configure(id, text="Hello")
         self.assertEqual(notebook.tab_cget(id, "text"), "Hello")
 
     def test_activate(self):
         notebook = VNotebook(self.window)
-        self.add_test_frame(notebook)
-        self.add_test_frame(notebook)
+        self._add_test_frame(notebook)
+        self._add_test_frame(notebook)
         self.assertEqual(notebook.tabs[0], notebook.active)
         notebook.activate_index(1)
         self.assertEqual(notebook.tabs[1], notebook.active)
