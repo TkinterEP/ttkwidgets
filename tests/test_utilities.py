@@ -99,7 +99,7 @@ class TestUtilities(BaseWidgetTest):
         parent = tk.Toplevel()
         child = move_widget(widget, parent)
         self.assertIsChild(child, parent)
-        widget.invoke()
+        child.invoke()
         self.assertHasBeenInvoked()
 
     def test_move_widget_with_bound_method_on_parent(self):
@@ -215,4 +215,4 @@ class TestUtilities(BaseWidgetTest):
 
         self.assertTrue(coords_in_box((1, 1), (0, 0, 2, 2)))
         self.assertFalse(coords_in_box((1, 1), (1, 1, 2, 2), include_edges=False))
-        self.assertTrue(coords_in_box((0, 0), (-1, -1, 1, 1), bbox_is_x1y1x02y2=True))
+        self.assertTrue(coords_in_box((0, 0), (-1, -1, 1, 1), bbox_is_x1y1x2y2=True))
