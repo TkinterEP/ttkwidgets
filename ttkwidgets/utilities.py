@@ -61,11 +61,13 @@ def copy_widget(widget, new_parent, level=0):
     """
     if widget.tk is not new_parent.tk:
         raise RuntimeError("Widget may not be copied into new Tk instance")
+    widget._tclCommands = None  # Preserve bound functions
     rv = widget.__class__(master=new_parent, **get_widget_options(widget))
+
     for b in widget.bind():
-        widget._tclCommands = None  # Preserve bound functions
         script = widget.bind(b)
         rv.bind(b, script)
+
     if level > 0:
         try:
             pack_info = widget.pack_info()
@@ -93,6 +95,8 @@ def copy_widget(widget, new_parent, level=0):
     else:
         for child in widget.winfo_children():
             copy_widget(child, rv, level)
+
+    widget.destroy()
     return rv
 
 
