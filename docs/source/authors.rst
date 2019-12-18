@@ -14,6 +14,7 @@ List of all the authors of widgets in this repository. Please note that this lis
   * :class:`~ttkwidgets.frames.Balloon`
   * :class:`~ttkwidgets.ItemsCanvas`
   * :class:`~ttkwidgets.TimeLine`
+  * :class:`~ttkwidgets.VNotebook`
   
 - The Python Team
 
