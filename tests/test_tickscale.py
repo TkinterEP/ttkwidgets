@@ -40,21 +40,7 @@ class TestTickScale(BaseWidgetTest):
         self.assertTrue(scale.cget('showvalue'))
         self.assertEqual(scale['from'], 0)
         self.assertEqual(scale.cget('to'), 10)
-        keys = ['command',
-                'variable',
-                'orient',
-                'from',
-                'to',
-                'value',
-                'length',
-                'takefocus',
-                'cursor',
-                'style',
-                'class',
-                'tickinterval',
-                'showvalue',
-                'digits',
-                'state']
+        keys = ttk.Scale(self.window).keys() + ['showvalue', 'tickinterval', 'digits']
 
         self.assertEqual(sorted(scale.keys()), sorted(keys))
 
