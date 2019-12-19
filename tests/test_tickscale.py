@@ -53,7 +53,9 @@ class TestTickScale(BaseWidgetTest):
                 'class',
                 'tickinterval',
                 'showvalue',
-                'digits']
+                'digits',
+                'state']
+
         self.assertEqual(sorted(scale.keys()), sorted(keys))
 
         scale.config(from_=-1)
