@@ -3,12 +3,8 @@ Author: RedFantom and Juliette Monsel
 License: GNU GPLv3
 Source: This repository
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 
 class ScaleEntry(ttk.Frame):

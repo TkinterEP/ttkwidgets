@@ -1,10 +1,7 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
 import unittest
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 
 
 class BaseWidgetTest(unittest.TestCase):

@@ -4,10 +4,7 @@
 # For license see LICENSE
 
 from ttkwidgets import ScrolledListbox
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 
 window = tk.Tk()
 listbox = ScrolledListbox(window, height=5)

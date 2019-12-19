@@ -7,10 +7,7 @@ Source: This repository
 Treeview with checkboxes at each item and a noticeable disabled style
 """
 
-try:
-    import ttk
-except ImportError:
-    from tkinter import ttk
+from tkinter import ttk
 
 import os
 from PIL import Image, ImageTk

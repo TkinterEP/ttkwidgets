@@ -5,12 +5,8 @@ Source: https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.ht
 
 Edited by RedFantom for ttk and Python 2 and 3 cross-compatibility and <Enter> binding
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresis', 'Udiaeresis', 'ssharp']
 

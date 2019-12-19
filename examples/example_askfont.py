@@ -4,12 +4,8 @@
 # For license see LICENSE
 
 from ttkwidgets.font import askfont
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 def font():
     res = askfont()

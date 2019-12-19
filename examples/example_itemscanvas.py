@@ -3,12 +3,8 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
 from ttkwidgets import ItemsCanvas
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 
 root = tk.Tk()

@@ -3,12 +3,8 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 from ttkwidgets.utilities import open_icon
 from collections import OrderedDict
 from ttkwidgets import AutoHideScrollbar
