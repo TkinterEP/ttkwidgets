@@ -6,14 +6,13 @@ Copyright (C) 2018 RedFantom
 # Basic UI imports
 import tkinter as tk
 from tkinter import ttk
-from tkinter.font import Font
 
 
 class VNotebook(ttk.Frame):
     """
-    Notebook with vertical tabs. Does not actually use the 
-    :class:`ttk.Notebook` widget, but a set of Toolbutton-styles 
-    Radiobuttons to select a Frame of a set. Provides an interface that 
+    Notebook with vertical tabs. Does not actually use the
+    :class:`ttk.Notebook` widget, but a set of Toolbutton-styles
+    Radiobuttons to select a Frame of a set. Provides an interface that
     behaves like a normal :class:`ttk.Notebook` widget.
     """
 
@@ -42,7 +41,7 @@ class VNotebook(ttk.Frame):
     def __init__(self, master, **kwargs):
         """
         Create a VNotebook.
-        
+
         :param cursor: Cursor set upon hovering Buttons
         :type cursor: str
         :param padding: Amount of pixels between the Buttons
@@ -150,15 +149,15 @@ class VNotebook(ttk.Frame):
     def add(self, child, **kwargs):
         """
         Create new tab in the notebook and append it to the end.
-        
+
         :param child: Child widget, such as a :class:`ttk.Frame`
-        :param kwargs: Keyword arguments to create tab with. 
-            Supports all arguments supported by :meth:`VNotebook.tab` 
+        :param kwargs: Keyword arguments to create tab with.
+            Supports all arguments supported by :meth:`VNotebook.tab`
             function, and in addition supports:
-            
+
                 :param id: ID for the newly added Tab. If the ID is not given, one is generated automatically.
                 :param index: Position of the new Tab.
-            
+
         :return: ID for the new Tab
         :rtype: int
         """
