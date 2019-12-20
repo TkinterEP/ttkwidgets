@@ -3,14 +3,9 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
-try:
-    import Tkinter as tk
-    import ttk
-    import tkFileDialog as fd
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
-    import tkinter.filedialog as fd
+import tkinter as tk
+from tkinter import ttk
+from tkinter import filedialog as fd
 import sys
 from ttkwidgets import AutoHideScrollbar
 

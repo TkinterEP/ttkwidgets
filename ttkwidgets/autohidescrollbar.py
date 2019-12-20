@@ -5,10 +5,7 @@ Source: This repository
 """
 # Based on an idea by Fredrik Lundh (effbot.org/zone/tkinter-autoscrollbar.htm)
 # adapted to support all layouts
-try:
-    import ttk
-except ImportError:
-    from tkinter import ttk
+from tkinter import ttk
 
 
 class AutoHideScrollbar(ttk.Scrollbar):

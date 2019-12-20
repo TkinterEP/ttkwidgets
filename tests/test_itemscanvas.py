@@ -6,10 +6,7 @@ from ttkwidgets.utilities import get_assets_directory
 import os
 from PIL import Image, ImageTk
 
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 from pynput.mouse import Controller, Button
 
 

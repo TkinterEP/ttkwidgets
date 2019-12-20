@@ -2,10 +2,7 @@
 # For license see LICENSE
 from ttkwidgets.autocomplete import AutocompleteEntryListbox
 from tests import BaseWidgetTest
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 
 
 class TestEvent(object):

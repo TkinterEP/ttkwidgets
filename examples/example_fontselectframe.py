@@ -4,12 +4,8 @@
 # For license see LICENSE
 
 from ttkwidgets.font import FontSelectFrame
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 def update_preview(font_tuple):
     print(font_tuple)

@@ -7,12 +7,8 @@ Edited by RedFantom for ttk and Python 2 and 3 cross-compatibility and <Enter> b
 Edited by Juliette Monsel to include Tcl code to navigate the dropdown by Pawel Salawa
 (https://wiki.tcl-lang.org/page/ttk%3A%3Acombobox, copyright 2011)
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresis', 'Udiaeresis', 'ssharp']
 

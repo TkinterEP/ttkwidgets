@@ -2,12 +2,8 @@
 # For license see LICENSE
 from ttkwidgets import TickScale
 from tests import BaseWidgetTest
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 
 class TestTickScale(BaseWidgetTest):
@@ -40,9 +36,21 @@ class TestTickScale(BaseWidgetTest):
         self.assertTrue(scale.cget('showvalue'))
         self.assertEqual(scale['from'], 0)
         self.assertEqual(scale.cget('to'), 10)
-        keys = ttk.Scale(self.window).keys() + ['showvalue', 'tickinterval', 'digits']
-
-        self.assertEqual(sorted(scale.keys()), sorted(keys))
+        keys = ['command',
+                'variable',
+                'orient',
+                'from',
+                'to',
+                'value',
+                'length',
+                'takefocus',
+                'cursor',
+                'style',
+                'class',
+                'tickinterval',
+                'showvalue',
+                'digits']
+        self.assertTrue(all(key in scale.keys() for key in keys))
 
         scale.config(from_=-1)
         self.window.update()

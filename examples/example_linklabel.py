@@ -5,10 +5,7 @@
 # For license see LICENSE
 
 from ttkwidgets import LinkLabel
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 
 window = tk.Tk()
 LinkLabel(window, text="ttkwidgets repository",

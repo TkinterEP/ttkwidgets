@@ -2,10 +2,7 @@
 
 # Copyright (c) Juliette Monsel 2019
 # For license see LICENSE
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 from ttkwidgets.autocomplete import AutocompleteEntryListbox
 
 window = tk.Tk()
