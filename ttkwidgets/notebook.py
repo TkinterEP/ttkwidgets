@@ -52,7 +52,7 @@ class Tab(ttk.Frame):
         self.bind('<Enter>', self._on_enter_tab)
         self.bind('<Leave>', self._on_leave_tab)
         self.bind('<MouseWheel>', self._on_mousewheel)
-    
+
     def _on_mousewheel(self, event):
         if self.hovering_tab:
             if event.delta > 0:
@@ -62,7 +62,7 @@ class Tab(ttk.Frame):
 
     def _on_enter_tab(self, event):
         self.hovering_tab = True
-    
+
     def _on_leave_tab(self, event):
         self.hovering_tab = False
 
@@ -171,7 +171,7 @@ class Notebook(ttk.Frame):
 
             tabdrag: boolean (default True)
                 whether to enable dragging of tab labels
-            
+
             drag_to_toplevel : boolean (default tabdrag)
                 whether to enable dragging tabs to Toplevel windows
 
@@ -312,16 +312,16 @@ class Notebook(ttk.Frame):
 
     def __setitem__(self, key, value):
         self.configure(**{key: value})
-    
+
     def setup_style(self, bg="#dddddd", activebg="#efefef", pressedbg="#c1c1c1",
                     fg="black", fieldbg="white", lightcolor="#ededed", darkcolor="##cfcdc8",
                     bordercolor="#888888", focusbordercolor="#5e5e5e", selectbg="#c1c1c1",
                     selectfg="black", unselectfg="#999999", disabledfg='#999999', disabledbg="#dddddd"):
         """
         Setups the style for the notebook.
-        :param bg: 
-        :param activebg: 
-        :param pressedbg: 
+        :param bg:
+        :param activebg:
+        :param pressedbg:
         :param fg:
         :param fieldbg:
         :param lightcolor:
@@ -365,10 +365,10 @@ class Notebook(ttk.Frame):
                 5kEJADs=
                 ''', master=self)
         )
-        
+
         for seq in self.bind_class('TButton'):
             self.bind_class('Notebook.Tab.Close', seq, self.bind_class('TButton', seq), True)
-        
+
         style_config = {'bordercolor': theme['bordercolor'],
                         'background': theme['bg'],
                         'foreground': theme['fg'],
@@ -377,7 +377,7 @@ class Notebook(ttk.Frame):
                         'lightcolor': theme['lightcolor'],
                         'darkcolor': theme['darkcolor'],
                         'troughcolor': theme['pressedbg']}
-        
+
         style = ttk.Style(self)
         style.element_create('close', 'image', "img_close",
                              ("active", "pressed", "!disabled", "img_closepressed"),
@@ -539,6 +539,7 @@ class Notebook(ttk.Frame):
                 if not end_pos_in_widget:
                     self.move_to_toplevel(self._dragged_tab)
             self._dragged_tab = None
+            print(self._visible_tabs)
 
     def _menu_insert(self, tab, text):
         menu = []
@@ -639,7 +640,7 @@ class Notebook(ttk.Frame):
     def configure(self, cnf=None, **kw):
         """
         Configures this Notebook widget.
-        
+
         :param closebutton: If a close button should show on the tabs
         :type closebutton: bool
         :param closecommand: A callable to call when the tab is closed, takes one argument, the tab_id
