@@ -6,6 +6,7 @@ Copyright (C) 2018 RedFantom
 # Basic UI imports
 import tkinter as tk
 from tkinter import ttk
+from ttkwidgets.utilities import get_widget_options
 
 
 class VNotebook(ttk.Frame):
@@ -48,8 +49,6 @@ class VNotebook(ttk.Frame):
         :type padding: int
         :param compound: Location of the Buttons
         :type compound: str
-        :param callback: Callback called upon change of Frame
-        :type callback: callable
         :param kwargs: Passed on to :class:`ttk.Frame` initializer
         """
         # Argument processing
@@ -149,6 +148,7 @@ class VNotebook(ttk.Frame):
     def add(self, child, **kwargs):
         """
         Create new tab in the notebook and append it to the end.
+        If the child is already managed by the VNotebook widget, then update the child with its settings.
 
         :param child: Child widget, such as a :class:`ttk.Frame`
         :param kwargs: Keyword arguments to create tab with.
@@ -162,15 +162,25 @@ class VNotebook(ttk.Frame):
         :rtype: int
         """
         tab_id = kwargs.pop("id", hash(child))
-        self._tab_buttons[tab_id] = ttk.Radiobutton(
-            self._buttons_frame, variable=self._variable, value=tab_id)
-        self._tab_frames[tab_id] = child
-        # Process where argument
-        where = kwargs.pop("index", tk.END)
-        if where == tk.END:
-            self._tab_ids.append(tab_id)
+        updating = child in self._tab_frames.values()
+        if not updating:
+            self._tab_buttons[tab_id] = ttk.Radiobutton(
+                self._buttons_frame, variable=self._variable, value=tab_id)
+            self._tab_frames[tab_id] = child
         else:
+            self._tab_frames[tab_id].config(**get_widget_options(child))
+
+        # Process where argument
+        where = kwargs.get("index", tk.END)
+        if updating and 'index' in kwargs:
+            self._tab_ids.pop(where)
             self._tab_ids.insert(where, tab_id)
+        else:
+            if where == tk.END:
+                self._tab_ids.append(tab_id)
+            else:
+                self._tab_ids.insert(where, tab_id)
+        kwargs.pop('index', None)
         self.tab(tab_id, **kwargs)
         return tab_id
 
@@ -261,7 +271,7 @@ class VNotebook(ttk.Frame):
         for option in self.options:
             attr = "_{}".format(option)
             setattr(self, attr, kwargs.pop(option, getattr(self, attr)))
-        return ttk.Frame.configure(**kwargs)
+        return super().configure(**kwargs)
 
     def cget(self, key):
         """Return current value for a setting."""
