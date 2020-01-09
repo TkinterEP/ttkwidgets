@@ -767,9 +767,10 @@ class Notebook(ttk.Frame):
             return tab_id
         else:
             try:
-                return self._indexes[str(tab_id)]
-            except KeyError:
-                raise ValueError('No such tab in the Notebook: %s' % tab_id)
+                return self._visible_tabs[self._indexes[str(tab_id)]]
+            except KeyError as e:
+                e.message = "No such tab in the Notebook: {}".format(tab_id)
+                raise
 
     def select_next(self, rotate=False):
         """Go to next tab."""
