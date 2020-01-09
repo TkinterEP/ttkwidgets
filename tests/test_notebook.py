@@ -56,15 +56,17 @@ class TestNotebook(BaseWidgetTest):
 
     def test_notebook_index(self):
         nb = Notebook(self.window)
-        for i in range(10):
+        ids = list()
+        n = 10
+        for i in range(n):
             frame = ttk.Frame(self.window, width=200, height=200)
-            nb.add(frame, text="Frame" + str(i))
+            ids.append(nb.add(frame, text="Frame" + str(i)))
 
         with self.assertRaises(ValueError):
             nb.index(str(self.window) + '.!frame11')
 
-        self.assertEqual(nb.index(str(self.window) + '.!frame'), 0)
-        self.assertEqual(nb.index(tk.END), 10)
+        self.assertTrue(all(ids.index(id) == nb.index(id) for id in ids))
+        self.assertEqual(nb.index(tk.END), n)
         nb.current_tab = 0
         self.assertEqual(nb.index(tk.CURRENT), 0)
 
@@ -72,11 +74,19 @@ class TestNotebook(BaseWidgetTest):
 
     def test_notebook_forget_tab(self):
         nb = Notebook(self.window)
-        for i in range(3):
+        ids = list()
+        n = 3
+        for i in range(n):
             frame = ttk.Frame(self.window, width=200, height=200)
-            nb.add(frame, text="Frame" + str(i))
+            id = nb.add(frame, text="Frame" + str(i))
+            ids.append(id)
 
-        nb.forget(str(self.window) + '.!frame')
+        tabs = nb.tabs()
+        self.assertIn(id, tabs)
+        nb.forget(id)  # Test forgetting of the last created tab
+        tabs = nb.tabs()
+        self.assertEquals(len(tabs), n-1)
+        self.assertNotIn(id, tabs)
 
     def test_notebook_config_tab(self):
         nb = Notebook(self.window)
