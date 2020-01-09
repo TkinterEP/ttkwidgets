@@ -751,6 +751,7 @@ class Notebook(ttk.Frame):
             self._tab_labels[ind].grid_configure(column=i)
         self.update_idletasks()
         self._on_configure()
+        return index
 
     def enable_traversal(self):
         self.bind('<Control-Tab>', lambda e: self.select_next(True))
