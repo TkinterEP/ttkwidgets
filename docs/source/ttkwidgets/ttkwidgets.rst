@@ -17,9 +17,9 @@ ttkwidgets
     DebugWindow
     ItemsCanvas
     LinkLabel
+    Notebook
     ScaleEntry
     ScrolledListbox
     Table
     TickScale
     TimeLine
-    
