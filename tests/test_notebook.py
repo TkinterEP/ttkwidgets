@@ -45,13 +45,17 @@ class TestNotebook(BaseWidgetTest):
 
     def test_notebook_insert(self):
         nb = Notebook(self.window, drag_to_toplevel=False)
-        for i in range(3):
+        ids = list()
+        n = 3
+        for i in range(n):
             frame = ttk.Frame(self.window, width=200, height=200)
-            nb.add(frame, text="Frame" + str(i))
-        nb.insert(str(self.window) + '.!frame2',
-                  ttk.Frame(self.window, width=200, height=200),
-                  text="Added")
-
+            ids.append(nb.add(frame, text="Frame" + str(i)))
+            print(ids)
+        id = nb.insert(n-2, ttk.Frame(self.window, width=200, height=200), text="Added")
+        tabs = nb.tabs()
+        self.assertIn(id, tabs)
+        self.assertEquals(tabs.index(id), n-2)
+        self.assertEquals(nb.index(id), n-2)
         self.assertEqual(nb._visible_tabs, [0, 3, 1, 2])
 
     def test_notebook_index(self):

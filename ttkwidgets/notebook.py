@@ -765,7 +765,7 @@ class Notebook(ttk.Frame):
             return self.current_tab
         elif tab_id in self._tabs:
             return tab_id
-        else:
+        else:  # tab_id is str or tk.Widget
             try:
                 return self._visible_tabs[self._indexes[str(tab_id)]]
             except KeyError as e:
