@@ -743,7 +743,7 @@ class Notebook(ttk.Frame):
         if where == 'end':
             if not existing:
                 return
-        where = self.index(where)
+        where = self._index(where)
         self._visible_tabs.remove(index)
         self._visible_tabs.insert(where, index)
         for i in range(where, len(self._visible_tabs)):
@@ -757,20 +757,31 @@ class Notebook(ttk.Frame):
         self.bind('<Control-Tab>', lambda e: self.select_next(True))
         self.bind('<Shift-Control-ISO_Left_Tab>', lambda e: self.select_prev(True))
 
-    def index(self, tab_id):
-        """Return the tab index of TAB_ID."""
-        if tab_id == tk.END:
-            return len(self._tabs)
-        elif tab_id == tk.CURRENT:
-            return self.current_tab
+    def _index(self, tab_id):
+        if tab_id == tk.CURRENT:
+            return self.index(self.current_tab)
         elif tab_id in self._tabs:
-            return tab_id
+            return self._index(self._tabs[tab_id])
         else:  # tab_id is str or tk.Widget
             try:
-                return self._visible_tabs[self._indexes[str(tab_id)]]
+                return self._indexes[str(tab_id)]
             except KeyError as e:
                 e.message = "No such tab in the Notebook: {}".format(tab_id)
                 raise
+
+    def index(self, tab):
+        """
+        Return the index of the tab as visible to the user
+
+        :param tab: The tab that the index is returned of
+        :type tab: ``tk.Widget``, ``str``, a valid TAB_ID
+        :return:
+        """
+        if tab == tk.END:
+            return len(self._visible_tabs) - 1
+
+        index = self._index(tab)
+        return self._visible_tabs.index(index)
 
     def select_next(self, rotate=False):
         """Go to next tab."""
@@ -796,7 +807,7 @@ class Notebook(ttk.Frame):
         """Make label of tab TAB_ID visible."""
         if tab_id < 0:
             return
-        tab = self.index(tab_id)
+        tab = self._index(tab_id)
         w = self._tab_frame.winfo_reqwidth()
         label = self._tab_labels[tab]
         x1 = label.winfo_x() / w
@@ -820,7 +831,7 @@ class Notebook(ttk.Frame):
 
     def hide(self, tab_id):
         """Hide tab TAB_ID."""
-        tab = self.index(tab_id)
+        tab = self._index(tab_id)
         if tab in self._visible_tabs:
             self._visible_tabs.remove(tab)
             if tab in self._active_tabs:
@@ -839,7 +850,7 @@ class Notebook(ttk.Frame):
 
     def forget(self, tab_id):
         """Remove tab TAB_ID from notebook."""
-        tab = self.index(tab_id)
+        tab = self._index(tab_id)
         if tab in self._hidden_tabs:
             self._hidden_tabs.remove(tab)
         elif tab in self._visible_tabs:
@@ -878,7 +889,7 @@ class Notebook(ttk.Frame):
         """Select tab TAB_ID. If TAB_ID is None, return currently selected tab."""
         if tab_id is None:
             return self.current_tab
-        self._show(self.index(tab_id))
+        self._show(self._index(tab_id))
 
     def tab(self, tab_id, option=None, **kw):
         """
@@ -887,7 +898,7 @@ class Notebook(ttk.Frame):
         The widget corresponding to tab_id can be obtained by passing the option
         'widget' but cannot be modified.
         """
-        tab = self.index(tab_id)
+        tab = self._index(tab_id)
         if option == 'widget':
             return self._tabs[tab]
         elif option:

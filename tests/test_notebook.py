@@ -74,7 +74,7 @@ class TestNotebook(BaseWidgetTest):
         self.assertTrue(all(ids.index(id) == nb.index(id) for id in ids))
         self.assertTrue(all(nb.index(id) == nb.index(frame) for id, frame in zip(ids, frames)))
 
-        self.assertEqual(nb.index(tk.END), n)
+        self.assertEqual(nb.index(tk.END), n-1)
         nb.current_tab = 0
         self.assertEqual(nb.index(tk.CURRENT), 0)
 
