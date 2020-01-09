@@ -57,15 +57,19 @@ class TestNotebook(BaseWidgetTest):
     def test_notebook_index(self):
         nb = Notebook(self.window)
         ids = list()
+        frames = list()
         n = 10
         for i in range(n):
             frame = ttk.Frame(self.window, width=200, height=200)
+            frames.append(frame)
             ids.append(nb.add(frame, text="Frame" + str(i)))
 
         with self.assertRaises(ValueError):
             nb.index(str(self.window) + '.!frame11')
 
         self.assertTrue(all(ids.index(id) == nb.index(id) for id in ids))
+        self.assertTrue(all(nb.index(id) == nb.index(frame) for id, frame in zip(ids, frames)))
+        
         self.assertEqual(nb.index(tk.END), n)
         nb.current_tab = 0
         self.assertEqual(nb.index(tk.CURRENT), 0)
