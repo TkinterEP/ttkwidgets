@@ -48,15 +48,15 @@ class TestHooks(TestCase):
         return updated and len(self.expected) == 0
 
     def test_basic_hook(self):
-        self.expected = {"tooltip": "Hello World"}
-        options = {"tooltip": "Default Value"}
+        self.expected = {"random_kwarg": "Hello World"}
+        options = {"random_kwarg": "Default Value"}
         hook_ttk_widgets(self.basic_updater, options)
-        button = ttk.Button(tooltip="Hello World")
+        button = ttk.Button(random_kwarg="Hello World")
         self.assertTrue(self.has_been_updated())
 
         self.assertTrue(is_hooked(options))
         self.assertTrue(hasattr(ttk.Button, generate_hook_name(options)))
-        self.assertTrue("tooltip" in button.keys())
+        self.assertTrue("random_kwarg" in button.keys())
 
     def test_user_hook_and_defaults(self):
         self.expected = {"not_user": "Hello World"}
