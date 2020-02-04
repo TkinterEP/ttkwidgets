@@ -22,6 +22,15 @@ class CheckboxTreeview(ttk.Treeview):
     """
     :class:`ttk.Treeview` widget with checkboxes left of each item.
 
+    The states of the items are managed with tags:
+
+        - 'checked', 'unchecked', 'tristate' for the checkbox state
+        - 'disabled' to prevent the user from changing the checkbox state
+          by clicking on the item
+
+    When an item state is changed by the user, this change propagates to the
+    item's ancestors and descendants.
+
     .. note::
         The checkboxes are done via the image attribute of the item,
         so to keep the checkbox, you cannot add an image to the item.
@@ -49,6 +58,7 @@ class CheckboxTreeview(ttk.Treeview):
         self.tag_configure("unchecked", image=self.im_unchecked)
         self.tag_configure("tristate", image=self.im_tristate)
         self.tag_configure("checked", image=self.im_checked)
+        self.tag_configure("disabled", foreground='grey')
         # check / uncheck boxes on click
         self.bind("<Button-1>", self._box_click, True)
 
@@ -204,6 +214,8 @@ class CheckboxTreeview(ttk.Treeview):
         :param item: item identifier
         :type item: str
         """
+        if self.tag_has('disabled', item):
+            return
         self._check_ancestor(item)
         self._check_descendant(item)
 
@@ -214,6 +226,8 @@ class CheckboxTreeview(ttk.Treeview):
         :param item: item identifier
         :type item: str
         """
+        if self.tag_has('disabled', item):
+            return
         self._uncheck_descendant(item)
         self._uncheck_ancestor(item)
 
@@ -282,6 +296,8 @@ class CheckboxTreeview(ttk.Treeview):
         if "image" in elem:
             # a box was clicked
             item = self.identify_row(y)
+            if self.tag_has('disabled', item):
+                return
             if self.tag_has("unchecked", item) or self.tag_has("tristate", item):
                 self._check_ancestor(item)
                 self._check_descendant(item)
