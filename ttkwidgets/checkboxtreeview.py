@@ -167,12 +167,17 @@ class CheckboxTreeview(ttk.Treeview):
         else:
             tag = 'unchecked'
         if "tags" not in kw:
-            kw["tags"] = (tag,)
-        elif not ("unchecked" in kw["tags"] or "checked" in kw["tags"] or
-                  "tristate" in kw["tags"]):
-            kw["tags"] += (tag,)
+            tags = (tag,)
+        else:
+            tags = kw.pop("tags")
+            if isinstance(tags, str):
+                tags = [tags]
+            else:
+                tags = list(tags)
+            if not ("unchecked" in tags or "checked" in tags or "tristate" in tags):
+                tags.append(tag)
 
-        return ttk.Treeview.insert(self, parent, index, iid, **kw)
+        return ttk.Treeview.insert(self, parent, index, iid, tags=tags, **kw)
 
     def get_checked(self):
         """Return the list of checked items that do not have any child."""
