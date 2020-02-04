@@ -26,7 +26,7 @@ except ImportError:
 
 def is_hooked(options):
     # type: (dict) -> bool
-    """Return whether a class is hooked for any of the given options"""
+    """Return whether ``ttk.Widget`` is hooked for any of the given options"""
     for hookname in [hook for hook in dir(ttk.Widget) if hook.startswith("WidgetHook_")]:
         hookoptions = getattr(ttk.Widget, hookname).defaults
         if any(option in hookoptions for option in options):
@@ -61,7 +61,7 @@ def hook_ttk_widgets(updater, options):
     :param updater: Function to call when an option in the given options
         is changed. The function should support updating for all the
         options given in the hook.
-    :type updater: (widget: t(t)k.Widget, option: str, value: Any) -> None
+    :type updater: (widget: ttk.Widget, option: str, value: Any) -> None
     :param options: A dictionary of options where the keys are the
         keyword argument names and the values are their respective
         default values. A default value must be specified for every
@@ -151,6 +151,7 @@ def hook_ttk_widgets(updater, options):
     ttk.Widget.configure = configure
     ttk.Widget.config = configure
     ttk.Widget.cget = cget
+    ttk.Widget.__getitem__ = cget
     ttk.Widget.keys = keys
 
     return name
