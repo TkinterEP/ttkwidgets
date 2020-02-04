@@ -16,8 +16,13 @@ class TestCheckboxTreeview(BaseWidgetTest):
     def test_checkboxtreeview_events(self):
         tree = CheckboxTreeview(self.window)
         tree.pack()
+        tree.insert("", "end", "1", text="1")
+        tree.insert("1", "end", "11", text="11")
+        tree.insert("11", "end", "111", text="111")
+        tree.insert("11", "end", "112", text="112")
         self.window.update()
-        tree.event_generate("<1>", x=10, y=10)
+        for x, y in [(0, 0), (5, 20), (20, 20), (20, 30), (35, 30)]:
+            tree.event_generate("<1>", x=x, y=y)
         self.window.update()
 
     def test_checkboxtreeview_methods(self):
@@ -29,16 +34,19 @@ class TestCheckboxTreeview(BaseWidgetTest):
         tree.insert("11", "end", "111", text="111")
         tree.insert("11", "end", "112", text="112")
         self.window.update()
+        # state
         tree.state()
         self.window.update()
         tree.state(['disabled'])
         self.window.update()
         tree.state(['!disabled'])
         self.window.update()
+        # expand / collapse
         tree.collapse_all()
         self.window.update()
         tree.expand_all()
         self.window.update()
+        # tag add / del, change_state
         tree.tag_add("1", "item")
         self.assertTrue(tree.tag_has("item", "1"))
         self.window.update()
@@ -51,6 +59,7 @@ class TestCheckboxTreeview(BaseWidgetTest):
         tree.tag_del("1", "item")
         self.assertFalse(tree.tag_has("item", "1"))
         self.window.update()
+        # _(un)check_descendant/ancestor _tristate_parent
         tree._check_descendant("1")
         self.assertTrue(tree.tag_has("checked", "11"))
         self.assertTrue(tree.tag_has("checked", "111"))
@@ -80,4 +89,34 @@ class TestCheckboxTreeview(BaseWidgetTest):
         tree.change_state("1", "checked")
         tree._check_descendant("1")
         self.assertEqual(tree.get_checked(), ["111", "112"])
+        # item_(un)check
+        tree.item_uncheck('')
+        self.assertEqual(tree.get_checked(), [])
+        tree.item_check('112')
+        self.assertTrue(tree.tag_has("unchecked", "111"))
+        self.assertTrue(tree.tag_has("checked", "112"))
+        self.assertTrue(tree.tag_has("tristate", "11"))
+        self.assertTrue(tree.tag_has("tristate", "1"))
+        # insert with tags
+        tree.insert("112", "end", "1121", text="1121", tags='item')
+        tree.insert("112", "end", "1122", text="1122", tags=('unchecked',))
+        tree.insert("11", "end", "113", text="113")
+        tree.insert("", "end", "2", text="2", tags=('test',))
+        self.assertTrue(tree.tag_has("checked", "1121"))
+        self.assertTrue(tree.tag_has("unchecked", "1122"))
+        self.assertTrue(tree.tag_has("unchecked", "113"))
+        # disabled
+        tree.item_uncheck('')
+        self.assertTrue(tree.tag_has("unchecked", "11"))
+        self.window.update()
+        bbox = tree.bbox('11', '#0')
+        tree.tag_add("11", "disabled")
+        tree.item_check('11')
+        self.assertTrue(tree.tag_has("unchecked", "11"))
+        self.assertTrue(tree.tag_has("unchecked", "111"))
+        tree.event_generate('<1>', x=bbox[0] + 20, y=bbox[1] + 10)
+        self.assertTrue(tree.tag_has("unchecked", "11"))
+        tree.tag_del("11", "disabled")
+        tree.event_generate('<1>', x=bbox[0] + 20, y=bbox[1] + 10)
+        self.assertTrue(tree.tag_has("checked", "11"))
         self.window.update()
