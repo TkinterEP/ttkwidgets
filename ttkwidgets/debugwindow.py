@@ -14,11 +14,11 @@ class DebugWindow(tk.Toplevel):
     """
     A Toplevel that shows sys.stdout and sys.stderr for Tkinter applications
     """
-    def __init__(self, master=None, title="Debug window", stdout=True, 
+    def __init__(self, master=None, title="Debug window", stdout=True,
                  stderr=False, width=70, autohidescrollbar=True, **kwargs):
         """
         Create a Debug window.
-        
+
         :param master: master widget
         :type master: widget
         :param stdout: whether to redirect stdout to the widget
@@ -61,7 +61,7 @@ class DebugWindow(tk.Toplevel):
     def save(self):
         """Save widget content."""
         file_name = fd.asksaveasfilename()
-        if file_name is "" or file_name is None:
+        if file_name == "" or file_name is None:
             return
         with open(file_name, "w") as f:
             f.write(self.text.get("1.0", tk.END))
@@ -73,7 +73,7 @@ class DebugWindow(tk.Toplevel):
     def write(self, line):
         """
         Write line at the end of the widget.
-        
+
         :param line: text to insert in the widget
         :type line: str
         """

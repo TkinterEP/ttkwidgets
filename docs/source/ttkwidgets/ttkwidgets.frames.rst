@@ -14,3 +14,4 @@ ttkwidgets.frames
     Balloon
     ScrolledFrame
     ToggledFrame
+    VNotebook
