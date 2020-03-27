@@ -7,15 +7,31 @@ from ttkwidgets.font import FontSelectFrame
 import tkinter as tk
 from tkinter import ttk
 
-def update_preview(font_tuple):
-    print(font_tuple)
-    font = font_selection.font[0]
-    if font is not None:
-        label.configure(font=font)
 
-window = tk.Tk()
-label = ttk.Label(window, text='Sample text rendered in the chosen font.')
-label.pack(padx=10, pady=10)
-font_selection = FontSelectFrame(window, callback=update_preview)
-font_selection.pack()
-window.mainloop()
+class Example():
+    def __init__(self, root, is_top_level=False):
+        if is_top_level:
+            self.main = tk.Toplevel(root)
+            self.main.transient(root)
+            self.main.grab_set()
+        else:
+            self.main = root
+
+        self.label = ttk.Label(
+                self.main, text='Sample text rendered in the chosen font.')
+        self.label.pack(padx=10, pady=10)
+        self.font_selection = FontSelectFrame(
+                self.main, callback=self.update_preview)
+        self.font_selection.pack()
+
+    def update_preview(self, font_tuple):
+        print(font_tuple)
+        font = self.font_selection.font[0]
+        if font is not None:
+            self.label.configure(font=font)
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    Example(root)
+    root.mainloop()

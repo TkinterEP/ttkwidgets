@@ -6,8 +6,24 @@
 from ttkwidgets.autocomplete import AutocompleteCombobox
 import tkinter as tk
 
-window = tk.Tk()
-tk.Label(window, text="Combobox with autocompletion for the Tk instance's methods:").pack(side='left')
-entry = AutocompleteCombobox(window, width=20, completevalues=dir(window))
-entry.pack(side='right')
-window.mainloop()
+
+class Example():
+    def __init__(self, root, is_top_level=False):
+        if is_top_level:
+            self.main = tk.Toplevel(root)
+            self.main.transient(root)
+            self.main.grab_set()
+        else:
+            self.main = root
+
+        tk.Label(self.main,
+            text="Combobox with autocompletion for the Tk instance's methods:").pack(side='left')
+        entry = AutocompleteCombobox(
+            self.main, width=20, completevalues=dir(self.main))
+        entry.pack(side='right')
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    Example(root)
+    root.mainloop()

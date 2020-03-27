@@ -7,14 +7,28 @@ from ttkwidgets.font import askfont
 import tkinter as tk
 from tkinter import ttk
 
-def font():
-    res = askfont()
-    if res[0] is not None:
-        label.configure(font=res[0])
-    print(res)
 
-window = tk.Tk()
-label = ttk.Label(window, text='Sample text rendered in the chosen font.')
-label.pack(padx=10, pady=10)
-ttk.Button(window, text="Pick a font", command=font).pack()
-window.mainloop()
+class Example():
+    def __init__(self, root, is_top_level=False):
+        if is_top_level:
+            self.main = tk.Toplevel(root)
+            self.main.transient(root)
+            self.main.grab_set()
+        else:
+            self.main = root
+
+        self.label = ttk.Label(self.main, text='Sample text rendered in the chosen font.')
+        self.label.pack(padx=10, pady=10)
+        ttk.Button(self.main, text="Pick a font", command=self.font).pack()
+
+    def font(self):
+        res = askfont()
+        if res[0] is not None:
+            self.label.configure(font=res[0])
+        print(res)
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    Example(root)
+    root.mainloop()

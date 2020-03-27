@@ -6,16 +6,31 @@
 from ttkwidgets import AutoHideScrollbar
 import tkinter as tk
 
-window = tk.Tk()
-listbox = tk.Listbox(window, height=5)
-scrollbar = AutoHideScrollbar(window, command=listbox.yview)
-listbox.configure(yscrollcommand=scrollbar.set)
 
-for i in range(10):
-    listbox.insert('end', 'item %i' % i)
+class Example():
+    def __init__(self, root, is_top_level=False):
+        if is_top_level:
+            self.main = tk.Toplevel(root)
+            self.main.transient(root)
+            self.main.grab_set()
+        else:
+            self.main = root
 
-tk.Label(window, text="Increase the window's height\nto make the scrollbar vanish.").pack(side='top', padx=4, pady=4)
-scrollbar.pack(side='right', fill='y')
-listbox.pack(side='left', fill='both', expand=True)
+        listbox = tk.Listbox(self.main, height=5)
+        scrollbar = AutoHideScrollbar(self.main, command=listbox.yview)
+        listbox.configure(yscrollcommand=scrollbar.set)
 
-window.mainloop()
+        for i in range(10):
+            listbox.insert('end', 'item %i' % i)
+
+        tk.Label(self.main,
+            text="Increase the window's height\nto make the scrollbar vanish.").pack(side='top',
+            padx=4, pady=4)
+        scrollbar.pack(side='right', fill='y')
+        listbox.pack(side='left', fill='both', expand=True)
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    Example(root)
+    root.mainloop()
