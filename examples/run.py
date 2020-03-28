@@ -46,7 +46,7 @@ def _get_samples():
 def _add_samples(window):
     samples = _get_samples()
     total_samples = len(samples)
-    max_col_count = 6
+    max_col_count = 5
     row = -1
     col = -1
     row_checked = False
