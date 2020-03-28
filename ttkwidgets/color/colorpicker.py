@@ -80,7 +80,9 @@ class ColorPicker(tk.Toplevel):
         tk.Toplevel.__init__(self, parent)
 
         self.title(title)
+
         self.transient(self.master)
+
         self.resizable(False, False)
         self.rowconfigure(1, weight=1)
 

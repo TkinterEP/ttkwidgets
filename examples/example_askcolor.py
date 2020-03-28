@@ -33,6 +33,7 @@ class Example():
         if res[1] is not None:
             im = ImageTk.PhotoImage(Image.new('RGBA', (100, 100), res[1]), master=self.main)
             self.canvas.create_image(60, 60, image=im, tags='image', anchor='center')
+        self.main.grab_set()
         print(res)
 
 
