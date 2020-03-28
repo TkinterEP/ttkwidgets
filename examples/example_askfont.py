@@ -22,9 +22,10 @@ class Example():
         ttk.Button(self.main, text="Pick a font", command=self.font).pack()
 
     def font(self):
-        res = askfont()
+        res = askfont(self.main)
         if res[0] is not None:
             self.label.configure(font=res[0])
+        self.main.grab_set()
         print(res)
 
 

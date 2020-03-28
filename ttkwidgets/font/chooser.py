@@ -27,6 +27,7 @@ class FontChooser(tk.Toplevel):
         :param kwargs: keyword arguments passed to :class:`tk.Toplevel` initializer
         """
         tk.Toplevel.__init__(self, master, **kwargs)
+        self.transient(self.master)
         self.wm_title("Choose a font")
         self.resizable(False, False)
         self.style = ttk.Style()
@@ -52,6 +53,8 @@ class FontChooser(tk.Toplevel):
         self._ok_button = ttk.Button(self, text="OK", command=self._close)
         self._cancel_button = ttk.Button(self, text="Cancel", command=self._cancel)
         self._grid_widgets()
+
+        self.grab_set()
 
     def _grid_widgets(self):
         """Puts all the child widgets in the correct position."""
@@ -146,12 +149,12 @@ class FontChooser(tk.Toplevel):
         self.destroy()
 
 
-def askfont():
+def askfont(parent):
     """
     Opens a :class:`FontChooser` toplevel to allow the user to select a font
     
     :return: font tuple (family_name, size, \*options), :class:`~font.Font` object
     """
-    chooser = FontChooser()
-    chooser.wait_window()
+    chooser = FontChooser(parent)
+    chooser.wait_window(chooser)
     return chooser.font
