@@ -20,8 +20,10 @@ class Example():
         self.main.columnconfigure(0, weight=1)
         self.main.rowconfigure(0, weight=1)
 
-        style = ttk.Style(self.main)
-        style.theme_use('alt')
+        self.style = ttk.Style(self.main)
+        self.preserve_style = self.style.theme_use()
+        self.style.theme_use('alt')
+
         self.sortable = tk.BooleanVar(self.main, False)
         self.drag_row = tk.BooleanVar(self.main, False)
         self.drag_col = tk.BooleanVar(self.main, False)
@@ -65,6 +67,8 @@ class Example():
         frame.grid()
         self.main.geometry('400x200')
 
+        self.main.protocol("WM_DELETE_WINDOW", self.exit)
+
     # toggle table properties
     def toggle_sort(self):
         self.table.config(sortable=self.sortable.get())
@@ -74,6 +78,10 @@ class Example():
 
     def toggle_drag_row(self):
         self.table.config(drag_rows=self.drag_row.get())
+
+    def exit(self, event=None):
+        self.style.theme_use(self.preserve_style)
+        self.main.destroy()
 
 
 if __name__ == '__main__':

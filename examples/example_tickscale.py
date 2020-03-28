@@ -17,11 +17,12 @@ class Example():
         else:
             self.main = root
 
-        style = ttk.Style(self.main)
-        style.theme_use('clam')
-        style.configure('my.Vertical.TScale', sliderlength=50,
+        self.style = ttk.Style(self.main)
+        self.preserve_style = self.style.theme_use()
+        self.style.theme_use('clam')
+        self.style.configure('my.Vertical.TScale', sliderlength=50,
                 background='white', foreground='red')
-        style.configure('my.Horizontal.TScale', sliderlength=10,
+        self.style.configure('my.Horizontal.TScale', sliderlength=10,
                 font='TkDefaultFont 20 italic')
         s1 = TickScale(self.main, orient='vertical', style='my.Vertical.TScale',
                 tickinterval=0.2, from_=-1, to=1, showvalue=True, digits=2,
@@ -35,6 +36,12 @@ class Example():
         s1.pack(fill='y')
         s2.pack(fill='x')
         s3.pack(fill='x')
+
+        self.main.protocol("WM_DELETE_WINDOW", self.exit)
+
+    def exit(self, event=None):
+        self.style.theme_use(self.preserve_style)
+        self.main.destroy()
 
 
 if __name__ == '__main__':
