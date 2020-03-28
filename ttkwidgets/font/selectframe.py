@@ -78,7 +78,9 @@ class FontSelectFrame(ttk.Frame):
     def _on_change(self):
         """Call callback if any property is changed."""
         if callable(self.__callback):
-            self.__callback((self._family, self._size, self._bold, self._italic, self._underline, self._overstrike))
+            self.__callback((self._family, self._size,
+                self._bold, self._italic, self._underline,
+                self._overstrike))
 
     def __generate_font_tuple(self):
         """
