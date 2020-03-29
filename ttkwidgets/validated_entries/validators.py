@@ -40,7 +40,7 @@ class RegexValidator(Validator):
 
     def _validate(self, value):
         if not isinstance(value, str):
-            raise TypeError(f'{value} is not a string.')
+            raise TypeError('{} is not a string.'.format(value))
 
         if super()._validate(value):
             return True
@@ -49,7 +49,7 @@ class RegexValidator(Validator):
             return self.REGEX.search(value) is not None
         if isinstance(self.REGEX, str):
             return re.search(self.REGEX, value) is not None
-        raise TypeError(f'{self.regex} is not a pattern or a string')
+        raise TypeError('{} is not a pattern or a string'.format(self.regex))
 
 
 class IntValidator(Validator):
