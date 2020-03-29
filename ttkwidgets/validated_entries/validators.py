@@ -44,7 +44,8 @@ class RegexValidator(Validator):
 
         if super()._validate(value):
             return True
-        if isinstance(self.REGEX, re.Pattern):
+        #  isinstance(self.REGEX, re.Pattern) only works on 3.7+
+        if re.search(r'(Pattern|SRE_Pattern)', self.REGEX.__class__.__name__):
             return self.REGEX.search(value) is not None
         if isinstance(self.REGEX, str):
             return re.search(self.REGEX, value) is not None
@@ -73,7 +74,15 @@ class PercentValidator(Validator):
 
 
 class StringValidator(Validator):
+    """
+    A validator you have to instanciate with a string containing the
+    characters you want in.
+    """
     def __init__(self, string):
+        """
+        :param string: String of allowed characters
+        :type string: str
+        """
         self.string = string
 
     def _validate(self, value):
