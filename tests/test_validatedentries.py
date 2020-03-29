@@ -1,4 +1,4 @@
-# Copyright (c) RedFantom 2017
+# Copyright (c) Dogeek 2020
 # For license see LICENSE
 import ttkwidgets.validated_entries as v_entries
 from tests import BaseWidgetTest
