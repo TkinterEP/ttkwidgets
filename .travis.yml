@@ -14,7 +14,6 @@ install:
   - python -m pip install nose coverage codecov mock pynput
 script:
   - python -m pip install .
-  - python -m nose
+  - python -m nose --with-coverage --cover-xml
 after_success:
-  - coverage run nosetests
   - codecov
