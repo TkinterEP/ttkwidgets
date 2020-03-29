@@ -67,6 +67,20 @@ class TestScaleEntry(BaseWidgetTest):
         self.assertValidatedFalse(v_entries.PasswordEntry, 'ABC&1234')  # No lowercase
         self.assertValidatedFalse(v_entries.PasswordEntry, 'aBcd1234')  # No special
 
+    def test_validatedentry_no_validator(self):
+        entry = v_entries.ValidatedEntry()
+        validator = v_entries.Validator
+        vinstance = validator()
+
+        with self.assertRaises(TypeError):
+            entry._get_validator()
+
+        with self.assertRaises(TypeError):
+            entry._get_validator(123)
+            entry._get_validator('123')
+
+        self.assertIsInstance(entry._get_validator(validator), v_entries.Validator)
+        self.assertIs(entry._get_validator(vinstance), vinstance)
 
 if __name__ == '__main__':
     import unittest
