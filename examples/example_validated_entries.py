@@ -31,6 +31,7 @@ for i, entry_data in enumerate([(n, vars(v_entries)[n]) for n in dir(v_entries) 
     name, klass = entry_data
     label = ttk.Label(frame, text=name)
     entry = klass(frame)
+    entry.configure_validator()
     label.grid(row=i, column=0)
     entry.grid(row=i, column=1)
 window.mainloop()
