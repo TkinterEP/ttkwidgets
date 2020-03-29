@@ -82,6 +82,7 @@ class TestScaleEntry(BaseWidgetTest):
         self.assertIsInstance(entry._get_validator(validator), v_entries.Validator)
         self.assertIs(entry._get_validator(vinstance), vinstance)
 
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
