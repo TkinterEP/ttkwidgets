@@ -1,6 +1,15 @@
 # Copyright (c) 2020 Fredy Ramirez <https://formateli.com>
 # For license see LICENSE
 
+"""
+run.py
+Show all examples located in this example folder.
+Main window show a button for each example, and
+when pressed it displays it as a tk TopLevel window.
+Each example must implement the 'Example' class,
+so it can be called by the script.
+"""
+
 import sys, os
 import tkinter as tk
 from tkinter import ttk
