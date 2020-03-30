@@ -7,7 +7,7 @@ import tkinter as tk
 from ttkwidgets import TimeLine
 
 
-class Example():
+class Example:
     def __init__(self, root, is_top_level=False):
         if is_top_level:
             self.main = tk.Toplevel(root)

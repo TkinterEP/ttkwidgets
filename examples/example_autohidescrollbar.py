@@ -7,7 +7,7 @@ from ttkwidgets import AutoHideScrollbar
 import tkinter as tk
 
 
-class Example():
+class Example:
     def __init__(self, root, is_top_level=False):
         if is_top_level:
             self.main = tk.Toplevel(root)
