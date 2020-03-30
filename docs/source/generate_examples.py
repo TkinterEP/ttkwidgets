@@ -18,6 +18,15 @@ EXAMPLES_FILE = \
     "Examples\n" \
     "========\n" \
     "\n" \
+    "Examples can be run in one of two ways:\n" \
+    "    - Run each example file as a stand alone script.\n" \
+    "    - Run the *run.py* script, which open a window\n" \
+    "      with all reports at once represented each one by a button.\n" \
+    "\n" \
+    ".. note::\n" \
+    "    For developers: *Example* class must be implemented in example file\n" \
+    "    so it can be called by *run.py* script.\n" \
+    "\n" \
     "{}"
 
 TOCTREE_TEMPLATE = \
@@ -36,6 +45,8 @@ example_files = list()
 pkgs = {}
 
 for example in EXAMPLES:
+    if example == 'run.py':
+        continue
     path = os.path.join(FOLDER, example)
     with open(path) as fi:
         lines = fi.readlines()
