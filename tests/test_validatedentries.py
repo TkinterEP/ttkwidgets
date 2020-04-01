@@ -1,5 +1,7 @@
 # Copyright (c) Dogeek 2020
 # For license see LICENSE
+import string
+
 import ttkwidgets.validated_entries as v_entries
 from tests import BaseWidgetTest
 import tkinter as tk
@@ -84,6 +86,56 @@ class TestScaleEntry(BaseWidgetTest):
 
         self.assertIsInstance(entry._get_validator(validator), v_entries.Validator)
         self.assertIs(entry._get_validator(vinstance), vinstance)
+
+    def test_multi_validator(self):
+        with self.assertRaises(TypeError):
+            val = v_entries.AllValidator(v_entries.FloatValidator, int)
+
+        self.assertTrue(
+            v_entries.AllValidator(
+                v_entries.RegexValidator(r'.'),
+                v_entries.RegexValidator(r'\d'),
+                )._validate('1')
+        )
+        self.assertFalse(
+            v_entries.AllValidator(
+                v_entries.RegexValidator(r'[a-z]'),
+                v_entries.RegexValidator(r'\d'),
+                )._validate('1')
+        )
+
+        self.assertTrue(
+            v_entries.AnyValidator(
+                v_entries.RegexValidator(r'.'),
+                v_entries.RegexValidator(r'\d'),
+                )._validate('1')
+        )
+        self.assertTrue(
+            v_entries.AnyValidator(
+                v_entries.RegexValidator(r'[a-z]'),
+                v_entries.RegexValidator(r'\d'),
+                )._validate('1')
+        )
+
+    def test_regex_validator(self):
+        self.assertTrue(v_entries.RegexValidator(r'\d')._validate('1'))
+        self.assertTrue(v_entries.RegexValidator(r'[a-z]')._validate('a'))
+        self.assertFalse(v_entries.RegexValidator(r'[a-z]')._validate('1'))
+        self.assertFalse(v_entries.RegexValidator(r'\d')._validate('a'))
+
+    def test_number_validators(self):
+        self.assertTrue(v_entries.FloatValidator()._validate('1.0'))
+        self.assertTrue(v_entries.IntValidator()._validate('1'))
+        self.assertTrue(v_entries.PercentValidator()._validate('0.55'))
+        self.assertFalse(v_entries.PercentValidator()._validate('123'))
+
+    def test_string_validators(self):
+        self.assertTrue(v_entries.StringValidator(string.ascii_lowercase)._validate('abc'))
+        self.assertFalse(v_entries.StringValidator(string.ascii_lowercase)._validate('ABC'))
+        self.assertTrue(v_entries.StringValidator(string.ascii_uppercase)._validate('ABC'))
+        self.assertFalse(v_entries.StringValidator(string.ascii_uppercase)._validate('abc'))
+        self.assertTrue(v_entries.EmailValidator()._validate('firstname@example.com'))
+        self.assertTrue(v_entries.PasswordValidator()._validate('Abcd&1234'))
 
 
 if __name__ == '__main__':

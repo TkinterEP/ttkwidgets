@@ -118,6 +118,11 @@ class RegexValidator(Validator):
     """
     REGEX = None
 
+    def __init__(self, regex=None, **kwargs):
+        if regex is not None:
+            self.REGEX = regex
+        super().__init__(**kwargs)
+
     def _validate(self, value):
         if not isinstance(value, str):
             raise TypeError('{} is not a string.'.format(value))
