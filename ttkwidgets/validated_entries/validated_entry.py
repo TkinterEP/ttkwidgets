@@ -21,12 +21,6 @@ class ValidatedEntry(ttk.Entry):
     """
     VALIDATOR = None
 
-    def __init__(self, *args, **kwargs):
-        validator = self._get_validator()
-        config = validator.validate(self)
-        config.update(kwargs)
-        super().__init__(*args, **config)
-
     def _get_validator(self, validator=None):
         """
         Gets a validator instance from either the VALIDATOR class attribute
@@ -55,7 +49,9 @@ class ValidatedEntry(ttk.Entry):
         Configures the validator on this entry. See `ValidatedEntry._get_validator`
         for more info.
         """
+        existing_config = {k: self.config(k)[-1] for k in ('validate', 'validatecommand')}
 
         validator = self._get_validator(validator)
-
-        self.config(validator.validate(self))
+        new_config = validator.validate(self)
+        new_config.update(existing_config)
+        self.config(new_config)

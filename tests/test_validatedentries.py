@@ -7,7 +7,8 @@ import tkinter as tk
 
 class TestScaleEntry(BaseWidgetTest):
     def _test_entry_init(self, entry):
-        entry = entry(self.window)
+        entry = entry(self.window, validate='all')
+        entry.configure_validator()
         entry.pack()
         self.window.update()
 
@@ -25,10 +26,12 @@ class TestScaleEntry(BaseWidgetTest):
         validator = entry._get_validator()
         self.assertFalse(validator._validate(inserted))
 
-    def test_entries_init(self):
+    def test_validated_entries_init(self):
         entries = [e for e in dir(v_entries) if e.endswith('Entry')]
         for e in entries:
-            self._test_entry_init(vars(v_entries)[e])
+            entry = vars(v_entries)[e]
+            if isinstance(entry, v_entries.ValidatedEntry):
+                self._test_entry_init(entry)
 
     def test_intentry_validation(self):
         self.assertValidatedFalse(v_entries.IntEntry, 'abc123')
