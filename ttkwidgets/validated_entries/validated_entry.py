@@ -1,3 +1,11 @@
+"""
+Author: Dogeek
+License: GNU GPLv3
+Source: This repository
+
+ValidatedEntry widget using validators to check the input against specific patterns.
+"""
+
 import tkinter.ttk as ttk
 
 from .validators import Validator
@@ -12,6 +20,12 @@ class ValidatedEntry(ttk.Entry):
     The entry won't accept input that has not been validated.
     """
     VALIDATOR = None
+
+    def __init__(self, *args, **kwargs):
+        validator = self._get_validator()
+        config = validator.validate(self)
+        config.update(kwargs)
+        super().__init__(*args, **config)
 
     def _get_validator(self, validator=None):
         """

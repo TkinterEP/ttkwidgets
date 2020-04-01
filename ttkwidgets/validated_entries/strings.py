@@ -1,3 +1,12 @@
+"""
+Author: Dogeek
+License: GNU GPLv3
+Source: This repository
+
+ValidatedEntry widgets for string validation
+"""
+
+
 from string import ascii_lowercase, ascii_uppercase
 
 from .validated_entry import ValidatedEntry

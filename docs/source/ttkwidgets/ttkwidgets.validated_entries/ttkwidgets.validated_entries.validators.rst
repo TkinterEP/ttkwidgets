@@ -10,6 +10,27 @@ Validators
    .. automethod:: __init__
 
 
+.. autoclass:: MultiValidator
+   :show-inheritance:
+   :members:
+
+   .. automethod:: __init__
+
+
+.. autoclass:: AnyValidator
+   :show-inheritance:
+   :members:
+
+   .. automethod:: __init__
+
+
+.. autoclass:: AllValidator
+   :show-inheritance:
+   :members:
+
+   .. automethod:: __init__
+
+
 .. autoclass:: RegexValidator
    :show-inheritance:
    :members:
@@ -31,13 +52,11 @@ Validators
    .. automethod:: __init__
 
 
-
 .. autoclass:: PercentValidator
    :show-inheritance:
    :members:
 
    .. automethod:: __init__
-
 
 
 .. autoclass:: StringValidator
@@ -47,7 +66,6 @@ Validators
    .. automethod:: __init__
 
 
-
 .. autoclass:: CapitalizedStringValidator
    :show-inheritance:
    :members:
@@ -55,13 +73,11 @@ Validators
    .. automethod:: __init__
 
 
-
 .. autoclass:: EmailValidator
    :show-inheritance:
    :members:
 
    .. automethod:: __init__
-
 
 
 .. autoclass:: PasswordValidator

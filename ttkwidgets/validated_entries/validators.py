@@ -1,3 +1,11 @@
+"""
+Author: Dogeek
+License: GNU GPLv3
+Source: This repository
+
+Validators to validate entry input.
+"""
+
 import re
 import sys
 
@@ -21,12 +29,84 @@ class Validator:
     """
     VALIDATE_ON = 'all'
 
+    def __init__(self, validate_on=None):
+        if validate_on is not None:
+            self.VALIDATE_ON = validate_on
+        self.widget = None
+
     def validate(self, widget):
+        self.widget = widget
         validatecmd = (widget.register(self._validate), '%P')
         return {'validate': self.VALIDATE_ON, 'validatecommand': validatecmd}
 
     def _validate(self, value):
         return not value
+
+    @property
+    def is_valid(self):
+        if self.widget is not None:
+            return self._validate(self.widget.get())
+        raise ValueError('Widget is not attached to this validator')
+
+
+class MultiValidator:
+    """
+    Base class to handle multiple validators attachment.
+    """
+    def __init__(self, *validators, validate_on='all'):
+        """
+        :param *validators: Validator instances or classes to attach
+        :param validate_on: tkinter condition on which the validation will be done
+                            default : 'all', see `help(Validator)` for a list of
+                            possible values
+        """
+        if validate_on not in ('all', 'none', 'focusin', 'focusout', 'focus', 'key'):
+            raise ValueError(
+                "validate_on is not in ('all', 'none', "
+                "'focusin', 'focusout', 'focus', 'key')"
+            )
+        self.validators = []
+        for v in validators:
+            if isinstance(v, type):
+                v = v()
+            if isinstance(v, (MultiValidator, Validator)):
+                self.validators.append(v)
+            else:
+                raise TypeError("One of the provided validators is not a Validator or MultiValidator instance")
+        self.validate_on = validate_on
+        self.widget = None
+
+    def validate(self, widget):
+        self.widget = widget
+        validatecmd = (widget.register(self._validate), '%P')
+        return {'validate': self.validate_on, 'validatecommand': validatecmd}
+
+    def _validate(self, value):
+        raise NotImplementedError()
+
+    @property
+    def is_valid(self):
+        if self.widget is not None:
+            return self._validate(self.widget.get())
+        raise ValueError('Widget is not attached to this validator')
+
+
+class AnyValidator(MultiValidator):
+    """
+    Validates any attached validators. The input will be deemed valid if and only if
+    one of the attached validators deem the value valid.
+    """
+    def _validate(self, value):
+        return any(validator._validate(value) for validator in self.validators)
+
+
+class AllValidator(MultiValidator):
+    """
+    Validates all attached validators. The input will be deemed valid if and only if
+    all attached validators deem the value valid.
+    """
+    def _validate(self, value):
+        return all(validator._validate(value) for validator in self.validators)
 
 
 class RegexValidator(Validator):

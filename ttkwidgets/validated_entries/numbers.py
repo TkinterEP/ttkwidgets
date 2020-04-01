@@ -1,3 +1,12 @@
+"""
+Author: Dogeek
+License: GNU GPLv3
+Source: This repository
+
+ValidatedEntry widgets for number validation.
+"""
+
+
 from .validated_entry import ValidatedEntry
 from .validators import PercentValidator, IntValidator, FloatValidator
 

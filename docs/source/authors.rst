@@ -15,6 +15,7 @@ List of all the authors of widgets in this repository. Please note that this lis
   * :class:`~ttkwidgets.ItemsCanvas`
   * :class:`~ttkwidgets.TimeLine`
 
+
 - The Python Team
 
   * :class:`~ttkwidgets.Calendar`, found `here <http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py>`_
@@ -37,6 +38,7 @@ List of all the authors of widgets in this repository. Please note that this lis
   * :class:`~ttkwidgets.autocomplete.AutocompleteEntryListbox`
 
 - `Dogeek <https://www.github.com/Dogeek>`_
+
   * :class:`~ttkwidgets.validated_entries.ValidatedEntry`
   * :class:`~ttkwidgets.validated_entries.Validator`
   * :class:`~ttkwidgets.validated_entries.RegexValidator`
