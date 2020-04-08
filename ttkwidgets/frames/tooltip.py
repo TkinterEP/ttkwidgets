@@ -10,15 +10,15 @@ import os
 from ttkwidgets.utilities import get_assets_directory
 
 
-class Balloon(ttk.Frame):
+class Tooltip(ttk.Frame):
     """Simple help hover balloon."""
 
     def __init__(self, master=None, headertext="Help", text="Some great help is displayed here.", width=200, timeout=1,
-                 background="#fef9cd", **kwargs):
+                 background="#fef9cd", offset=(2, 2), showheader=True, static=False, **kwargs):
         """
-        Create a Balloon.
+        Create a Tooltip
         
-        :param master: widget to bind the Balloon to
+        :param master: widget to bind the Tooltip to
         :type master: widget
         :param headertext: text to show in window header
         :type headertext: str
@@ -26,10 +26,19 @@ class Balloon(ttk.Frame):
         :type text: str
         :param width: width of the window
         :type width: int
-        :param timeout: timeout in seconds to wait until the Balloon is shown
+        :param timeout: timeout in seconds to wait until the Tooltip is shown
         :type timeout: float
-        :param background: background color of the Balloon
+        :param background: background color of the Tooltip
         :type background: str
+        :param offset: The offset from the mouse position the Ballon shows up
+        :type offset: Tuple[int, int]
+        :param showheader: Whether to display the header with image
+        :type showheader: bool
+        :param static: Whether to display the tooltip with static
+            position. When the position is set to static, the balloon
+            will always appear an offset from the bottom right corner of
+            the widget.
+        :type static: bool
         :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
@@ -47,11 +56,21 @@ class Balloon(ttk.Frame):
         self.__headertext = headertext
         self.__text = text
         self.__width = width
+        self.__offset = offset
+        self.__showheader = showheader
+        self.__static = static
+
         self.master = master
         self._id = None
         self._timeout = timeout
-        self.master.bind("<Enter>", self._on_enter)
-        self.master.bind("<Leave>", self._on_leave)
+
+        self._bind_to_master()
+
+    def _bind_to_master(self):
+        """Bind the Balloon widget to the master widget's events"""
+        self.master.bind("<Enter>", self._on_enter, "add")
+        self.master.bind("<Leave>", self._on_leave, "add")
+        self.master.bind("<ButtonPress>", self._on_leave, "add")
 
     def __getitem__(self, key):
         return self.cget(key)
@@ -62,7 +81,8 @@ class Balloon(ttk.Frame):
     def _grid_widgets(self):
         """Place the widgets in the Toplevel."""
         self._canvas.grid(sticky="nswe")
-        self.header_label.grid(row=1, column=1, sticky="nswe", pady=5, padx=5)
+        if self.__showheader is True:
+            self.header_label.grid(row=1, column=1, sticky="nswe", pady=5, padx=5)
         self.text_label.grid(row=3, column=1, sticky="nswe", pady=6, padx=5)
 
     def _on_enter(self, event):
@@ -80,9 +100,10 @@ class Balloon(ttk.Frame):
 
     def show(self):
         """
-        Create the Toplevel widget and its child widgets to show in the spot of the cursor.
+        Create the Toplevel and its children to show near the cursor
 
-        This is the callback for the delayed :obj:`<Enter>` event (see :meth:`~Balloon._on_enter`). 
+        This is the callback for the delayed :obj:`<Enter>` event
+        (see :meth:`~Tooltip._on_enter`).
         """
         self._toplevel = tk.Toplevel(self.master)
         self._canvas = tk.Canvas(self._toplevel, background=self.__background)
@@ -93,11 +114,17 @@ class Balloon(ttk.Frame):
         self._toplevel.attributes("-topmost", True)
         self._toplevel.overrideredirect(True)
         self._grid_widgets()
-        x, y = self.master.winfo_pointerxy()
+        if self.__static is True:
+            x, y = self.master.winfo_rootx(), self.master.winfo_rooty()
+            w, h = self.master.winfo_width(), self.master.winfo_height()
+            x, y = x + w, y + h
+        else:
+            x, y = self.master.winfo_pointerxy()
         self._canvas.update()
         # Update the Geometry of the Toplevel to update its position and size
-        self._toplevel.geometry("{0}x{1}+{2}+{3}".format(self._canvas.winfo_width(), self._canvas.winfo_height(),
-                                                         x + 2, y + 2))
+        self._toplevel.geometry("{0}x{1}+{2}+{3}".format(
+            self._canvas.winfo_width(), self._canvas.winfo_height(),
+            x + self.__offset[0], y + self.__offset[1]))
 
     def cget(self, key):
         """
@@ -107,7 +134,8 @@ class Balloon(ttk.Frame):
         :type key: str
         :return: value of the option
 
-        To get the list of options for this widget, call the method :meth:`~Balloon.keys`.
+        To get the list of options for this widget, call the method
+        :meth:`~Tooltip.keys`.
         """
         if key == "headertext":
             return self.__headertext
@@ -119,6 +147,12 @@ class Balloon(ttk.Frame):
             return self._timeout
         elif key == "background":
             return self.__background
+        elif key == "offset":
+            return self.__offset
+        elif key == "showheader":
+            return self.__showheader
+        elif key == "static":
+            return self.__static
         else:
             return ttk.Frame.cget(self, key)
 
@@ -126,14 +160,18 @@ class Balloon(ttk.Frame):
         """
         Configure resources of the widget.
 
-        To get the list of options for this widget, call the method :meth:`~Balloon.keys`.
-        See :meth:`~Balloon.__init__` for a description of the widget specific option.
+        To get the list of options for this widget, call the method
+        :meth:`~Tooltip.keys`. See :meth:`~Tooltip.__init__` for a
+        description of the widget specific option.
         """
         self.__headertext = kwargs.pop("headertext", self.__headertext)
         self.__text = kwargs.pop("text", self.__text)
         self.__width = kwargs.pop("width", self.__width)
         self._timeout = kwargs.pop("timeout", self._timeout)
         self.__background = kwargs.pop("background", self.__background)
+        self.__offset = kwargs.pop("offset", self.__offset)
+        self.__showheader = kwargs.pop("showheader", self.__showheader)
+        self.__static = kwargs.pop("static", self.__static)
         if self._toplevel:
             self._on_leave(None)
             self.show()
@@ -143,5 +181,5 @@ class Balloon(ttk.Frame):
 
     def keys(self):
         keys = ttk.Frame.keys(self)
-        keys.extend(["headertext", "text", "width", "timeout", "background"])
+        keys.extend(["headertext", "text", "width", "timeout", "background", "offset", "showheader", "static"])
         return keys

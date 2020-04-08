@@ -11,6 +11,6 @@ ttkwidgets.frames
     :nosignatures:
     :toctree: ttkwidgets.frames
 
-    Balloon
+    Tooltip
     ScrolledFrame
     ToggledFrame
