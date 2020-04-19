@@ -7,7 +7,7 @@ from tests import BaseWidgetTest
 import tkinter as tk
 
 
-class TestScaleEntry(BaseWidgetTest):
+class TestValidatedEntry(BaseWidgetTest):
     def _test_entry_init(self, entry):
         entry = entry(self.window, validate='all')
         entry.configure_validator()
