@@ -28,12 +28,9 @@ class _SampleButton:
         self.btn.grid(row=row, column=col, sticky="nsew") 
 
     def run_example(self, event=None):
-        try:
-            subprocess.run(
-                ['python', 'example_' + self.btn['text'] + '.py'], env=EXAMPLE_ENV
-            )
-        except Exception as e:
-            print(e)
+        subprocess.run(
+            ['python', 'example_' + self.btn['text'] + '.py'], env=EXAMPLE_ENV
+        )
 
 
 def _get_samples():
