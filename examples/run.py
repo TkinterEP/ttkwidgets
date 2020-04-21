@@ -5,7 +5,8 @@ run.py
 Show all examples located in this example folder.
 Main window show a button for each example.
 """
-import sys, os
+import os
+import os
 import subprocess
 import tkinter as tk
 from tkinter import ttk
@@ -29,11 +30,7 @@ class _SampleButton:
     def run_example(self, event=None):
         try:
             subprocess.run(
-                [
-                    'python',
-                    'example_' + self.btn['text'] + '.py'
-                ],
-                env=EXAMPLE_ENV
+                ['python', 'example_' + self.btn['text'] + '.py'], env=EXAMPLE_ENV
             )
         except Exception as e:
             print(e)
@@ -48,15 +45,14 @@ def _get_samples():
             continue
         fp = os.path.join(dir_, f)
         if os.path.isfile(f) and f.endswith('.py'):
-            f = f[8:] # remove example_
-            f = f[0:len(f)-3] # remove .py
+            f = f[8:]           # remove example_
+            f = f[0:len(f)-3]   # remove .py
             result.append([f, fp])
     return result
 
 
 def _add_samples(window):
     samples = _get_samples()
-    total_samples = len(samples)
     max_col_count = 5
     row = -1
     col = -1
@@ -80,11 +76,7 @@ def _add_samples(window):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    root.title('ttkwidget Examples')
+    root.title('ttkwidgets Examples')
     root.geometry('800x500')
     _add_samples(root)
     root.mainloop()
-    try:
-        root.destroy()
-    except:
-        pass
