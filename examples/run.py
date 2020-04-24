@@ -6,7 +6,6 @@ Show all examples located in this example folder.
 Main window show a button for each example.
 """
 import os
-import os
 import subprocess
 import tkinter as tk
 from tkinter import ttk
@@ -23,14 +22,11 @@ else:
 
 class _SampleButton:
     def __init__(self, root, text, col, row):
-        self.root = root
         self.btn = ttk.Button(root, text=text, command=self.run_example)
         self.btn.grid(row=row, column=col, sticky="nsew") 
 
     def run_example(self, event=None):
-        subprocess.run(
-            ['python', 'example_' + self.btn['text'] + '.py'], env=EXAMPLE_ENV
-        )
+        subprocess.Popen(['python', 'example_' + self.btn['text'] + '.py'], env=EXAMPLE_ENV)
 
 
 def _get_samples():
