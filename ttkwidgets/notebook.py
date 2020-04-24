@@ -1,6 +1,7 @@
 """
 Copyright 2018-2019 Juliette Monsel <j_4321 at protonmail dot com>
 Copyright 2019 Dogeek
+Copyright 2020 RedFantom <redfantom at outlook dot com>
 
 Adapted from PyTkEditor - Python IDE's Notebook widget by
 Juliette Monsel. Adapted by Dogeek <https://github.com/Dogeek>
@@ -9,6 +10,7 @@ PyTkEditor is distributed with the GNU GPL license.
 
 Notebook with draggable / scrollable tabs
 """
+from functools import partial
 import tkinter as tk
 from tkinter import ttk
 from ttkwidgets.utilities import move_widget, parse_geometry, coords_in_box
@@ -51,11 +53,13 @@ class Tab(ttk.Frame):
         self.bind("<ButtonRelease-2>", self._b2_press)
         self.bind("<Enter>", self._on_enter_tab)
         self.bind("<Leave>", self._on_leave_tab)
-        self.bind("<MouseWheel>", self._on_mousewheel)
+        self.bind("<MouseWheel>", partial(self._on_mousewheel, None))
+        self.bind("<Button-4>", partial(self._on_mousewheel, True))  # Linux mousewheel bind
+        self.bind("<Button-5>", partial(self._on_mousewheel, False))
 
-    def _on_mousewheel(self, event):
+    def _on_mousewheel(self, updown, event):
         if self.hovering_tab:
-            if event.delta > 0:
+            if (updown is None and event.delta > 0) or updown is True:
                 self.master.master.select_prev(True)
             else:
                 self.master.master.select_next(True)
@@ -330,7 +334,7 @@ class Notebook(ttk.Frame):
         :param bordercolor:
         :param focusbordercolor:
         :param selectbg:
-        :param selectfb:
+        :param selectfg:
         :param unselectfg:
         :param disabledfg:
         :param disabledbg:
