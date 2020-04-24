@@ -318,10 +318,9 @@ class Notebook(ttk.Frame):
     def __setitem__(self, key, value):
         self.configure(**{key: value})
 
-    def setup_style(self, bg="#dddddd", activebg="#efefef", pressedbg="#c1c1c1",
-                    fg="black", fieldbg="white", lightcolor="#ededed", darkcolor="##cfcdc8",
-                    bordercolor="#888888", focusbordercolor="#5e5e5e", selectbg="#c1c1c1",
-                    selectfg="black", unselectfg="#999999", disabledfg="#999999", disabledbg="#dddddd"):
+    def setup_style(self, bg=None, activebg=None, pressedbg=None, fg=None, fieldbg=None, lightcolor="#ededed",
+                    darkcolor="#cfcdc8", bordercolor="#888888",  focusbordercolor="#5e5e5e", selectbg=None,
+                    selectfg=None, unselectfg="#999999", disabledfg=None, disabledbg=None):
         """
         Setups the style for the notebook.
         :param bg:
@@ -339,22 +338,24 @@ class Notebook(ttk.Frame):
         :param disabledfg:
         :param disabledbg:
         """
-        theme = {"bg": bg,
-                 "activebg": activebg,
-                 "pressedbg": pressedbg,
-                 "fg": fg,
-                 "fieldbg": fieldbg,
-                 "lightcolor": lightcolor,
-                 "darkcolor": darkcolor,
+        style = ttk.Style(self)
+
+        theme = {"bg": bg or style.lookup(".", "background", default="#dddddd"),
+                 "activebg": activebg or style.lookup(".", "background", ("active",), default="#efefef"),
+                 "pressedbg": pressedbg or style.lookup(".", "selectbackground", default="#c1c1c1"),
+                 "fg": fg or style.lookup(".", "foreground", default="black"),
+                 "fieldbg": fieldbg or style.lookup(".", "fieldbackground", default="white"),
+                 "lightcolor": lightcolor or style.lookup(".", "focuscolor", default="#ededed"),
+                 "darkcolor": darkcolor or style.lookup(".", "throughcolor", default="#cfcdc8"),
                  "bordercolor": bordercolor,
                  "focusbordercolor": focusbordercolor,
-                 "selectbg": selectbg,
-                 "selectfg": selectfg,
+                 "selectbg": selectbg or style.lookup(".", "selectbackground", default="#c1c1c1"),
+                 "selectfg": selectfg or style.lookup(".", "selectforeground", default="black"),
                  "unselectedfg": unselectfg,
-                 "disabledfg": disabledfg,
-                 "disabledbg": disabledbg}
+                 "disabledfg": disabledfg or style.lookup(".", "foreground", ("disabled",), default="#999999"),
+                 "disabledbg": disabledbg or style.lookup(".", "background", ("disabled",), default="#dddddd")}
 
-        self.images = (
+        self.images = (  # Must be on self to keep reference
             tk.PhotoImage("img_close", data="""
                 R0lGODlhCAAIAMIBAAAAADs7O4+Pj9nZ2Ts7Ozs7Ozs7Ozs7OyH+EUNyZWF0ZWQg
                 d2l0aCBHSU1QACH5BAEKAAQALAAAAAAIAAgAAAMVGDBEA0qNJyGw7AmxmuaZhWEU
@@ -383,7 +384,6 @@ class Notebook(ttk.Frame):
                         "darkcolor": theme["darkcolor"],
                         "troughcolor": theme["pressedbg"]}
 
-        style = ttk.Style(self)
         style.element_create("close", "image", "img_close",
                              ("active", "pressed", "!disabled", "img_closepressed"),
                              ("active", "!disabled", "img_closeactive"),
