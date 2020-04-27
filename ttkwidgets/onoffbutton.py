@@ -162,20 +162,18 @@ class OnOffButton(ttk.Frame):
                 self._offvalue if self._variable.get() == self._offvalue else self._onvalue
             self._variable.set(value)
 
-        #super(OnOffButton, self).config(**kw)
-
     config = configure
 
     def _draw(self):
         style = ttk.Style()
-        background = style.lookup(OnOffButton._style_class, 'background')
-        switchcolor = style.lookup(OnOffButton._style_class, 'switchcolor')
-        oncolor = style.lookup(OnOffButton._style_class, 'oncolor')
-        offcolor = style.lookup(OnOffButton._style_class, 'offcolor')
+        background = style.lookup(self._curr_style_class, 'background')
+        switchcolor = style.lookup(self._curr_style_class, 'switchcolor')
+        oncolor = style.lookup(self._curr_style_class, 'oncolor')
+        offcolor = style.lookup(self._curr_style_class, 'offcolor')
         disabledcolor = style.lookup(
-                OnOffButton._style_class, 'disabledcolor')
+                self._curr_style_class, 'disabledcolor')
         switchdisabledcolor = style.lookup(
-                OnOffButton._style_class, 'switchdisabledcolor')
+                self._curr_style_class, 'switchdisabledcolor')
 
         half = self._size / 2
         space = self._size * 0.15
