@@ -53,12 +53,11 @@ class OnOffButton(ttk.Frame):
         """
         OnOffButton._get_style()
         if style is None:
-            curr_style = OnOffButton._style_class
+            self._curr_style_class = OnOffButton._style_class
         else:
-            curr_style = style
-            OnOffButton._validate_style(curr_style)
+            self._curr_style_class = style
         # Always pass predefined style for Frame
-        kwargs_frame = {'style': OnOffButton._style_class + '.TFrame'}
+        kwargs_frame = {'style': OnOffButton._get_frame_style()}
 
         super(OnOffButton, self).__init__(master, **kwargs_frame)
 
@@ -67,14 +66,14 @@ class OnOffButton(ttk.Frame):
         self._size = self._validate_size(size)
         self._variable, self._onvalue, self._offvalue = \
                 self._validate_variable(variable, onvalue, offvalue)
-        self._curr_style_class = curr_style
         self._canvas = tk.Canvas(self,
                 width=self._size * 2,
                 height=self._size, border=-2,
             )
         self._canvas.pack()
-        self._draw()
         self._variable.set(self._offvalue)
+        self.bind('<Configure>', self._configure_event)
+        self._configure_event()  # Force first time draw
 
     def invoke(self):
         '''
@@ -154,15 +153,17 @@ class OnOffButton(ttk.Frame):
                 if change: 
                     self._variable.set(value)
         if 'style' in kw:
-            st = kw.pop('style')
-            OnOffButton._validate_style(st)
-            self._curr_style_class = st
-            self._draw()
-            value = \
-                self._offvalue if self._variable.get() == self._offvalue else self._onvalue
-            self._variable.set(value)
+            self._curr_style_class = kw.pop('style')
+            self._configure_event()
 
     config = configure
+
+    def _configure_event(self, event=None):
+        OnOffButton._validate_style(self._curr_style_class)
+        self._draw()
+        value = \
+            self._offvalue if self._variable.get() == self._offvalue else self._onvalue
+        self._variable.set(value)
 
     def _draw(self):
         style = ttk.Style()
@@ -178,9 +179,7 @@ class OnOffButton(ttk.Frame):
         half = self._size / 2
         space = self._size * 0.15
 
-        self._canvas.delete('circle')
-        self._canvas.delete('rectangle_off')
-        self._canvas.delete('rectangle_on')
+        self._canvas.delete('all')
         self._canvas.tag_unbind('rectangle_on', '<Button-1>')
         self._canvas.tag_unbind('rectangle_off', '<Button-1>')
         self._canvas.config(bg=background)
@@ -248,9 +247,21 @@ class OnOffButton(ttk.Frame):
         add_opts = {}
         for opt, value in OnOffButton._style_opts.items():
             if not style.lookup(name, opt):
-                add_opts[opt] = value
+                if opt == 'background':
+                    add_opts[opt] = style.lookup('TFrame', 'background')
+                else:
+                    add_opts[opt] = value
+
         if add_opts:
             style.configure(name, **add_opts)
+
+    @classmethod
+    def _get_frame_style(cls):
+        # Frame style
+        style = ttk.Style()
+        name = OnOffButton._style_class + '.TFrame'
+        style.configure(name, background=style.lookup('TFrame', 'background'), padding=0)
+        return name
 
     @classmethod
     def _get_style(cls):
@@ -259,10 +270,6 @@ class OnOffButton(ttk.Frame):
 
         style = ttk.Style()
         OnOffButton._style_class = 'OnOffButton'
-
-        # Frame style
-        style.configure(OnOffButton._style_class + '.TFrame',
-            background=style.lookup('TFrame', 'background'), padding=0)
 
         # default options
         OnOffButton._style_opts = {
@@ -273,12 +280,6 @@ class OnOffButton(ttk.Frame):
                 'disabledcolor': 'gray',
                 'switchdisabledcolor': '#d9d9d9',
             }
-
-        onoff_style = style.configure(OnOffButton._style_class)
-        if onoff_style is None:
-            style.configure(OnOffButton._style_class, **OnOffButton._style_opts)
-        else:
-            cls._validate_style(OnOffButton._style_class)
 
     def _validate_variable(self, variable, onvalue, offvalue):
         if variable is None:
