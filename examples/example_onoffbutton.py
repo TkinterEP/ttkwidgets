@@ -8,6 +8,7 @@ try:
     import Tkinter as tk
 except ImportError:
     import tkinter as tk
+    from tkinter import ttk
 
 
 window = tk.Tk()
@@ -18,26 +19,27 @@ def grid_button(button, row, column):
     button.grid(row=row, column=column, padx=10, pady=10)
 
 
-def print_value(button):
-    print(button.get())
+def print_value():
+    print('Button toggled')
 
 
-onoff_24_off = OnOffButton(window, command=print_value)
-grid_button(onoff_24_off, 0, 0)
+onoff_off = OnOffButton(window, command=print_value)
+grid_button(onoff_off, 0, 0)
 
-onoff_24_on = OnOffButton(window, command=print_value)
-grid_button(onoff_24_on, 0, 1)
-onoff_24_off.set(1)
+onoff_off_dis = OnOffButton(window)
+grid_button(onoff_off_dis, 0, 1)
+onoff_off_dis['state'] = 'disabled'
 
-onoff_24_disabled = OnOffButton(window, command=print_value)
-grid_button(onoff_24_disabled, 0, 2)
-onoff_24_disabled.config(state='disabled')
+onoff_on = OnOffButton(window, command=print_value, cursor='hand2')
+grid_button(onoff_on, 0, 2)
+onoff_on.set('on')
 
-onoff_48_on = OnOffButton(window, size=48, command=print_value)
-grid_button(onoff_48_on, 1, 0)
+onoff_on_dis = OnOffButton(window)
+grid_button(onoff_on_dis, 0, 3)
+onoff_on_dis.set('on')
+onoff_on_dis['state'] = 'disabled'
 
-onoff_100_on = OnOffButton(window, size=100, command=print_value)
-grid_button(onoff_100_on, 1, 1)
-onoff_100_on.set(1)
+chk = ttk.Checkbutton(window)
+grid_button(chk, 1, 0)
 
 window.mainloop()
