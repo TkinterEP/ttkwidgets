@@ -257,3 +257,6 @@ class OnOffButton(ttk.Checkbutton):
                 )
             ]
         )
+
+        style.configure('OnOffButton',
+                        **style.configure('TCheckbutton').copy())
