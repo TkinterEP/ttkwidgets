@@ -11,4 +11,11 @@ from ttkwidgets.scaleentry import ScaleEntry
 from ttkwidgets.timeline import TimeLine
 from ttkwidgets.tickscale import TickScale
 from ttkwidgets.table import Table
-from ttkwidgets.validated_entries import *
+
+from ttkwidgets.validated_entries.numbers import (
+    PercentEntry, IntEntry, FloatEntry,
+)
+from ttkwidgets.validated_entries.strings import (
+    IPv4Entry, PasswordEntry, EmailEntry,
+    CapitalizedStringEntry, UpperStringEntry, LowerStringEntry,
+)

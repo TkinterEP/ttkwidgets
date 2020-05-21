@@ -201,3 +201,15 @@ class PasswordValidator(RegexValidator):
     VALIDATE_ON = 'focusout'
 
     REGEX = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})'
+
+
+class IPv4Validator(RegexValidator):
+    """
+    Validates IPv4 addresses. The following are valid:
+        * localhost
+        * 192.168.0.1
+        * localhost:3158
+    """
+    VALIDATE_ON = 'focusout'
+
+    REGEX = r'^((?:[0-9]{1,3}\.){3}[0-9]{1,3}|localhost)(:\d{2,6})?$'

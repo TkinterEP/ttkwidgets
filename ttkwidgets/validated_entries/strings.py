@@ -13,6 +13,7 @@ from .validated_entry import ValidatedEntry
 from .validators import (
     EmailValidator, CapitalizedStringValidator,
     PasswordValidator, StringValidator,
+    IPv4Validator,
 )
 
 
@@ -54,3 +55,10 @@ class PasswordEntry(ValidatedEntry):
         * Be at least 8 characters long
     """
     VALIDATOR = PasswordValidator
+
+
+class IPv4Entry(ValidatedEntry):
+    """
+    Validates IPv4 addresses
+    """
+    VALIDATOR = IPv4Validator

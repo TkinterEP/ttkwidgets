@@ -136,6 +136,9 @@ class TestValidatedEntry(BaseWidgetTest):
         self.assertFalse(v_entries.StringValidator(string.ascii_uppercase)._validate('abc'))
         self.assertTrue(v_entries.EmailValidator()._validate('firstname@example.com'))
         self.assertTrue(v_entries.PasswordValidator()._validate('Abcd&1234'))
+        self.assertTrue(v_entries.IPv4Validator()._validate('127.0.0.1'))
+        self.assertTrue(v_entries.IPv4Validator()._validate('127.0.0.1:9999'))
+        self.assertTrue(v_entries.IPv4Validator()._validate('localhost'))
 
 
 if __name__ == '__main__':
