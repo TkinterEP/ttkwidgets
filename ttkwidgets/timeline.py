@@ -555,8 +555,6 @@ class TimeLine(ttk.Frame):
 
         :param iid: identifier of the marker to change
         :type iid: str
-        :param kwargs: Dictionary of options to update
-        :type kwargs: dict
         :raises: ValueError
         """
         if iid not in self._markers:

@@ -25,6 +25,11 @@ class CheckboxTreeview(ttk.Treeview):
     .. note::
         The checkboxes are done via the image attribute of the item, 
         so to keep the checkbox, you cannot add an image to the item.
+
+    .. note::
+        The checkboxes are shown in column ``#0``, which is only
+        shown if ``tree`` is included in the keyword argument
+        ``show``. This is the default behaviour.
     """
 
     def __init__(self, master=None, **kw):

@@ -23,7 +23,7 @@ class Table(ttk.Treeview):
     This widget is based on the :class:`ttk.Treeview` and shares many options and methods
     with it.
     """
-    _initialized = False  # to kwnow whether class bindings and Table layout have been created yet
+    _initialized = False  # To know whether class bindings and Table layout have been created yet
 
     def __init__(self, master=None, show='headings', drag_cols=True, drag_rows=True,
                  sortable=True, class_='Table', **kwargs):

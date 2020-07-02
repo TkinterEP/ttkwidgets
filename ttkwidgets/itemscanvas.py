@@ -23,7 +23,7 @@ class ItemsCanvas(ttk.Frame):
         :param canvaswidth: width of the canvas in pixels
         :type canvaswidth: int
         :param canvasheight: height of the canvas in pixels
-        :type canvascanvasheightwidth: int
+        :type canvasheight: int
         :param callback_add: callback for when an item is created, \*(int item, int rectangle)
         :type callback_add: function
         :param callback_del: callback for when an item is deleted, \*(int item, int rectangle)
@@ -83,7 +83,7 @@ class ItemsCanvas(ttk.Frame):
             self.current = None
             return
         results = self.canvas.find_withtag(tk.CURRENT)
-        if len(results) is 0:
+        if len(results) == 0:
             return
         self.current = results[0]
         self.canvas.itemconfigure(self.current, fill=self.item_colors[self.current][2])
@@ -109,7 +109,7 @@ class ItemsCanvas(ttk.Frame):
         """
         self.set_current()
         results = self.canvas.find_withtag(tk.CURRENT)
-        if len(results) is 0:
+        if len(results) == 0:
             return
         item = results[0]
         rectangle = self.items[item]
@@ -223,17 +223,17 @@ class ItemsCanvas(ttk.Frame):
 
         To get the list of options for this widget, call the method :meth:`~ItemsCanvas.keys`.
         """
-        if key is "canvaswidth":
+        if key == "canvaswidth":
             return self._canvaswidth
-        elif key is "canvasheight":
+        elif key == "canvasheight":
             return self._canvasheight
-        elif key is "function_new":
+        elif key == "function_new":
             return self._function_new
-        elif key is "callback_add":
+        elif key == "callback_add":
             return self._callback_add
-        elif key is "callback_del":
+        elif key == "callback_del":
             return self._callback_del
-        elif key is "callback_move":
+        elif key == "callback_move":
             return self._callback_move
         else:
             ttk.Frame.cget(self, key)

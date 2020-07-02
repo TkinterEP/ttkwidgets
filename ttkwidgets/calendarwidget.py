@@ -45,7 +45,7 @@ class Calendar(ttk.Frame):
         :type month: int
         :param selectbackground: background color of the selected day
         :type selectbackground: str
-        :param selectforeground: selectforeground color of the selected day
+        :param selectforeground: foreground color of the selected day
         :type selectforeground: str
         :param kw: options to be passed on to the :class:`ttk.Frame` initializer
         """
