@@ -10,7 +10,7 @@ ttkwidgets
 .. autosummary::
     :nosignatures:
     :toctree: ttkwidgets
-    
+
     AutoHideScrollbar
     Calendar
     CheckboxTreeview
@@ -22,4 +22,4 @@ ttkwidgets
     Table
     TickScale
     TimeLine
-    
+    Shell
