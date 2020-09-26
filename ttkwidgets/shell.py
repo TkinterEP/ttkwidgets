@@ -1,11 +1,11 @@
 import tkinter as tk
 import tkinter.font as tkfont
-from collections import defaultdict
+from collections import defaultdict, deque
 
 
 class Shell(tk.Canvas):
     def __init__(self, master, textvariable=None, prefix='', force_focus=True,
-                 font=None, **kwargs):
+                 font=None, history_size=1_000, **kwargs):
         """
         :param master: parent widget
         :type master: tkinter.Widget
@@ -36,17 +36,20 @@ class Shell(tk.Canvas):
         self.line_pos = (5, 5)
         self.texts = []
         self.last_text = None
-        self.cursor = None
-        self.blink = True
+        self._cursor = None
+        self._blink = True
+        self._command_history = deque(maxlen=history_size)
+        self._history_index = None
         self.buffer = prefix
         self.text_update()
         self.commands = defaultdict(list)
-        self.cursor_blink()
+        self._cursor_blink()
 
     def on_key_press(self, event):
         if event.keysym == 'Return' and len(self.buffer) > len(self.prefix):
             self.texts.append(self.last_text)
-            span = self.text_line_span()
+            self._command_history.append(self.buffer)
+            span = self.text_line_span
             self.last_text = None
             self.line_pos = (5, self.line_pos[1] + 15 * span)
             self.call_command('onreturn', self.buffer[len(self.prefix):])
@@ -68,6 +71,21 @@ class Shell(tk.Canvas):
             self.text_update()
             return
 
+        if event.keysym == 'Up':
+            if self._history_index is None:
+                self._history_index = 0
+            self._history_index = min(
+                self._history_index + 1, len(self._command_history),
+            )
+            self.recall_command()
+            return
+
+        if event.keysym == 'Down':
+            self._history_index -= 1
+            if self._history_index < 0:
+                self._history_index = None
+            self.recall_command()
+
     def on_configure(self, event):
         padding = 4
         width = self.master.winfo_width() - padding
@@ -77,10 +95,18 @@ class Shell(tk.Canvas):
             self.itemconfig(t, width=width)
         self.itemconfig(self.last_text, width=width)
 
+    def recall_command(self):
+        if self._history_index is None:
+            self.buffer = self.prefix
+            self.text_update()
+            return
+
+        text = self._command_history[-self._history_index]
+        self.buffer = text
+        self.text_update()
+
     def text_update(self):
-        """
-        Updates the text on the screen.
-        """
+        """Updates the text on the screen."""
         self.textvariable.set(self.buffer)
         if self.last_text:
             self.delete(self.last_text)
@@ -92,23 +118,22 @@ class Shell(tk.Canvas):
             'font': self.font,
         }
         self.last_text = self.create_text(*self.line_pos, **kwargs)
-        return
 
-    def cursor_blink(self):
-        if self.cursor:
-            self.delete(self.cursor)
-            self.cursor = None
-        if self.last_text is not None and self.blink:
-            pos = self.cursor_pos
+    def _cursor_blink(self):
+        if self._cursor:
+            self.delete(self._cursor)
+            self._cursor = None
+        if self.last_text is not None and self._blink:
+            pos = self._cursor_pos
             font = self.itemcget(self.last_text, 'font').split()
-            width, height = self.max_char_width, int(font[-1])
+            width, height = self._max_char_width, int(font[-1])
             pos = pos + (pos[0] + width, pos[1] + height)
-            self.cursor = self.create_rectangle(*pos, fill='white')
-        self.blink = not self.blink
-        self.after(1000, self.cursor_blink)
+            self._cursor = self.create_rectangle(*pos, fill='white')
+        self._blink = not self._blink
+        self.after(1000, self._cursor_blink)
 
     @property
-    def max_char_width(self):
+    def _max_char_width(self):
         """
         Gets the width of a W character
 
@@ -119,16 +144,17 @@ class Shell(tk.Canvas):
         return font.measure('W')
 
     @property
-    def cursor_pos(self):
+    def _cursor_pos(self):
         text = self.itemcget(self.last_text, 'text')
         font = tkfont.Font(self, font=self.itemcget(self.last_text, 'font'))
         text_len = font.measure(text)
-        width = self.max_char_width
-        span = self.text_line_span()
+        width = self._max_char_width
+        span = self.text_line_span
         x = text_len % int(self['width']) + width + self.line_pos[0]
         y = self.line_pos[1] + 15 * (span - 1)
         return x, y
 
+    @property
     def text_line_span(self):
         """
         Gets the number of lines to display the current text
@@ -149,7 +175,11 @@ class Shell(tk.Canvas):
         :param command: Command name to call
         :type command: str
         """
-        commands = self.commands.get(command, [])
+        def default_command(*a):
+            nonlocal command
+            self.print('Unknown command %s.' % command)
+
+        commands = self.commands.get(command, default_command)
         if callable(commands):
             return commands(*args)
 
@@ -168,17 +198,17 @@ class Shell(tk.Canvas):
         assert all(callable(callback) for callback in callbacks), f'Callback should be a function'
         self.commands[command].extend(callbacks)
 
-    def print(self, message):
+    def print(self, *messages, end=' '):
         """
         Prints a message on the screen
 
-        :param message: message to write
-        :type message: str
+        :param *messages: messages to write
+        :type messages: str
         """
-        self.buffer = message
+        self.buffer = end.join(str(m) for m in messages)
         self.text_update()
         self.texts.append(self.last_text)
-        span = self.text_line_span()
+        span = self.text_line_span
         self.last_text = None
         self.line_pos = (5, self.line_pos[1] + 15 * span)
         self.buffer = self.prefix
