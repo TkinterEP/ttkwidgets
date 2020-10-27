@@ -27,12 +27,18 @@ class CheckboxTreeview(ttk.Treeview):
         so to keep the checkbox, you cannot add an image to the item.
     """
 
-    def __init__(self, master=None, **kw):
+    def __init__(self, master=None, im_checked=None, im_unchecked=None, im_tristate=None, **kw):
         """
         Create a CheckboxTreeview.
 
         :param master: master widget
         :type master: widget
+        :param im_checked: checked checkbox image
+        :type im_checked: PhotoImage
+        :param im_unchecked: unchecked checkbox image
+        :type im_unchecked: PhotoImage
+        :param im_tristate: tristate checkbox image
+        :type im_tristate: PhotoImage
         :param kw: options to be passed on to the :class:`ttk.Treeview` initializer
         """
         ttk.Treeview.__init__(self, master, style='Checkbox.Treeview', **kw)
@@ -43,9 +49,9 @@ class CheckboxTreeview(ttk.Treeview):
                   foreground=[("disabled", 'gray40')],
                   background=[("disabled", '#E6E6E6')])
         # checkboxes are implemented with pictures
-        self.im_checked = ImageTk.PhotoImage(Image.open(IM_CHECKED), master=self)
-        self.im_unchecked = ImageTk.PhotoImage(Image.open(IM_UNCHECKED), master=self)
-        self.im_tristate = ImageTk.PhotoImage(Image.open(IM_TRISTATE), master=self)
+        self.im_checked = im_checked or ImageTk.PhotoImage(Image.open(IM_CHECKED), master=self)
+        self.im_unchecked = im_unchecked or ImageTk.PhotoImage(Image.open(IM_UNCHECKED), master=self)
+        self.im_tristate = im_tristate or ImageTk.PhotoImage(Image.open(IM_TRISTATE), master=self)
         self.tag_configure("unchecked", image=self.im_unchecked)
         self.tag_configure("tristate", image=self.im_tristate)
         self.tag_configure("checked", image=self.im_checked)
