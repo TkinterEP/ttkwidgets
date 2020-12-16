@@ -11,6 +11,7 @@ before_install:
   - sleep 3
 install:
   - sudo apt-get install python-tk python3-tk
+  - python -m pip install -U setuptools pip
   - python -m pip install nose coverage codecov mock pynput
 script:
   - python -m pip install .
