@@ -11,7 +11,7 @@ List of all the authors of widgets in this repository. Please note that this lis
   * :class:`~ttkwidgets.ScrolledListbox`
   * :class:`~ttkwidgets.font.FontChooser`, based on an idea by `Nelson Brochado <https://www.github.com/nbro>`_
   * :class:`~ttkwidgets.font.FontSelectFrame`
-  * :class:`~ttkwidgets.frames.Balloon`
+  * :class:`~ttkwidgets.frames.Tooltip`
   * :class:`~ttkwidgets.ItemsCanvas`
   * :class:`~ttkwidgets.TimeLine`
 

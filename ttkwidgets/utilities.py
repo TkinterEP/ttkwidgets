@@ -1,4 +1,8 @@
-# Copyright (c) RedFantom 2017
+"""
+Author: The ttkwidgets authors
+License: GNU GPLv3
+Source: The ttkwidgets repository
+"""
 import os
 from PIL import Image, ImageTk
 import re
@@ -42,3 +46,12 @@ def isint(value):
     if value.__class__.__name__ == 'StringVar' and isint(value.get()):
         return True
     return False
+
+
+def parse_geometry_string(string):
+    """Parse a Tkinter geometry string ('XxY+W+H') into a box tuple"""
+    e = string.split("x")
+    w = int(e[0])
+    e = e[1].split("+")
+    h, x, y = map(int, e)
+    return x, y, w, h
