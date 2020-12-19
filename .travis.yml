@@ -1,10 +1,10 @@
 language: python
 required: sudo
 python:
-  - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 before_install:
   - "export DISPLAY=:99.0"
   - sudo systemctl start xvfb
