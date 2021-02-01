@@ -5,7 +5,8 @@ Source: The ttkwidgets repository
 """
 import tkinter as tk
 from tkinter import ttk
-from ttkwidgets import tooltips  # Import once, use everywhere
+# Import once, use everywhere
+from ttkwidgets import tooltips
 
 
 window = tk.Tk()

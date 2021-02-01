@@ -44,6 +44,8 @@ for example in EXAMPLES:
     if example == 'run.py':
         continue
     path = os.path.join(FOLDER, example)
+    if not os.path.isfile(path):
+        continue
     with open(path) as fi:
         lines = fi.readlines()
     text = "   ".join(lines)

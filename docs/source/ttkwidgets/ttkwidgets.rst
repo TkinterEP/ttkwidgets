@@ -22,3 +22,12 @@ ttkwidgets
     Table
     TickScale
     TimeLine
+
+.. rubric::  Modules
+
+.. autosummary::
+    :nosignatures:
+    :toctree: ttkwidgets
+
+    hook
+    tooltips
