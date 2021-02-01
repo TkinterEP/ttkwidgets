@@ -5,13 +5,13 @@ Source: The ttkwidgets repository
 
 By importing this file at some point in a program, the
 ttk.Widget parent classes get dynamically mixed in with a class that
-adds the functionality of adding a tooltip (Balloon) to any widget.
+adds the functionality of adding a tooltip (Tooltip) to any widget.
 
 Tooltips are only added when a string to show in them is explicitly
-given. Options for a Balloon may be given as a dictionary of keyword
+given. Options for a Tooltip may be given as a dictionary of keyword
 arguments upon widget initialization.
 
-The default options for the Balloon widget for the program may also be
+The default options for the Tooltip widget for the program may also be
 changed by using the update_defaults function.
 """
 try:
@@ -21,7 +21,7 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 from ttkwidgets.hook import hook_ttk_widgets, generate_hook_name, is_hooked
-from ttkwidgets.frames import Balloon
+from ttkwidgets.frames import Tooltip
 
 
 OPTIONS = {"tooltip": None, "tooltip_options": {}}
@@ -69,14 +69,14 @@ def tooltip_options_hook(self, option, value):
 
 
 def tooltip_tooltip_updater(self, holder, tooltip_widget, tooltip):
-    # type: ((tk.Widget, ttk.Widget), object, (Balloon, None), (str, None)) -> None
+    # type: ((tk.Widget, ttk.Widget), object, (Tooltip, None), (str, None)) -> None
     """Update the ``tooltip`` option of a widget by updating tooltip text"""
     if tooltip_widget is None and tooltip is not None:
         # Create a new tooltip
         options = OPTIONS["tooltip_options"].copy()
         options.update(getattr(holder, "tooltip_options", {}))
         options["text"] = tooltip
-        tooltip_widget = Balloon(self, **options)
+        tooltip_widget = Tooltip(self, **options)
     elif tooltip_widget is not None and tooltip is None:
         # Destroy existing tooltip
         tooltip_widget.destroy()
