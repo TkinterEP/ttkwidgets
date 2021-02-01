@@ -22,4 +22,3 @@ ttkwidgets
     Table
     TickScale
     TimeLine
-    

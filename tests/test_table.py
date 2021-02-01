@@ -95,7 +95,8 @@ class TestTable(BaseWidgetTest):
                 'class',
                 'sortable',
                 'drag_cols']
-        self.assertEqual(sorted(table.keys()), sorted(keys))
+        widget_keys = table.keys()
+        self.assertTrue(all(key in widget_keys for key in keys))
 
         table.move('4', '', 0)
         self.assertEqual(table.get_children('')[0], '4')
