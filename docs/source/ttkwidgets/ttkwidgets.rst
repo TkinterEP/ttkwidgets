@@ -17,6 +17,7 @@ ttkwidgets
     DebugWindow
     ItemsCanvas
     LinkLabel
+    OnOffButton
     ScaleEntry
     ScrolledListbox
     Table
