@@ -6,7 +6,7 @@ environment:
     - PYTHON: "C:\\PYTHON37"
     - PYTHON: "C:\\PYTHON38"
 install:
-  - "%PYTHON%\\python.exe -m pip install codecov coverage nose mock pynput"
+  - "%PYTHON%\\python.exe -m pip install -U codecov coverage nose mock pynput setuptools pip"
 build: off
 test_script:
   - "%PYTHON%\\python.exe -m pip install ."

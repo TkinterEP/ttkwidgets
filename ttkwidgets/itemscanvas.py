@@ -223,17 +223,17 @@ class ItemsCanvas(ttk.Frame):
 
         To get the list of options for this widget, call the method :meth:`~ItemsCanvas.keys`.
         """
-        if key is "canvaswidth":
+        if key == "canvaswidth":
             return self._canvaswidth
-        elif key is "canvasheight":
+        elif key == "canvasheight":
             return self._canvasheight
-        elif key is "function_new":
+        elif key == "function_new":
             return self._function_new
-        elif key is "callback_add":
+        elif key == "callback_add":
             return self._callback_add
-        elif key is "callback_del":
+        elif key == "callback_del":
             return self._callback_del
-        elif key is "callback_move":
+        elif key == "callback_move":
             return self._callback_move
         else:
             ttk.Frame.cget(self, key)

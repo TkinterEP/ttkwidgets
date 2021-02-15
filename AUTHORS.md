@@ -11,6 +11,7 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `Tooltip`
   * `ItemsCanvas`
   * `TimeLine`
+  * `hook.py` and `tooltips.py` modules
 - The Python Team
   * `Calendar`, found [here](http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py)
 - Mitja Martini
