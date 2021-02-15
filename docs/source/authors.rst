@@ -14,19 +14,20 @@ List of all the authors of widgets in this repository. Please note that this lis
   * :class:`~ttkwidgets.frames.Tooltip`
   * :class:`~ttkwidgets.ItemsCanvas`
   * :class:`~ttkwidgets.TimeLine`
-  
+
+
 - The Python Team
 
   * :class:`~ttkwidgets.Calendar`, found `here <http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py>`_
-  
+
 - Mitja Martini
 
   * :class:`~ttkwidgets.autocomplete.AutocompleteEntry`, found `here <https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html>`_
-  
+
 - Russell Adams
 
   * :class:`~ttkwidgets.autocomplete.AutocompleteCombobox`, found `here <https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.html>`_
-  
+
 - `Juliette Monsel <https://www.github.com/j4321>`_
 
   * :class:`~ttkwidgets.CheckboxTreeview`
@@ -35,8 +36,28 @@ List of all the authors of widgets in this repository. Please note that this lis
   * :class:`~ttkwidgets.AutoHideScrollbar` based on an idea by `Fredrik Lundh <effbot.org/zone/tkinter-autoscrollbar.htm>`_
   * All color widgets: :func:`~ttkwidgets.color.askcolor`, :class:`~ttkwidgets.color.ColorPicker`, :class:`~ttkwidgets.color.GradientBar` and :class:`~ttkwidgets.color.ColorSquare`, :class:`~ttkwidgets.color.LimitVar`, :class:`~ttkwidgets.color.Spinbox`, :class:`~ttkwidgets.color.AlphaBar` and supporting functions in :file:`functions.py`.
   * :class:`~ttkwidgets.autocomplete.AutocompleteEntryListbox`
-  
+
+- `Dogeek <https://www.github.com/Dogeek>`_
+
+  * :class:`~ttkwidgets.validated_entries.ValidatedEntry`
+  * :class:`~ttkwidgets.validated_entries.Validator`
+  * :class:`~ttkwidgets.validated_entries.RegexValidator`
+  * :class:`~ttkwidgets.validated_entries.IntValidator`
+  * :class:`~ttkwidgets.validated_entries.FloatValidator`
+  * :class:`~ttkwidgets.validated_entries.PercentValidator`
+  * :class:`~ttkwidgets.validated_entries.StringValidator`
+  * :class:`~ttkwidgets.validated_entries.CapitalizedStringValidator`
+  * :class:`~ttkwidgets.validated_entries.EmailValidator`
+  * :class:`~ttkwidgets.validated_entries.PasswordValidator`
+  * :class:`~ttkwidgets.validated_entries.IntEntry`
+  * :class:`~ttkwidgets.validated_entries.FloatEntry`
+  * :class:`~ttkwidgets.validated_entries.PercentEntry`
+  * :class:`~ttkwidgets.validated_entries.LowerStringEntry`
+  * :class:`~ttkwidgets.validated_entries.UpperStringEntry`
+  * :class:`~ttkwidgets.validated_entries.CapitalizedStringEntry`
+  * :class:`~ttkwidgets.validated_entries.EmailEntry`
+  * :class:`~ttkwidgets.validated_entries.PasswordEntry`
+
 - Multiple authors:
 
   * :class:`~ttkwidgets.ScaleEntry` (RedFantom and Juliette Monsel)
-
