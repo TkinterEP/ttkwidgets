@@ -113,7 +113,7 @@ class ItemsCanvas(ttk.Frame):
             return
         item = results[0]
         rectangle = self.items[item]
-        self.config(cursor="fleur")
+        self.config(cursor="exchange")
         self.canvas.itemconfigure(item, fill="blue")
         xc, yc = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         dx, dy = xc - self.current_coords[0], yc - self.current_coords[1]
