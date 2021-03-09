@@ -29,12 +29,7 @@ class LinkLabel(ttk.Label):
         :type clicked_color: str
         :param kwargs: options to be passed on to the :class:`ttk.Label` initializer
         """
-        if root.tk.call('tk', 'windowingsystem') == 'win32':
-            self._cursor = kwargs.pop("cursor", "hand2") # Native Windows hand pointer
-        elif root.tk.call('tk', 'windowingsystem') == 'aqua':
-            self._cursor = kwargs.pop("cursor", "pointinghand") # Native Mac hand pointer
-        else:
-            self._cursor = kwargs.pop("cursor", "hand1")
+        self._cursor = kwargs.pop("cursor", "hand1")
         self._link = kwargs.pop("link", "")
         self._normal_color = kwargs.pop("normal_color", "#0563c1")
         self._hover_color = kwargs.pop("hover_color", "#057bc1")
