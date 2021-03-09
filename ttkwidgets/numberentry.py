@@ -11,27 +11,31 @@ from tkinter import ttk
 class NumberEntry(ttk.Entry):
     """
     An entry that takes only numbers or calculations and calculates the result of the calculation
-    
-    :param expressions: Allow the use of expressions (default is True)
-    :type expressions: bool
-    
-    :param roundto: The number of decimals in the result (default is 0)
-    :type roundto: int
     """
-    
-    
-    def __init__(self, master, **kwargs):
+    def __init__(self, master=None, **kwargs):
+        """
+        Create a NumberEntry
         
-        
+        :param expressions: Allow the use of expressions (default is True)
+        :type expressions: bool
+        :param roundto: The number of decimals in the result (default is 0)
+        :type roundto: int
+        """
         self._expr = kwargs.pop("expressions", True)
         self._round = kwargs.pop("roundto", 0)
         ttk.Entry.__init__(self, master, **kwargs)
         self.bind("<Return>", self._eval)
         self.bind("<FocusOut>", self._eval)
         self.bind("<KeyRelease>", self._check)
-    
+        
+    def __getitem__(self, key):
+        return self.cget(key)
+
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
     
     def _eval(self, *args):
+        """Calculate the result of the entered calculation"""
         current = self.get()
         try:
             if len(current) > 0:
@@ -52,7 +56,6 @@ class NumberEntry(ttk.Entry):
             self.insert(0, "ZeroDivisionError")
             self.select_range(0, "end")
         
-        
     def _check(self, *args):
         typed = self.get()
         if not typed == "SyntaxError" and not typed == "ZeroDivisionError":
@@ -60,8 +63,8 @@ class NumberEntry(ttk.Entry):
             self.delete(0, "end")
             self.insert(0, checked)
         
-        
     def _replace(self, typed) -> str:
+        """Delete the not allowed characters"""
         if self._expr:
             allowed = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+", "-", "*", "/", "%", "."]
         else:
@@ -70,7 +73,14 @@ class NumberEntry(ttk.Entry):
             if not current in allowed:
                 typed = typed.replace(current, "")
         return typed
-    
+
+    def configure(self, **kwargs):
+        """Configure resources of the widget."""
+        self._expr = kwargs.pop("expressions", True)
+        self._round = kwargs.pop("roundto", 0)
+        ttk.Entry.configure(self, **kwargs)
+
+    config = configure
     
     def cget(self, key):
         """Return the resource value for a KEY given as string"""
@@ -81,11 +91,9 @@ class NumberEntry(ttk.Entry):
         else:
             return ttk.Entry.cget(self, key)
         
-        
     def keys(self):
         """Return a list of all resource names of this widget"""
         keys = ttk.Entry.keys(self)
         keys.extend(["expressions", "roundto"])
         keys = sorted(keys)
         return keys
-      
