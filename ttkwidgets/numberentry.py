@@ -76,8 +76,8 @@ class NumberEntry(ttk.Entry):
 
     def configure(self, **kwargs):
         """Configure resources of the widget."""
-        self._expr = kwargs.pop("expressions", True)
-        self._round = kwargs.pop("roundto", 0)
+        self._expr = kwargs.pop("expressions", self._expr)
+        self._round = kwargs.pop("roundto", self._round)
         ttk.Entry.configure(self, **kwargs)
 
     config = configure
