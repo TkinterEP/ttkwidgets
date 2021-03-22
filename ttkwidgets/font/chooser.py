@@ -53,7 +53,7 @@ class FontChooser(tk.Toplevel):
     Should only be used through :func:`askfont`.
     """
 
-    def __init__(self, master=None, title=None, default=(), **kwargs):
+    def __init__(self, master=None, title=None, default=("Arial", 9), **kwargs):
         """
         Create a FontChooser.
         
