@@ -54,7 +54,7 @@ class FontFamilyDropdown(AutocompleteCombobox):
         :return: None if no font is selected and font family name if one is selected.
         :rtype: None or str
         """
-        if self._font.get() is "" or self._font.get() not in self._font_families:
+        if self._font.get() == "" or self._font.get() not in self._font_families:
             return None
         else:
             return self._font.get()
