@@ -2,6 +2,9 @@
 Author: Juliette Monsel
 License: GNU GPLv3
 Source: This repository
+
+Edited by rdbende: use <Return> as well to select the completition suggestion, and listboxheight option
+to set the height of the listbox
 """
 import tkinter as tk
 from tkinter import ttk
@@ -33,13 +36,16 @@ class AutocompleteEntryListbox(ttk.Frame):
         :param font: font in entry and listbox
         :param autohidescrollbar: whether to use an :class:`~ttkwidgets.AutoHideScrollbar` or a :class:`ttk.Scrollbar`
         :type autohidescrollbar: bool
+        :param listboxheight: the height of the listbox given in rows
+        :type listboxheight: int
         :param kwargs: keyword arguments passed to the :class:`ttk.Frame` initializer
         """
-        exportselection = kwargs.pop('exportselection', False)
-        width = kwargs.pop('width', None)
-        justify = kwargs.pop('justify', None)
-        font = kwargs.pop('font', None)
-        kwargs.setdefault('padding', 4)
+        exportselection = kwargs.pop("exportselection", False)
+        width = kwargs.pop("width", None)
+        justify = kwargs.pop("justify", None)
+        font = kwargs.pop("font", None)
+        self._listboxheight = kwargs.pop("listboxheight", 10)
+        kwargs.setdefault("padding", 4)
 
         ttk.Frame.__init__(self, master, **kwargs)
         self.columnconfigure(0, weight=1)
@@ -48,30 +54,33 @@ class AutocompleteEntryListbox(ttk.Frame):
         self._completevalues = completevalues
         validatecmd = self.register(self._validate)
         self.entry = ttk.Entry(self, width=width, justify=justify, font=font,
-                               validate='key', exportselection=exportselection,
+                               validate="key", exportselection=exportselection,
                                validatecommand=(validatecmd, "%d", "%S", "%i", "%s", "%P"))
-        f = ttk.Frame(self, style='border.TFrame', padding=1)
-        self.listbox = tk.Listbox(f, width=width, font=font,
+        f = ttk.Frame(self, style="border.TFrame", padding=1)
+        self.listbox = tk.Listbox(f, width=width, font=font, height=self._listboxheight,
                                   exportselection=exportselection, selectmode="browse",
-                                  highlightthickness=0, relief='flat')
+                                  highlightthickness=0, relief="flat")
         try:
             self.listbox.configure(justify=justify)   # this is an option only for tk >= 8.6.5
         except tk.TclError:
             pass
-        self.listbox.pack(fill='both', expand=True)
+        self.listbox.pack(fill="both", expand=True)
         if autohidescrollbar:
             self._scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
         else:
             self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
         self.listbox.configure(yscrollcommand=self._scrollbar.set)
-        self.entry.grid(sticky='ew')
-        f.grid(sticky='nsew')
-        self._scrollbar.grid(row=1, column=1, sticky='ns')
+        self.entry.grid(sticky="ew")
+        f.grid(sticky="nsew")
+        self._scrollbar.grid(row=1, column=1, sticky="ns")
         for c in self._completevalues:
-            self.listbox.insert('end', c)
+            self.listbox.insert(tk.END, c)
 
-        self.listbox.bind('<<ListboxSelect>>', self._update_entry)
+        self.listbox.bind("<<ListboxSelect>>", self._update_entry)
         self.listbox.bind("<KeyPress>", self._listbox_keypress)
+        # Sometimes it’s annoying that you can’t select the completition
+        # with Enter, only with Tab, so I added that as well
+        self.entry.bind("<Return>", self._tab)
         self.entry.bind("<Tab>", self._tab)
         self.entry.bind("<Right>", self._right)
         self.entry.bind("<Down>", self._down)
@@ -83,20 +92,21 @@ class AutocompleteEntryListbox(ttk.Frame):
 
     def _select_all(self, event):
         """Select all entry content."""
-        self.entry.selection_range(0, 'end')
+        self.entry.selection_range(0, tk.END)
         return "break"
 
     def _right(self, event):
-        """Move at the end of selected text on right press."""
+        """Move at the end of selected text on Right press."""
         if self.entry.selection_present():
             self.entry.select_clear()
-            self.entry.icursor("end")
+            self.entry.icursor(tk.END)
             return "break"
 
     def _tab(self, event):
-        """Move at the end of selected text on tab press."""
+        """Move at the end of selected text on Tab or Enter press."""
         self.entry.select_clear()
-        self.entry.icursor("end")
+        self.entry.icursor(tk.END)
+        self.listbox.event_generate("<<ListboxSelect>>")
         return "break"
 
     def _listbox_keypress(self, event):
@@ -105,7 +115,7 @@ class AutocompleteEntryListbox(ttk.Frame):
         l = [i for i in self._completevalues if i[0].lower() == key]
         if l:
             i = self._completevalues.index(l[0])
-            self.listbox.selection_clear(0, "end")
+            self.listbox.selection_clear(0, tk.END)
             self.listbox.selection_set(i)
             self.listbox.see(i)
             self._update_entry()
@@ -114,44 +124,44 @@ class AutocompleteEntryListbox(ttk.Frame):
         """Navigate in the listbox with up key."""
         try:
             i = self.listbox.curselection()[0]
-            self.listbox.selection_clear(0, "end")
+            self.listbox.selection_clear(0, tk.END)
             if i <= 0:
                 i = len(self._completevalues)
             self.listbox.see(i - 1)
             self.listbox.select_set(i - 1)
             self.listbox.activate(i - 1)
         except (tk.TclError, IndexError):
-            self.listbox.selection_clear(0, "end")
+            self.listbox.selection_clear(0, tk.END)
             i = len(self._completevalues)
             self.listbox.see(i - 1)
             self.listbox.select_set(i - 1)
             self.listbox.activate(i - 1)
-        self.listbox.event_generate('<<ListboxSelect>>')
+        self.listbox.event_generate("<<ListboxSelect>>")
         return "break"
 
     def _down(self, event):
         """Navigate in the listbox with down key."""
         try:
             i = self.listbox.curselection()[0]
-            self.listbox.selection_clear(0, "end")
+            self.listbox.selection_clear(0, tk.END)
             if i >= len(self._completevalues) - 1:
                 i = -1
             self.listbox.see(i + 1)
             self.listbox.select_set(i + 1)
             self.listbox.activate(i + 1)
         except (tk.TclError, IndexError):
-            self.listbox.selection_clear(0, "end")
+            self.listbox.selection_clear(0, tk.END)
             self.listbox.see(0)
             self.listbox.select_set(0)
             self.listbox.activate(0)
-        self.listbox.event_generate('<<ListboxSelect>>')
+        self.listbox.event_generate("<<ListboxSelect>>")
         return "break"
 
     def _validate(self, action, modif, pos, prev_txt, new_txt):
         """Complete the text in the entry with values."""
         try:
             sel = self.entry.selection_get()
-            txt = prev_txt.replace(sel, '')
+            txt = prev_txt.replace(sel, "")
         except tk.TclError:
             txt = prev_txt
         if action == "0":
@@ -162,13 +172,13 @@ class AutocompleteEntryListbox(ttk.Frame):
             l = [i for i in self._completevalues if i[:len(txt)] == txt]
             if l:
                 i = self._completevalues.index(l[0])
-                self.listbox.selection_clear(0, "end")
+                self.listbox.selection_clear(0, tk.END)
                 self.listbox.selection_set(i)
                 self.listbox.see(i)
                 index = self.entry.index("insert")
-                self.entry.delete(0, "end")
+                self.entry.delete(0, tk.END)
                 self.entry.insert(0, l[0].replace("\ ", " "))
-                self.entry.selection_range(index + 1, "end")
+                self.entry.selection_range(index + 1, tk.END)
                 self.entry.icursor(index + 1)
                 return True
             else:
@@ -186,16 +196,16 @@ class AutocompleteEntryListbox(ttk.Frame):
             sel = self.listbox.get(self.listbox.curselection()[0])
         except (tk.TclError, IndexError):
             return
-        self.entry.delete(0, "end")
+        self.entry.delete(0, tk.END)
         self.entry.insert(0, sel)
         self.entry.selection_clear()
-        self.entry.icursor("end")
-        self.event_generate('<<ItemSelect>>')
+        self.entry.icursor(tk.END)
+        self.event_generate("<<ItemSelect>>")
 
     def keys(self):
         keys = ttk.Frame.keys(self)
-        keys.extend(['completevalues', 'allow_other_values', 'exportselection',
-                     'justify', 'font'])
+        keys.extend(["completevalues", "allow_other_values", "exportselection",
+                     "justify", "font", "listboxheight"])
         return keys
 
     def get(self):
@@ -203,13 +213,15 @@ class AutocompleteEntryListbox(ttk.Frame):
         return self.entry.get()
 
     def cget(self, key):
-        if key == 'allow_other_values':
+        if key == "allow_other_values":
             return self._allow_other_values
-        elif key == 'completevalues':
+        elif key == "completevalues":
             return self._completevalues
-        elif key == 'autohidescrollbar':
+        elif key == "autohidescrollbar":
             return isinstance(self._scrollbar, AutoHideScrollbar)
-        elif key in ['justify', 'font', 'exportselection', 'width']:
+        elif key == "listboxheight":
+            return self._listboxheight
+        elif key in ["justify", "font", "exportselection", "width"]:
             return self.entry.cget(key)
         else:
             return ttk.Frame.cget(self, key)
@@ -219,17 +231,17 @@ class AutocompleteEntryListbox(ttk.Frame):
         kwargs.update(cnf)
         kwargs.update(kw)
         # completion settings
-        self._allow_other_values = kwargs.pop('allow_other_values', self._allow_other_values)
-        if 'completevalues' in kwargs:
-            completevalues = kwargs.pop('completevalues')
+        self._allow_other_values = kwargs.pop("allow_other_values", self._allow_other_values)
+        if "completevalues" in kwargs:
+            completevalues = kwargs.pop("completevalues")
             self._completevalues = completevalues
-            self.listbox.delete(0, 'end')
+            self.listbox.delete(0, tk.END)
             for c in self._completevalues:
-                self.listbox.insert('end', c)
+                self.listbox.insert(tk.END, c)
 
         # autohidescrollbar
         autohidescrollbar = isinstance(self._scrollbar, AutoHideScrollbar)
-        autohidescrollbar2 = kwargs.pop('autohidescrollbar', autohidescrollbar)
+        autohidescrollbar2 = kwargs.pop("autohidescrollbar", autohidescrollbar)
         if autohidescrollbar != autohidescrollbar2:
             self._scrollbar.destroy()
             if autohidescrollbar2:
@@ -237,21 +249,24 @@ class AutocompleteEntryListbox(ttk.Frame):
             else:
                 self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.listbox.yview)
             self.listbox.configure(yscrollcommand=self._scrollbar.set)
-            self._scrollbar.grid(row=1, column=1, sticky='ns')
+            self._scrollbar.grid(row=1, column=1, sticky="ns")
         # entry/listbox settings
         entry_listbox_kw = {}
-        for key in ['font', 'exportselection', 'width']:
+        for key in ["font", "exportselection", "width"]:
             if key in kwargs:
                 entry_listbox_kw[key] = kwargs.pop(key)
         self.entry.configure(entry_listbox_kw)
         self.listbox.configure(entry_listbox_kw)
-        if 'justify' in kwargs:
-            justify = kwargs.pop('justify')
+        if "justify" in kwargs:
+            justify = kwargs.pop("justify")
             self.entry.configure(justify=justify)
             try:
                 self.listbox.configure(justify=justify)   # this is an option only for tk >= 8.6.5
             except tk.TclError:
                 pass
+        if "listboxheight" in kwargs:
+            self._listboxheight = kwargs.pop("listboxheight", "10")
+            self.listbox.configure(height=self._listboxheight)
         # frame settings
         ttk.Frame.config(self, kwargs)
 
