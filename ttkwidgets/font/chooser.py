@@ -2,6 +2,8 @@
 Author: RedFantom
 License: GNU GPLv3
 Source: This repository
+
+Edited by rdbende: translation, autocompleteentrylistbox, and defult font option
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
 import tkinter as tk
@@ -10,6 +12,39 @@ from tkinter import font as tkfont
 from .familylistbox import FontFamilyListbox
 from .sizedropdown import FontSizeDropdown
 from .propertiesframe import FontPropertiesFrame
+from .familydropdown import FontFamilyDropdown
+from locale import getdefaultlocale
+
+
+# --- Translation
+EN = {"Font family": "Font family", "Font properties": "Font properties",
+      "Font size": "Font size", "Cancel": "Cancel", "Font Chooser": "Font Chooser"}
+
+FR = {"Font family": "Famille", "Font properties": "Propriétés",
+      "Font size": "Taille", "Cancel": "Annuler", "Font Chooser": "Sélecteur de polices"}
+
+DE = {"Font family": "Familie", "Font properties": "Eigenschaften",
+      "Font size": "Schriftgröße", "Cancel": "Abbrechen", "Font Chooser": "Schriftauswahl"}
+
+HU = {"Font family": "Betűtípus", "Font properties": "Betűstílus",
+      "Font size": "Méret", "Cancel": "Mégse", "Font Chooser": "Betűtípus"}
+
+try:
+    if getdefaultlocale()[0][:2] == "fr":
+        TR = FR
+    elif getdefaultlocale()[0][:2] == "de":
+        TR = DE
+    elif getdefaultlocale()[0][:2] == "hu":
+        TR = HU
+    else:
+        TR = EN
+except ValueError:
+    TR = EN
+
+
+def tr(text):
+    """Translate text."""
+    return TR.get(text, text)
 
 
 class FontChooser(tk.Toplevel):
@@ -18,53 +53,69 @@ class FontChooser(tk.Toplevel):
     Should only be used through :func:`askfont`.
     """
 
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, title=None, default=(), **kwargs):
         """
         Create a FontChooser.
         
         :param master: master window
         :type master: widget
+        :param title: dialog title
+        :type title: str
+        :param default: set the default font, family and size must be specified: (family, size, options)
+        :type default: tuple
         :param kwargs: keyword arguments passed to :class:`tk.Toplevel` initializer
         """
         tk.Toplevel.__init__(self, master, **kwargs)
-        self.wm_title("Choose a font")
+        
+        self.title(title)
+        self.transient(self.master)
         self.resizable(False, False)
-        self.style = ttk.Style()
-        self.style.configure("FontChooser.TLabel", font=("default", 11), relief=tk.SUNKEN, anchor=tk.CENTER)
-        self._font_family_header = ttk.Label(self, text="Font family", style="FontChooser.TLabel")
-        self._font_family_list = FontFamilyListbox(self, callback=self._on_family, height=8)
-        self._font_label_variable = tk.StringVar()
-        self._font_label = ttk.Label(self, textvariable=self._font_label_variable, background="white")
-        self._font_properties_header = ttk.Label(self, text="Font properties", style="FontChooser.TLabel")
-        self._font_properties_frame = FontPropertiesFrame(self, callback=self._on_properties, label=False)
-        self._font_size_header = ttk.Label(self, text="Font size", style="FontChooser.TLabel")
-        self._size_dropdown = FontSizeDropdown(self, callback=self._on_size, width=4)
-        self._example_label = tk.Label(self, text="Example", anchor=tk.CENTER, background="white", height=2,
-                                       relief=tk.SUNKEN)
+        self.columnconfigure(1, weight=1)
 
-        self._family = None
-        self._size = 11
-        self._bold = False
-        self._italic = False
-        self._underline = False
-        self._overstrike = False
+        self._family = default[0]
+        self._size = default[1]
+        self._bold = True if "bold" in default else False
+        self._italic = True if "italic" in default else False
+        self._underline = True if "underline" in default else False
+        self._overstrike = True if "overstrike" in default else False
+        
+        self._font_family_frame = ttk.LabelFrame(self, text=tr("Font family"))
+        # I don't know why, but search with lowercase characters isn't work for me
+        self._font_family_list = FontFamilyListbox(self._font_family_frame, callback=self._on_family,
+                                                   font=default, listboxheight=8)
+        self._font_properties_frame = ttk.LabelFrame(self, text=tr("Font properties"))
+        self._font_properties = FontPropertiesFrame(self._font_properties_frame, callback=self._on_properties,
+                                                    font=self.__generate_font_tuple()[2:], label=False)
+        self._font_size_frame = ttk.LabelFrame(self, text=tr("Font size"))
+        self._size_dropdown = FontSizeDropdown(self._font_size_frame, font=default, callback=self._on_size, width=6)
+        self._example_label = tk.Label(self, text="AaBbYyZz01", height=2, anchor=tk.CENTER, relief=tk.SOLID, borderwidth=1)
+        
         self._font = None
-        self._ok_button = ttk.Button(self, text="OK", command=self._close)
-        self._cancel_button = ttk.Button(self, text="Cancel", command=self._cancel)
+        self._ok_button = ttk.Button(self, text="Ok", command=self._close)
+        self._cancel_button = ttk.Button(self, text=tr("Cancel"), command=self._cancel)
         self._grid_widgets()
+        self._on_change()
+        
+        # To be consistent with colorpicker
+        self.wait_visibility()
+        self.lift()
+        self.grab_set()
 
     def _grid_widgets(self):
         """Puts all the child widgets in the correct position."""
-        self._font_family_header.grid(row=0, column=1, sticky="nswe", padx=5, pady=5)
-        self._font_label.grid(row=1, column=1, sticky="nswe", padx=5, pady=(0, 5))
-        self._font_family_list.grid(row=2, rowspan=3, column=1, sticky="nswe", padx=5, pady=(0, 5))
-        self._font_properties_header.grid(row=0, column=2, sticky="nswe", padx=5, pady=5)
-        self._font_properties_frame.grid(row=1, rowspan=2, column=2, sticky="we", padx=5, pady=5)
-        self._font_size_header.grid(row=3, column=2, sticky="we", padx=5, pady=5)
-        self._size_dropdown.grid(row=4, column=2, sticky="we", padx=5, pady=5)
-        self._example_label.grid(row=5, column=1, columnspan=2, sticky="nswe", padx=5, pady=5)
-        self._ok_button.grid(row=6, column=2, sticky="nswe", padx=5, pady=5)
-        self._cancel_button.grid(row=6, column=1, sticky="nswe", padx=5, pady=5)
+        self._font_family_frame.grid(row=0, rowspan=2, column=0, sticky="nswe", padx=5, pady=5)
+        self._font_family_list.grid(row=0, column=0, sticky="nswe", padx=5, pady=(0, 5))
+        
+        self._font_properties_frame.grid(row=0, column=1, columnspan=2, sticky="nswe", padx=5, pady=5)
+        self._font_properties.pack(anchor=tk.CENTER, pady=15)
+        
+        self._font_size_frame.grid(row=1, column=1, columnspan=2, sticky="nswe", padx=5, pady=5)
+        self._size_dropdown.pack(anchor=tk.CENTER, pady=15)
+        
+        self._example_label.grid(row=2, column=0, columnspan=3, sticky="nswe", padx=5, pady=5)
+        
+        self._ok_button.grid(row=3, column=1, sticky="e", padx=5, pady=5)
+        self._cancel_button.grid(row=3, column=2, sticky="e", padx=5, pady=5)
 
     def _on_family(self, family):
         """
@@ -72,7 +123,6 @@ class FontChooser(tk.Toplevel):
         
         :param family: family name
         """
-        self._font_label_variable.set(family)
         self._family = family
         self._on_change()
 
@@ -146,12 +196,19 @@ class FontChooser(tk.Toplevel):
         self.destroy()
 
 
-def askfont():
+def askfont(master=None, title=tr("Font Chooser"), default=("Arial", 9)):
     """
-    Opens a :class:`FontChooser` toplevel to allow the user to select a font
+    Opens a :class:`FontChooser` dialog and return the chosen font.
     
     :return: font tuple (family_name, size, \*options), :class:`~font.Font` object
+
+    :param master: parent widget
+    :type master: widget
+    :param title: dialog title
+    :type title: str
+    :param default: set the default font, family and size must be specified: (family, size, options)
+    :type default: tuple 
     """
-    chooser = FontChooser()
-    chooser.wait_window()
+    chooser = FontChooser(master, title, default)
+    chooser.wait_window(chooser)
     return chooser.font

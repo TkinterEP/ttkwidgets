@@ -2,10 +2,39 @@
 Author: RedFantom
 License: GNU GPLv3
 Source: This repository
+
+Edited by rdbende: translation and default font properties option
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
 import tkinter as tk
 from tkinter import ttk
+from locale import getdefaultlocale
+
+# --- Translation
+EN = {"Font properties:": "Font properties:"}
+
+FR = {"Font properties:": "Propriétés"}
+
+DE = {"Font properties:": "Eigenschaften"}
+
+HU = {"Font properties:": "Betűstílus"}
+
+try:
+    if getdefaultlocale()[0][:2] == "fr":
+        TR = FR
+    elif getdefaultlocale()[0][:2] == "de":
+        TR = DE
+    elif getdefaultlocale()[0][:2] == "hu":
+        TR = HU
+    else:
+        TR = EN
+except ValueError:
+    TR = EN
+
+
+def tr(text):
+    """Translate text."""
+    return TR.get(text, text)
 
 
 class FontPropertiesFrame(ttk.Frame):
@@ -13,7 +42,7 @@ class FontPropertiesFrame(ttk.Frame):
     Simple frame with buttons for Bold, Italic and Underline font types.
     """
 
-    def __init__(self, master=None, callback=None, label=True, fontsize=11, **kwargs):
+    def __init__(self, master=None, callback=None, label=True, font=None, fontsize=11, **kwargs):
         """
         Create a FontPropertiesFrame.
         
@@ -24,6 +53,8 @@ class FontPropertiesFrame(ttk.Frame):
         :type callback: function
         :param label: show a header label
         :type label: str
+        :param font: set the default font properties
+        :type font: tuple
         :param fontsize: size of the font on the buttons
         :type fontsize: int
         :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
@@ -32,23 +63,26 @@ class FontPropertiesFrame(ttk.Frame):
         self._style = ttk.Style()
         self.__label = label
         self.__callback = callback
-        self._header_label = ttk.Label(self, text="Font properties:")
+        self._header_label = ttk.Label(self, text=tr("Font properties:"))
+        
         self._style.configure("Bold.Toolbutton", font=("default", fontsize, "bold"), anchor=tk.CENTER)
         self._style.configure("Italic.Toolbutton", font=("default", fontsize, "italic"), anchor=tk.CENTER)
         self._style.configure("Underline.Toolbutton", font=("default", fontsize, "underline"), anchor=tk.CENTER)
         self._style.configure("Overstrike.Toolbutton", font=("default", fontsize, "overstrike"), anchor=tk.CENTER)
-        self._bold = tk.BooleanVar()
-        self._italic = tk.BooleanVar()
-        self._underline = tk.BooleanVar()
-        self._overstrike = tk.BooleanVar()
-        self._bold_button = ttk.Checkbutton(self, style="Bold.Toolbutton", text="B", width=2, command=self._on_click,
-                                            variable=self._bold)
+
+        self._bold = tk.BooleanVar(value=True if "bold" in font else False)
+        self._italic = tk.BooleanVar(value=True if "italic" in font else False)
+        self._underline = tk.BooleanVar(value=True if "underline" in font else False)
+        self._overstrike = tk.BooleanVar(value=True if "overstrike" in font else False)
+        
+        self._bold_button = ttk.Checkbutton(self, style="Bold.Toolbutton", text="B", width=2,
+                                            command=self._on_click, variable=self._bold, offvalue=False)
         self._italic_button = ttk.Checkbutton(self, style="Italic.Toolbutton", text="I", width=2,
-                                              command=self._on_click, variable=self._italic)
+                                              command=self._on_click, variable=self._italic, offvalue=False)
         self._underline_button = ttk.Checkbutton(self, style="Underline.Toolbutton", text="U", width=2,
-                                                 command=self._on_click, variable=self._underline)
+                                                 command=self._on_click, variable=self._underline, offvalue=False)
         self._overstrike_button = ttk.Checkbutton(self, style="Overstrike.Toolbutton", text="O", width=2,
-                                                  command=self._on_click, variable=self._overstrike)
+                                                  command=self._on_click, variable=self._overstrike, offvalue=False)
         self._grid_widgets()
 
     def _grid_widgets(self):
@@ -65,8 +99,18 @@ class FontPropertiesFrame(ttk.Frame):
 
     def _on_click(self):
         """Handles clicks and calls callback."""
+    
         if callable(self.__callback):
-            self.__callback((self.bold, self.italic, self.underline, self.overstrike))
+            self.__callback((self.__generate_prop_tuple()))
+    
+    def __generate_prop_tuple(self):
+        """
+        Generate a prop tuple for tkinter widgets based on the user's entries.
+        
+        :return: prop tuple (*options)
+        """
+        prop = (self._bold.get(), self._italic.get(), self._underline.get(), self._overstrike.get())
+        return prop
 
     @property
     def bold(self):

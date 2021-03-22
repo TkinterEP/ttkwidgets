@@ -2,10 +2,13 @@
 Author: RedFantom
 License: GNU GPLv3
 Source: This repository
+
+Edited by rdbende: default font option
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
+import tkinter as tk
 from tkinter import ttk
-from tkinter import font
+from tkinter import font as tkfont
 from .familydropdown import FontFamilyDropdown
 from .propertiesframe import FontPropertiesFrame
 from .sizedropdown import FontSizeDropdown
@@ -18,27 +21,35 @@ class FontSelectFrame(ttk.Frame):
     For :class:`~font.Font` object, use :obj:`font` property.
     """
 
-    def __init__(self, master=None, callback=None, **kwargs):
+    def __init__(self, master=None, callback=None, default=("Arial", 9), **kwargs):
         """
         :param master: master widget
         :type master: widget
         :param callback: callback passed argument
                          (`str` family, `int` size, `bool` bold, `bool` italic, `bool` underline)
         :type callback: function
+        :param default: set the default font, family and size must be specified: (family, size, options)
+        :type default: tuple 
         :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
         self.__callback = callback
-        self._family = None
-        self._size = 11
-        self._bold = False
-        self._italic = False
-        self._underline = False
-        self._overstrike = False
-        self._family_dropdown = FontFamilyDropdown(self, callback=self._on_family)
-        self._size_dropdown = FontSizeDropdown(self, callback=self._on_size, width=4)
-        self._properties_frame = FontPropertiesFrame(self, callback=self._on_properties, label=False)
+        self._family = default[0]
+        self._size = default[1]
+        
+        self._bold = True if "bold" in default else False
+        self._italic = True if "italic" in default else False
+        self._underline = True if "underline" in default else False
+        self._overstrike = True if "overstrike" in default else False
+        
+        self._family_dropdown = FontFamilyDropdown(self, font=default, callback=self._on_family)
+        self._size_dropdown = FontSizeDropdown(self, font=default, callback=self._on_size, width=6)
+        self._properties_frame = FontPropertiesFrame(self, callback=self._on_properties, font=self.__generate_font_tuple()[2:], label=False)
         self._grid_widgets()
+        # Unfortunately we can't just call _on_change,
+        # because if the callback function uses the returned value (like in the example)
+        # it raises error, because the widget basically does not exist until the end of __init__
+        # self._on_change()
 
     def _grid_widgets(self):
         """
@@ -65,7 +76,7 @@ class FontSelectFrame(ttk.Frame):
         """
         self._size = size
         self._on_change()
-
+        
     def _on_properties(self, properties):
         """
         Callback if properties are changed
@@ -74,16 +85,17 @@ class FontSelectFrame(ttk.Frame):
         """
         self._bold, self._italic, self._underline, self._overstrike = properties
         self._on_change()
-
+        
     def _on_change(self):
         """Call callback if any property is changed."""
         if callable(self.__callback):
-            self.__callback((self._family, self._size, self._bold, self._italic, self._underline, self._overstrike))
+            font = self.__generate_font_tuple()
+            self.__callback(font)
 
     def __generate_font_tuple(self):
         """
         Generate a font tuple for tkinter widgets based on the user's entries.
-
+        
         :return: font tuple (family_name, size, *options)
         """
         if not self._family:
@@ -102,17 +114,17 @@ class FontSelectFrame(ttk.Frame):
     @property
     def font(self):
         """
-        Font property.
-
-        :return: a :class:`~font.Font` object if family is set, else None
-        :rtype: :class:`~font.Font` or None
+        Selected font.
+        
+        :return: font tuple (family_name, size, \*options), :class:`~font.Font` object
         """
-        if not self._family:
+        if self._family is None:
             return None, None
-        font_obj = font.Font(family=self._family, size=self._size,
-                             weight=font.BOLD if self._bold else font.NORMAL,
-                             slant=font.ITALIC if self._italic else font.ROMAN,
-                             underline=1 if self._underline else 0,
-                             overstrike=1 if self._overstrike else 0)
-        font_tuple = self.__generate_font_tuple()
-        return font_tuple, font_obj
+        else:
+            font_tuple = self.__generate_font_tuple()
+            font_obj = tkfont.Font(family=self._family, size=self._size,
+                                   weight=tkfont.BOLD if self._bold else tkfont.NORMAL,
+                                   slant=tkfont.ITALIC if self._italic else tkfont.ROMAN,
+                                   underline=1 if self._underline else 0,
+                                   overstrike=1 if self._overstrike else 0)
+            return font_tuple, font_obj
