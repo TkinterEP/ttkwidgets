@@ -33,7 +33,6 @@ class FontFamilyListbox(AutocompleteEntryListbox):
         self._callback = callback
         self._font_families = sorted(set(tkfont.families()))
         AutocompleteEntryListbox.__init__(self, master, completevalues=self._font_families, **kwargs)
-        self.font_indexes = {}
         if font:
             self.listbox.selection_set(self._font_families.index(font[0]))
             self.listbox.yview_scroll(self._font_families.index(font[0]), "units")
