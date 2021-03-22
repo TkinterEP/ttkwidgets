@@ -50,7 +50,7 @@ class FontSizeDropdown(AutocompleteCombobox):
         :return: None if no value is selected and size if selected.
         :rtype: None or int
         """
-        if self.get() is "":
+        if self.get() == "":
             return None
         else:
             return int(self.get())
