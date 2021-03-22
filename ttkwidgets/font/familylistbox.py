@@ -56,6 +56,6 @@ class FontFamilyListbox(AutocompleteEntryListbox):
         :rtype: None or str
         """
         selection = self.listbox.curselection()
-        if len(selection) is 0:
+        if len(selection) == 0:
             return None
         return self._font_families[selection[0]]
