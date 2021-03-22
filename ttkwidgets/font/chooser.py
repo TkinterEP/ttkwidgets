@@ -70,7 +70,6 @@ class FontChooser(tk.Toplevel):
         self.title(title)
         self.transient(self.master)
         self.resizable(False, False)
-        self.columnconfigure(1, weight=1)
 
         self._family = default[0]
         self._size = default[1]
@@ -80,7 +79,7 @@ class FontChooser(tk.Toplevel):
         self._overstrike = True if "overstrike" in default else False
         
         self._font_family_frame = ttk.LabelFrame(self, text=tr("Font family"))
-        # I don't know why, but search with lowercase characters isn't work for me
+        # I don't know why, but search with lowercase characters doesn't work for me
         self._font_family_list = FontFamilyListbox(self._font_family_frame, callback=self._on_family,
                                                    font=default, listboxheight=8)
         self._font_properties_frame = ttk.LabelFrame(self, text=tr("Font properties"))
