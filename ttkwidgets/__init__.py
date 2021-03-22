@@ -11,7 +11,6 @@ from ttkwidgets.scaleentry import ScaleEntry
 from ttkwidgets.timeline import TimeLine
 from ttkwidgets.tickscale import TickScale
 from ttkwidgets.table import Table
-from ttkwidgets.numberentry import NumberEntry
 
 from ttkwidgets.validated_entries.numbers import (
     PercentEntry, IntEntry, FloatEntry,
