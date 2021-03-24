@@ -17,7 +17,6 @@ ttkwidgets
     DebugWindow
     ItemsCanvas
     LinkLabel
-    NumberEntry
     ScaleEntry
     ScrolledListbox
     Table
