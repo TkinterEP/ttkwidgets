@@ -73,9 +73,9 @@ class GradientBar(tk.Canvas):
 
         self.gradient = tk.PhotoImage(master=self, width=width, height=height)
 
-        self.bind('<Configure>', lambda e: self._draw_gradient(hue))
-        self.bind('<ButtonPress-1>', self._on_click)
-        self.bind('<B1-Motion>', self._on_move)
+        self.bind("<Configure>", lambda e: self._draw_gradient(hue))
+        self.bind("<ButtonPress-1>", self._on_click)
+        self.bind("<B1-Motion>", self._on_move)
 
     def _draw_gradient(self, hue):
         """Draw the gradient and put the cursor on hue."""
@@ -97,19 +97,19 @@ class GradientBar(tk.Canvas):
         self.lower("gradient")
 
         x = hue / 360. * width
-        self.create_line(x, 0, x, height, width=2, tags='cursor')
+        self.create_line(x, 0, x, height, width=2, tags="cursor")
 
     def _on_click(self, event):
         """Move selection cursor on click."""
         x = event.x
-        self.coords('cursor', x, 0, x, self.winfo_height())
+        self.coords("cursor", x, 0, x, self.winfo_height())
         self._variable.set(round2((360. * x) / self.winfo_width()))
 
     def _on_move(self, event):
         """Make selection cursor follow the cursor."""
         w = self.winfo_width()
         x = min(max(event.x, 0), w)
-        self.coords('cursor', x, 0, x, self.winfo_height())
+        self.coords("cursor", x, 0, x, self.winfo_height())
         self._variable.set(round2((360. * x) / w))
 
     def _update_hue(self, *args):
@@ -123,7 +123,7 @@ class GradientBar(tk.Canvas):
 
     def get(self):
         """Return hue of color under cursor."""
-        coords = self.coords('cursor')
+        coords = self.coords("cursor")
         return round2(360 * coords[0] / self.winfo_width())
 
     def set(self, hue):
@@ -138,5 +138,5 @@ class GradientBar(tk.Canvas):
         elif hue < 0:
             hue = 0
         x = hue / 360. * self.winfo_width()
-        self.coords('cursor', x, 0, x, self.winfo_height())
+        self.coords("cursor", x, 0, x, self.winfo_height())
         self._variable.set(hue)
