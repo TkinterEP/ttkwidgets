@@ -66,7 +66,7 @@ try:
     elif getdefaultlocale()[0][:2] == "de":
         TR = DE
     elif getdefaultlocale()[0][:2] == "hu":
-        TR = EN
+        TR = HU
     else:
         TR = EN
 except ValueError:
