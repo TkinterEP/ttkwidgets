@@ -35,9 +35,11 @@ from math import atan2, sqrt, pi
 import colorsys
 
 
-PALETTE = ("red", "dark red", "orange", "yellow", "green", "lightgreen", "blue",
-           "royal blue", "sky blue", "purple", "magenta", "pink", "black",
-           "white", "gray", "saddle brown", "lightgray", "wheat")
+PALETTE = ("white", "black", "lightgray", "gray",
+           "wheat", "saddle brown", "yellow", "orange",
+           "red", "red4", "violet", "purple",
+           "pink", "magenta", "cornflower blue", "blue",
+           "lightgreen", "green")
 
 
 # in some python versions round returns a float instead of an int
