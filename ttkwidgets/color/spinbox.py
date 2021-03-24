@@ -6,6 +6,8 @@ Source: https://github.com/j4321/tkColorPicker
 
 Edited by RedFantom for Python 2/3 cross-compatibility and docstring formatting
 
+
+
 tkcolorpicker - Alternative to colorchooser for Tkinter.
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
 
@@ -23,6 +25,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Nicer Spinbox than the tk.Spinbox
+
+NOTE from rdbende: I would consider replacing this entire widget with a ttk.Spinbox.
+Unfortunately, it doesn't change much on Linux, but it would look better on Windows and Mac anyway.
 """
 
 
@@ -45,7 +50,7 @@ class Spinbox(tk.Spinbox):
         self.style.configure("%s.spinbox.TFrame" % self.frame,
                              background=self.style.lookup("TSpinbox",
                                                           "fieldbackground",
-                                                          default='white'))
+                                                          default="white"))
         self.frame.configure(style="%s.spinbox.TFrame" % self.frame)
         kwargs["relief"] = "flat"
         kwargs["highlightthickness"] = 0
@@ -57,7 +62,7 @@ class Spinbox(tk.Spinbox):
                                                        ("focus",))
         kwargs["background"] = self.style.lookup("TSpinbox",
                                                  "fieldbackground",
-                                                 default='white')
+                                                 default="white")
         kwargs["foreground"] = self.style.lookup("TSpinbox",
                                                  "foreground")
         kwargs["buttonbackground"] = self.style.lookup("TSpinbox",
@@ -97,7 +102,7 @@ class Spinbox(tk.Spinbox):
         self.place_info = self.frame.place_info
         self.place_slaves = self.frame.place_slaves
 
-        self.bind('<1>', lambda e: self.focus_set())
+        self.bind("<1>", lambda e: self.focus_set())
         self.frame.bind("<FocusIn>", self.focusin)
         self.frame.bind("<FocusOut>", self.focusout)
 
@@ -117,3 +122,4 @@ class Spinbox(tk.Spinbox):
         lc = self.style.lookup("TEntry", "lightcolor", ("focus",))
         self.style.configure("%s.spinbox.TFrame" % self.frame, bordercolor=bc,
                              darkcolor=dc, lightcolor=lc)
+
