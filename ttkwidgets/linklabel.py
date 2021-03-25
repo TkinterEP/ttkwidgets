@@ -2,8 +2,11 @@
 Author: RedFantom
 License: GNU GPLv3
 Source: This repository
+
+Edited by rdbende: default, native cursors, virtual event, colors
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbrol/tkinter-kit)
+# Unfortunately this link is invalid. I can't find any nbrol, or Nelson Brochado on GitHub :(
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
@@ -13,7 +16,7 @@ class LinkLabel(ttk.Label):
     """
     A :class:`ttk.Label` that can be clicked to open a link with a default blue color, a purple color when clicked and a bright
     blue color when hovering over the Label.
-    """
+    """    
     def __init__(self, master=None, **kwargs):
         """
         Create a LinkLabel.
@@ -29,13 +32,18 @@ class LinkLabel(ttk.Label):
         :type clicked_color: str
         :param kwargs: options to be passed on to the :class:`ttk.Label` initializer
         """
-        self._cursor = kwargs.pop("cursor", "hand1")
         self._link = kwargs.pop("link", "")
-        self._normal_color = kwargs.pop("normal_color", "#0563c1")
-        self._hover_color = kwargs.pop("hover_color", "#057bc1")
-        self._clicked_color = kwargs.pop("clicked_color", "#954f72")
+        self._normal_color = kwargs.pop("normal_color", "#005fff")
+        self._hover_color = kwargs.pop("hover_color", "#000fff")
+        self._clicked_color = kwargs.pop("clicked_color", "#6600a6")
+        self._master = master or tk._default_root
+        if self._master.tk.call("tk", "windowingsystem") == "aqua":
+            self._cursor = kwargs.pop("cursor", "pointinghand")
+        else:
+            self._cursor = kwargs.pop("cursor", "hand2")
         ttk.Label.__init__(self, master, **kwargs)
-        self.config(foreground=self._normal_color)
+        if "disabled" not in self.state():
+            self.configure(foreground=self._normal_color, cursor=self._cursor)
         self.__clicked = False
         self.bind("<Button-1>", self.open_link)
         self.bind("<Enter>", self._on_enter)
@@ -49,7 +57,10 @@ class LinkLabel(ttk.Label):
 
     def _on_enter(self, *args):
         """Set the text color to the hover color."""
-        self.config(foreground=self._hover_color, cursor=self._cursor)
+        if self.__clicked:
+            self.config(foreground=self._clicked_color)
+        else:
+            self.config(foreground=self._hover_color)
 
     def _on_leave(self, *args):
         """Set the text color to either the normal color when not clicked or the clicked color when clicked."""
@@ -57,7 +68,6 @@ class LinkLabel(ttk.Label):
             self.config(foreground=self._clicked_color)
         else:
             self.config(foreground=self._normal_color)
-        self.config(cursor="")
 
     def reset(self):
         """Reset Label to unclicked status if previously clicked."""
@@ -70,7 +80,24 @@ class LinkLabel(ttk.Label):
             webbrowser.open(self._link)
             self.__clicked = True
             self._on_leave()
+            self.event_generate("<<LinkOpened>>")
+            
+    def configure(self, **kwargs):
+        """
+        Configure resources of the widget.
 
+        To get the list of options for this widget, call the method :meth:`~LinkLabel.keys`.
+        See :meth:`~LinkLabel.__init__` for a description of the widget specific option.
+        """
+        self._link = kwargs.pop("link", self._link)
+        self._hover_color = kwargs.pop("hover_color", self._hover_color)
+        self._normal_color = kwargs.pop("normal_color", self._normal_color)
+        self._clicked_color = kwargs.pop("clicked_color", self._clicked_color)
+        self._cursor = kwargs.pop("cursor", self._cursor)
+        ttk.Label.configure(self, **kwargs)
+
+    config = configure
+        
     def cget(self, key):
         """
         Query widget option.
@@ -90,25 +117,11 @@ class LinkLabel(ttk.Label):
         elif key is "clicked_color":
             return self._clicked_color
         else:
-            return ttk.Label.cget(self, key)
-
-    def configure(self, **kwargs):
-        """
-        Configure resources of the widget.
-
-        To get the list of options for this widget, call the method :meth:`~LinkLabel.keys`.
-        See :meth:`~LinkLabel.__init__` for a description of the widget specific option.
-        """
-        self._link = kwargs.pop("link", self._link)
-        self._hover_color = kwargs.pop("hover_color", self._hover_color)
-        self._normal_color = kwargs.pop("normal_color", self._normal_color)
-        self._clicked_color = kwargs.pop("clicked_color", self._clicked_color)
-        ttk.Label.configure(self, **kwargs)
-        self._on_leave()
-
+            return ttk.Label.cget(self, key)   
+    
     def keys(self):
         """Return a list of all resource names of this widget."""
         keys = ttk.Label.keys(self)
         keys.extend(["link", "normal_color", "hover_color", "clicked_color"])
+        keys.sort()
         return keys
-
