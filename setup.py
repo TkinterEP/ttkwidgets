@@ -12,7 +12,7 @@ def read(file_name: str):
 
 setup(
     name="ttkwidgets",
-    packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color"],
+    packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color", "ttkwidgets.validated_entries"],
     py_modules=["ttkwidgets"],
     package_data={"ttkwidgets": ["assets/*"]},
     version="0.11.0",
