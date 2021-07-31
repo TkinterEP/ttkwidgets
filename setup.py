@@ -15,7 +15,7 @@ setup(
     packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color", "ttkwidgets.validated_entries"],
     py_modules=["ttkwidgets"],
     package_data={"ttkwidgets": ["assets/*"]},
-    version="0.11.0",
+    version="0.12.0",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
@@ -23,8 +23,7 @@ setup(
     url="https://www.github.com/RedFantom/ttkwidgets",
     download_url="https://www.github.com/RedFantom/ttkwidgets/releases",
     license="AGPL",
-    classifiers=["Programming Language :: Python :: 2.7",
-                 "Programming Language :: Python :: 3",
+    classifiers=["Programming Language :: Python :: 3",
                  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"],
     install_requires=["pillow"]
 )
