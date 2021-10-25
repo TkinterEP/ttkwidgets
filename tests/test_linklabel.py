@@ -36,3 +36,12 @@ class TestLinkLabel(BaseWidgetTest):
         self.window.update()
         label["clicked_color"] = "purple"
         self.window.update()
+
+    def test_linklabel_cget(self):
+        label = LinkLabel(self.window, link="www.google.com", text="Visit Google")
+        label.pack()
+        assert label.cget("hover_color") == label._hover_color
+        assert label.cget("link") == label._link
+        assert label.cget("normal_color") == label._normal_color
+        assert label.cget("clicked_color") == label._clicked_color
+        assert label.cget("text") == "Visit Google"
