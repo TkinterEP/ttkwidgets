@@ -83,7 +83,7 @@ class ItemsCanvas(ttk.Frame):
             self.current = None
             return
         results = self.canvas.find_withtag(tk.CURRENT)
-        if len(results) is 0:
+        if len(results) == 0:
             return
         self.current = results[0]
         self.canvas.itemconfigure(self.current, fill=self.item_colors[self.current][2])
@@ -109,7 +109,7 @@ class ItemsCanvas(ttk.Frame):
         """
         self.set_current()
         results = self.canvas.find_withtag(tk.CURRENT)
-        if len(results) is 0:
+        if len(results) == 0:
             return
         item = results[0]
         rectangle = self.items[item]
