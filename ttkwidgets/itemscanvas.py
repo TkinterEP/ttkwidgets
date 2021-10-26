@@ -104,21 +104,20 @@ class ItemsCanvas(ttk.Frame):
         """
         self.set_current()
         results = self.canvas.find_withtag(tk.CURRENT)
-        if len(results) == 0:
-            return
-        item = results[0]
-        rectangle = self.items[item]
-        self.config(cursor="exchange")
-        self.canvas.itemconfigure(item, fill="blue")
-        xc, yc = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
-        dx, dy = xc - self.current_coords[0], yc - self.current_coords[1]
-        self.current_coords = xc, yc
-        self.canvas.move(item, dx, dy)
-        # check whether the new position of the item respects the boundaries
-        x, y = self.canvas.coords(item)
-        x, y = max(min(x, self._max_x), 0), max(min(y, self._max_y), 0)
-        self.canvas.coords(item, x, y)
-        self.canvas.coords(rectangle, self.canvas.bbox(item))
+        if results:
+            item = results[0]
+            rectangle = self.items[item]
+            self.config(cursor="exchange")
+            self.canvas.itemconfigure(item, fill="blue")
+            xc, yc = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
+            dx, dy = xc - self.current_coords[0], yc - self.current_coords[1]
+            self.current_coords = xc, yc
+            self.canvas.move(item, dx, dy)
+            # check whether the new position of the item respects the boundaries
+            x, y = self.canvas.coords(item)
+            x, y = max(min(x, self._max_x), 0), max(min(y, self._max_y), 0)
+            self.canvas.coords(item, x, y)
+            self.canvas.coords(rectangle, self.canvas.bbox(item))
 
     def right_press(self, event):
         """
