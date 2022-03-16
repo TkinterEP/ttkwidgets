@@ -97,10 +97,10 @@ class TimeLine(ttk.Frame):
         :param finish: Value to end the timeline at
         :type finish: float
         :param resolution: Amount of time per pixel [s/pixel]
-        :type resolution: int
+        :type resolution: float
         :param tick_resolution: Amount of time between ticks on the
             timeline
-        :type tick_resolution: int
+        :type tick_resolution: float
         :param unit: Unit of time. Some units have predefined
             properties, such as minutes ('m') and hours ('h'), which
             make the tick markers have an appropriate format.
