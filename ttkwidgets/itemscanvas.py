@@ -81,7 +81,6 @@ class ItemsCanvas(ttk.Frame):
         if self.current:
             self.canvas.itemconfigure(self.current, fill=self.item_colors[self.current][1])
             self.current = None
-            return
 
     def left_release(self, event):
         """
