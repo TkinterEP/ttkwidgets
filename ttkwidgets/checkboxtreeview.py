@@ -78,6 +78,32 @@ class CheckboxTreeview(ttk.Treeview):
         for c in children:
             aux(c)
 
+    def check_all(self):
+        """Check all items."""
+
+        def aux(item):
+            self.change_state(item, "checked")
+            children = self.get_children(item)
+            for c in children:
+                aux(c)
+
+        children = self.get_children("")
+        for c in children:
+            aux(c)
+
+    def uncheck_all(self):
+        """Uncheck all items."""
+
+        def aux(item):
+            self.change_state(item, "unchecked")
+            children = self.get_children(item)
+            for c in children:
+                aux(c)
+
+        children = self.get_children("")
+        for c in children:
+            aux(c)
+
     def state(self, statespec=None):
         """
         Modify or inquire widget state.
