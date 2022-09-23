@@ -52,11 +52,11 @@ class CheckboxTreeview(ttk.Treeview):
         # check / uncheck boxes on click
         self.bind("<Button-1>", self._box_click, True)
 
-    def expand_all(self):
-        """Expand all items."""
+    def _expand_collapse_all(self, open):
+        """Expand or collapse all items."""
 
         def aux(item):
-            self.item(item, open=True)
+            self.item(item, open=open)
             children = self.get_children(item)
             for c in children:
                 aux(c)
@@ -65,11 +65,21 @@ class CheckboxTreeview(ttk.Treeview):
         for c in children:
             aux(c)
 
+    def expand_all(self):
+        """Expand all items."""
+
+        self._expand_collapse_all(True)
+
     def collapse_all(self):
         """Collapse all items."""
 
+        self._expand_collapse_all(False)
+
+    def _check_uncheck_all(self, state):
+        """Check or uncheck all items."""
+
         def aux(item):
-            self.item(item, open=False)
+            self.change_state(item, state)
             children = self.get_children(item)
             for c in children:
                 aux(c)
@@ -81,28 +91,12 @@ class CheckboxTreeview(ttk.Treeview):
     def check_all(self):
         """Check all items."""
 
-        def aux(item):
-            self.change_state(item, "checked")
-            children = self.get_children(item)
-            for c in children:
-                aux(c)
-
-        children = self.get_children("")
-        for c in children:
-            aux(c)
+        self._check_uncheck_all("checked")
 
     def uncheck_all(self):
         """Uncheck all items."""
 
-        def aux(item):
-            self.change_state(item, "unchecked")
-            children = self.get_children(item)
-            for c in children:
-                aux(c)
-
-        children = self.get_children("")
-        for c in children:
-            aux(c)
+        self._check_uncheck_all("unchecked")
 
     def state(self, statespec=None):
         """
