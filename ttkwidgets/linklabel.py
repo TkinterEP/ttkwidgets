@@ -108,13 +108,13 @@ class LinkLabel(ttk.Label):
 
         To get the list of options for this widget, call the method :meth:`~LinkLabel.keys`.
         """
-        if key is "link":
+        if key == "link":
             return self._link
-        elif key is "hover_color":
+        elif key == "hover_color":
             return self._hover_color
-        elif key is "normal_color":
+        elif key == "normal_color":
             return self._normal_color
-        elif key is "clicked_color":
+        elif key == "clicked_color":
             return self._clicked_color
         else:
             return ttk.Label.cget(self, key)   

@@ -1,7 +1,5 @@
 environment:
   matrix:
-    - PYTHON: "C:\\PYTHON34"
-    - PYTHON: "C:\\PYTHON35"
     - PYTHON: "C:\\PYTHON36"
     - PYTHON: "C:\\PYTHON37"
     - PYTHON: "C:\\PYTHON38"
