@@ -2,10 +2,7 @@
 # For license see LICENSE
 from ttkwidgets.frames import ScrolledFrame
 from tests import BaseWidgetTest
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 
 
 class TestScrolledFrame(BaseWidgetTest):
@@ -13,6 +10,13 @@ class TestScrolledFrame(BaseWidgetTest):
         frame = ScrolledFrame(self.window)
         frame.pack()
         self.window.update()
+        self.assertFalse(frame._scrollbar.winfo_ismapped())
+        
+        frame.destroy()
+        frame = ScrolledFrame(self.window, autohidescrollbar=False)
+        frame.pack()
+        self.window.update()
+        self.assertTrue(frame._scrollbar.winfo_ismapped())
 
     def test_scrollframe_methods(self):
         frame = ScrolledFrame(self.window)

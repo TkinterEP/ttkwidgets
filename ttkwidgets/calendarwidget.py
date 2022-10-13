@@ -3,14 +3,9 @@ Author: The Python Team
 License: The Python License
 Source: http://svn.python.org/projects/sandbox/trunk/ttk-gsoc/samples/ttkcalendar.py
 """
-try:
-    import Tkinter as tk
-    import ttk
-    import tkFont
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
-    from tkinter import font as tkFont
+import tkinter as tk
+from tkinter import ttk
+from tkinter import font as tkfont
 import calendar
 
 
@@ -25,9 +20,10 @@ def get_calendar(locale, fwday):
 class Calendar(ttk.Frame):
     """
     ttk Widget that enables a calender within a frame, allowing the user to select dates.
-    Credits to: The Python team
-    Source: The Python/ttk samples
-    License: The Python GPL-compatible license
+    
+    | Credits to: The Python team
+    | Source: The Python/ttk samples
+    | License: The Python GPL-compatible license
     """
 
     datetime = calendar.datetime.datetime
@@ -35,9 +31,23 @@ class Calendar(ttk.Frame):
 
     def __init__(self, master=None, **kw):
         """
-        WIDGET-SPECIFIC OPTIONS
-            locale, firstweekday, year, month, selectbackground,
-            selectforeground
+        Create a Calendar.
+        
+        :param master: master widget
+        :type master: widget
+        :param locale: calendar locale (defines the language, date formatting)
+        :type locale: str
+        :param firstweekday: first day of the week, 0 is monday
+        :type firstweekday: int
+        :param year: year to display
+        :type year: int
+        :param month: month to display
+        :type month: int
+        :param selectbackground: background color of the selected day
+        :type selectbackground: str
+        :param selectforeground: selectforeground color of the selected day
+        :type selectforeground: str
+        :param kw: options to be passed on to the :class:`ttk.Frame` initializer
         """
         # remove custom options from kw before initializating ttk.Frame
         fwday = kw.pop('firstweekday', calendar.MONDAY)
@@ -109,14 +119,14 @@ class Calendar(ttk.Frame):
         self._calendar.tag_configure('header', background='grey90')
         self._calendar.insert('', 'end', values=cols, tag='header')
         # adjust its columns width
-        font = tkFont.Font()
+        font = tkfont.Font()
         maxwidth = max(font.measure(col) for col in cols)
         for col in cols:
             self._calendar.column(col, width=maxwidth, minwidth=maxwidth,
                                   anchor='e')
 
     def __setup_selection(self, sel_bg, sel_fg):
-        self._font = tkFont.Font()
+        self._font = tkfont.Font()
         self._canvas = canvas = tk.Canvas(self._calendar,
                                           background=sel_bg, borderwidth=0, highlightthickness=0)
         canvas.text = canvas.create_text(0, 0, fill=sel_fg, anchor='w')
@@ -202,7 +212,11 @@ class Calendar(ttk.Frame):
 
     @property
     def selection(self):
-        """Return a datetime representing the current selected date."""
+        """
+        Return the currently selected date.
+        
+        :rtype: datetime
+        """
         if not self._selection:
             return None
 

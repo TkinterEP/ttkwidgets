@@ -5,29 +5,29 @@ Source: https://mail.python.org/pipermail/tkinter-discuss/2012-January/003041.ht
 
 Edited by RedFantom for ttk and Python 2 and 3 cross-compatibility and <Enter> binding
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 
 tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresis', 'Udiaeresis', 'ssharp']
 
 
 class AutocompleteEntry(ttk.Entry):
     """
-    Subclass of tk.Entry that features autocompletion.
+    Subclass of :class:`ttk.Entry` that features autocompletion.
 
-    To enable autocompletion use set_completion_list(list) to define
+    To enable autocompletion use :meth:`set_completion_list` to define
     a list of possible strings to hit.
     To cycle through hits use down and up arrow keys.
     """
     def __init__(self, master=None, completevalues=None, **kwargs):
         """
+        Create an AutocompleteEntry.
+
         :param master: master widget
-        :param completevalues: autocompletion values list
-        :param kwargs: keyword arguments passed on to Entry initializer
+        :type master: widget
+        :param completevalues: autocompletion values
+        :type completevalues: list
+        :param kwargs: keyword arguments passed to the :class:`ttk.Entry` initializer
         """
         ttk.Entry.__init__(self, master, **kwargs)
         self._completion_list = completevalues
@@ -39,8 +39,9 @@ class AutocompleteEntry(ttk.Entry):
     def set_completion_list(self, completion_list):
         """
         Set a new auto completion list
-        :param completion_list: list of values
-        :return: None
+
+        :param completion_list: completion values
+        :type completion_list: list
         """
         self._completion_list = sorted(completion_list, key=str.lower)  # Work with a sorted list
         self._hits = []
@@ -50,9 +51,10 @@ class AutocompleteEntry(ttk.Entry):
 
     def autocomplete(self, delta=0):
         """
-        Autocomplete the Entry, delta may be 0/1/-1 to cycle through possible hits
-        :param delta: int
-        :return: None
+        Autocomplete the Entry.
+
+        :param delta: 0, 1 or -1: how to cycle through possible hits
+        :type delta: int
         """
         if delta:  # need to delete selection otherwise we would fix the current position
             self.delete(self.position, tk.END)
@@ -78,9 +80,9 @@ class AutocompleteEntry(ttk.Entry):
 
     def handle_keyrelease(self, event):
         """
-        Event handler for the keyrelease event on this widget
+        Event handler for the keyrelease event on this widget.
+
         :param event: Tkinter event
-        :return: None
         """
         if event.keysym == "BackSpace":
             self.delete(self.index(tk.INSERT), tk.END)
@@ -105,9 +107,37 @@ class AutocompleteEntry(ttk.Entry):
 
     def handle_return(self, event):
         """
-        Function to bind to the Enter/Return key so if Enter is pressed the selection is cleared
+        Function to bind to the Enter/Return key so if Enter is pressed the selection is cleared.
+
         :param event: Tkinter event
-        :return: None
         """
         self.icursor(tk.END)
         self.selection_clear()
+
+    def config(self, **kwargs):
+        """Alias for configure"""
+        self.configure(**kwargs)
+
+    def configure(self, **kwargs):
+        """Configure widget specific keyword arguments in addition to :class:`ttk.Entry` keyword arguments."""
+        if "completevalues" in kwargs:
+            self.set_completion_list(kwargs.pop("completevalues"))
+        return ttk.Entry.configure(self, **kwargs)
+
+    def cget(self, key):
+        """Return value for widget specific keyword arguments"""
+        if key == "completevalues":
+            return self._completion_list
+        return ttk.Entry.cget(self, key)
+
+    def keys(self):
+        """Return a list of all resource names of this widget."""
+        keys = ttk.Entry.keys(self)
+        keys.append("completevalues")
+        return keys
+
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
+
+    def __getitem__(self, item):
+        return self.cget(item)

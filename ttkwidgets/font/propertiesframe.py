@@ -4,28 +4,29 @@ License: GNU GPLv3
 Source: This repository
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
-try:
-    import Tkinter as tk
-    import ttk
-    import tkFont as font
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
-    from tkinter import font
+import tkinter as tk
+from tkinter import ttk
 
 
 class FontPropertiesFrame(ttk.Frame):
     """
-    Simple frame with buttons for Bold, Italic and Undelrine font types
+    Simple frame with buttons for Bold, Italic and Underline font types.
     """
 
     def __init__(self, master=None, callback=None, label=True, fontsize=11, **kwargs):
         """
+        Create a FontPropertiesFrame.
+        
         :param master: master widget
-        :param callback: callback with argument (bool bold, bool italic, bool underline, bool overstrike)
+        :type master: widget
+        :param callback: callback with argument
+                         (`bool` bold, `bool` italic, `bool` underline, `bool` overstrike)
+        :type callback: function
         :param label: show a header label
+        :type label: str
         :param fontsize: size of the font on the buttons
-        :param kwargs: keyword arguments passed on to Frame initializer
+        :type fontsize: int
+        :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
         self._style = ttk.Style()
@@ -63,37 +64,46 @@ class FontPropertiesFrame(ttk.Frame):
         self._overstrike_button.grid(row=1, column=4, sticky="nswe", padx=(0, 5), pady=2)
 
     def _on_click(self):
-        """
-        Handles clicks and calls callback
-        :return: None
-        """
+        """Handles clicks and calls callback."""
         if callable(self.__callback):
             self.__callback((self.bold, self.italic, self.underline, self.overstrike))
 
     @property
     def bold(self):
         """
+        Bold property.
+        
         :return: True if bold is selected
+        :rtype: bool
         """
         return self._bold.get()
 
     @property
     def italic(self):
         """
+        Italic property.
+        
         :return: True if italic is selected
+        :rtype: bool
         """
         return self._italic.get()
 
     @property
     def underline(self):
         """
+        Underline property.
+        
         :return: True if underline is selected
+        :rtype: bool
         """
         return self._underline.get()
 
     @property
     def overstrike(self):
         """
+        Overstrike property.
+        
         :return: True if overstrike is selected
+        :rtype: bool
         """
         return self._overstrike.get()

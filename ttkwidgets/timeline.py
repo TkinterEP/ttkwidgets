@@ -3,110 +3,164 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
 from ttkwidgets.utilities import open_icon
 from collections import OrderedDict
+from ttkwidgets import AutoHideScrollbar
 
 
 class TimeLine(ttk.Frame):
     """
-    A Frame containing a Canvas and various buttons to manage a timeline that can be marked with certain events,
-    allowing the binding of commands to hovering over certain elements and creating texts inside the elements.
+    A Frame containing a Canvas and various buttons to manage a timeline
+    that can be marked with certain events, allowing the binding of
+    commands to hovering over certain elements and creating texts inside
+    the elements.
 
-    Each marker is pretty much a coloured rectangle with some optional text, that can be assigned tags. Tags may specify
-    the colors of the marker, but tags can also be assigned callbacks that can be called with the identifier of the tag
-    as well as a Tkinter event instance that was generated upon clicking. For example, the markers may be moved, or the
-    user may want to add a menu that shows upon right-clicking. See the create_marker function for more details on the
-    markers.
+    Each marker is pretty much a coloured rectangle with some optional
+    text, that can be assigned tags. Tags may specify the colors of the
+    marker, but tags can also be assigned callbacks that can be called
+    with the identifier of the tag as well as a Tkinter event instance
+    that was generated upon clicking. For example, the markers may be
+    moved, or the user may want to add a menu that shows upon
+    right-clicking. See the :meth:`create_marker` function for more details on
+    the markers.
 
-    The markers are put into a Canvas, which contains rows for each category. The categories are indicated by Labels and
-    separated by black separating lines. Underneath the rows of categories, there is a second Canvas containing markers
-    for the ticks of the time unit. Some time units get special treatment, such as "h" and "m", displayed in an
-    appropriate H:M and M:S format respectively.
+    The markers are put into a Canvas, which contains rows for each
+    category. The categories are indicated by Labels and separated by
+    black separating lines. Underneath the rows of categories, there is
+    a second Canvas containing markers for the ticks of the time unit.
+    Some time units get special treatment, such as "h" and "m",
+    displayed in an appropriate H:M and M:S format respectively.
 
-    The height of the row for each category is automatically adjusted to the height of its respective Label to give
-    a uniform appearance. All markers are redrawn if the generate_canvas_contents is called, and therefore it should
-    be called after any size change. Depending on the number of markers to draw, it may take a long time.
+    The height of the row for each category is automatically adjusted to
+    the height of its respective Label to give a uniform appearance.
+    All markers are redrawn if :meth:`draw_timeline` is called,
+    and therefore it should be called after any size change. Depending
+    on the number of markers to draw, it may take a long time.
 
-    The TimeLine can be scrolled in two ways: horizontally (with _scrollbar_timeline) and vertically (with
-    _scrollbar_timeline_v), which both use a class function as a proxy to allow for other functions to be called upon
-    scrolling. The horizontal scrollbar makes a small pop-up window appear to indicate the time the cursor is currently
-    pointing at on the timeline.
+    The TimeLine can be scrolled in two ways: horizontally (with
+    :obj:`_scrollbar_timeline`) and vertically (with :obj:`_scrollbar_timeline_v`),
+    which both use a class function as a proxy to allow for other
+    functions to be called upon scrolling. The horizontal scrollbar
+    makes a small pop-up window appear to indicate the time the cursor
+    is currently pointing at on the timeline.
 
-    The markers can be retrieved from the class using the markers property, and they can be saved and then the markers
-    can be recreated by calling create_marker again for each marker. This functionality is not built into the class,
-    if the user wants to do something like this, he or she should write the code required, as it can be done in
-    different ways.
+    The markers can be retrieved from the class using the markers
+    property, and they can be saved and then the markers can be
+    recreated by calling :meth:`create_marker` again for each marker. This
+    functionality is not built into the class, if the user wants to do
+    something like this, he or she should write the code required, as it
+    can be done in different ways.
 
-    Some of the code has been inspired by the ItemsCanvas, as that is also a Canvas that supports the manipulation of
-    items, but as this works in a fundamentally different way, the classes do not share any common parent class.
+    Some of the code has been inspired by the :class:`ItemsCanvas`, as that is
+    also a Canvas that supports the manipulation of items, but as this
+    works in a fundamentally different way, the classes do not share any
+    common parent class.
 
-    This widget is *absolutely not* thread-safe, and it was not designed as such. It may work in some situations, but
-    nothing is guaranteed when using this widget from multiple threads, even with Tkinter compiled with thread-safe
-    flags or when using mtTkinter for Python 2.
+    .. warning::
+         This widget is *absolutely not* thread-safe, and it was not designed
+         as such. It may work in some situations, but nothing is guaranteed
+         when using this widget from multiple threads, even with Tkinter
+         compiled with thread-safe flags or when using mtTkinter for
+         Python 2.
 
-    Some themes may conflict with this widget, for example because it makes the default font bigger for the category
-    Labels. This should be fixed by the user by modifying the TimeLine.T(Widget) style.
+    .. note::
+         Some themes may conflict with this widget, for example because it
+         makes the default font bigger for the category Labels. This should
+         be fixed by the user by modifying the "TimeLine.T(Widget)" style.
     """
 
     def __init__(self, master=None, **kwargs):
         """
         Create a TimeLine widget
 
-        Keyword Arguments:
-            TimeLine options:
-            * int width: width of the timeline in pixels                                    400
-            * int height: height of the timeline in pixels                                  200
-            * bool extend: whether to extend when an item is moved out of range             False
-            * float start: value to start at                                                0.0
-            * float finish: value to finish at                                              10.0
-            * float resolution: amount of time per pixel                                    0.01
-            * float tick_resolution: amount of time between ticks                           1.0
-            * str unit: unit of time, some units have predefined properties, such           "s"
-                as minutes ("m") and hours ("h"), which make the tick markers have
-                an appropriate format
-            * bool zoom_enabled: whether to allow zooming with the buttons                  True
-            * dict categories: a dictionary with the names of the categories as             {}
-                the keys and keyword argument dictionaries as the values
-            * str background: Tkinter-compatible background color for the Canvas            "gray90"
-            * str style: Style for the Frame widget                                         "TimeLine.TFrame"
-            * tuple float zoom_factors: tuple of zoom levels, for example (1, 2, 5)         (1, 2, 5)
-                means zoom levels of 1x, 2x and 5x are supported
-            * float zoom_default: default zoom value                                        zoom_factors[0]
-            * int snap_margin: amount of pixels between start and or finish of a            15
-                marker and a tick before the marker is snapped into place
-            * tk.Menu menu: Menu to show when a right-click is performed somewhere          None
-                on the timeline without a marker being active
-            Marker options:
-            * tuple marker_font: font tuple to specify the default font for the             ("default", 10)
-                markers
-            * str marker_background: Tkinter-compatible default background color            "lightblue"
-                for the markers
-            * str marker_foreground: Tkinter-compatible default foreground color            "black"
-                for the markers
-            * str marker_outline: Tkinter-compatible default outline color for the          "black"
-                markers
-            * int marker_border: number of pixels border width                              0
-            * bool marker_move: whether it is allowed to move markers                       True
-            * bool marker_change_category: whether the markers are allowed to change        False
-                category by moving them vertically
-            * bool marker_allow_overlap: whether the markers are allowed to overlap         False
-                this setting is only enforced on the marker being moved. This means
-                that when inserting markers, no errors will be raised, even with
-                overlaps, and an overlap-allowing marker is moved over a non-overlap
-                allowing marker, then an overlap will still occur.
-            * bool marker_snap_to_ticks: whether the markers should snap to the ticks       True
-                when close automatically
+        The style of the buttons can be modified by using the
+        "TimeLine.TButton" style.
+        The style of the surrounding Frame can be modified by using the
+        "TimeLine.TFrame" style, or by specifying another style in the
+        keyword arguments.
+        The style of the category Labels can be modified by using the
+        "TimeLine.TLabel" style.
 
-        The style of the buttons can be modified by using the "TimeLine.TButton" style.
-        The style of the surrounding Frame can be modified by using the "TimeLine.TFrame" style, or by specifying
-            another style in the keyword arguments.
-        The style of the category Labels can be modified by using the "TimeLine.TLabel" style.
+        **Base TimeLine Widget Options**
+
+        :param width: Width of the timeline in pixels
+        :type width: int
+        :param height: Height of the timeline in pixels
+        :type height: int
+        :param extend: Whether to extend when an item is moved out of
+            range
+        :type extend: bool
+        :param start: Value to start the timeline at
+        :type start: float
+        :param finish: Value to end the timeline at
+        :type finish: float
+        :param resolution: Amount of time per pixel [s/pixel]
+        :type resolution: int
+        :param tick_resolution: Amount of time between ticks on the
+            timeline
+        :type tick_resolution: int
+        :param unit: Unit of time. Some units have predefined
+            properties, such as minutes ('m') and hours ('h'), which
+            make the tick markers have an appropriate format.
+        :type unit: str
+        :param zoom_enabled: Whether to allow zooming on the timeline
+            using the zoom buttons
+        :type zoom_enabled: bool
+        :param categories: A dictionary with the names of the categories
+            as the keys and the keyword argument dictionaries as values.
+            Use an :obj:`OrderedDict` in order to preserve category
+            order.
+        :type categories: dict[Any, dict]
+        :param background: Background color for the Canvas widget
+        :type background: str
+        :param style: Style to apply to the Frame widget
+        :type style: str
+        :param zoom_factors: Tuple of allowed zoom levels. For example:
+            (1.0, 2.0, 5.0). The order of zoom levels is preserved.
+        :type zoom_factors: tuple[float]
+        :param zoom_default: Default zoom level to apply to the timeline
+        :type zoom_default: float
+        :param snap_margin: Amount of pixels between start and/or finish
+            of a marker and a tick on the timeline before the marker is
+            snapped into place
+        :type snap_margin: int
+        :param menu: Menu to show when a right-click is performed
+            somewhere on the TimeLine without a marker being active
+        :type menu: tk.Menu
+        :param autohidescrollbars: whether to use :class:`~ttkwidgets.AutoHideScrollbar`
+            or :class:`ttk.Scrollbar` for the scrollbars
+        :type autohidescrollbars: bool
+
+        **Marker Default Options**
+
+        :param marker_font: Font tuple to specify the default font for
+            the markers
+        :type marker_font: tuple
+        :param marker_background: Default background color for markers
+        :type marker_background: str
+        :param marker_foreground: Default foreground color for markers
+        :type marker_foreground: str
+        :param marker_outline: Default outline color for the markers
+        :type marker_outline: str
+        :param marker_border: Border width in pixels
+        :type marker_border: int
+        :param marker_move: Whether markers are allowed to move by
+            default
+        :type marker_move: bool
+        :param marker_change_category: Whether markers are allowed to
+            change category by being dragged vertically
+        :type marker_change_category: bool
+        :param marker_allow_overlap: Whether the markers are allowed to
+            overlap. This setting is only enforced on the marker being
+            moved. This means that when inserting markers, no errors
+            will be raised, even with overlaps, and when an
+            overlap-allowing marker is moved over an overlap-disallowing
+            marker and overlap will still occur.
+        :type marker_allow_overlap: bool
+        :param marker_snap_to_ticks: Whether the markers should snap to
+            the ticks when moved close to ticks automatically
         """
         self.check_kwargs(kwargs)
         # Keyword argument processing
@@ -126,6 +180,7 @@ class TimeLine(ttk.Frame):
         self._extend = kwargs.pop("extend", False)
         self._snap_margin = kwargs.pop("snap_margin", 10)
         self._menu = kwargs.pop("menu", None)
+        self._autohidescrollbars = kwargs.pop("autohidescrollbars", False)
         kwargs["style"] = self._style
         self._marker_font = kwargs.pop("marker_font", ("default", 10))
         self._marker_background = kwargs.pop("marker_background", "lightblue")
@@ -169,44 +224,54 @@ class TimeLine(ttk.Frame):
         # Create the child widgets
 
         # Frames
-        self._canvas_categories = tk.Canvas(self, background=self._background, height=self._height,
-                                            borderwidth=0)
-        self._canvas_ticks = tk.Canvas(self, background=self._background, width=self._width, height=30,
-                                       borderwidth=0)
+        self._canvas_categories = tk.Canvas(
+            self, background=self._background, height=self._height, borderwidth=0)
+        self._canvas_ticks = tk.Canvas(
+            self, background=self._background, width=self._width, height=30, borderwidth=0)
         self._frame_zoom = ttk.Frame(self, style=self._style)
         self._frame_categories = ttk.Frame(self._canvas_categories, style=self._style)
+
         # Zoom buttons
-        self._button_zoom_in = ttk.Button(self._frame_zoom, image=self._image_zoom_in, command=self.zoom_in,
-                                          state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
-        self._button_zoom_out = ttk.Button(self._frame_zoom, image=self._image_zoom_out, command=self.zoom_out,
-                                           state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
-        self._button_zoom_reset = ttk.Button(self._frame_zoom, image=self._image_zoom_reset, command=self.zoom_reset,
-                                             state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
+        self._button_zoom_in = ttk.Button(
+            self._frame_zoom, image=self._image_zoom_in, command=self.zoom_in,
+            state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
+        self._button_zoom_out = ttk.Button(
+            self._frame_zoom, image=self._image_zoom_out, command=self.zoom_out,
+            state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
+        self._button_zoom_reset = ttk.Button(
+            self._frame_zoom, image=self._image_zoom_reset, command=self.zoom_reset,
+            state=tk.NORMAL if self._zoom_enabled else tk.DISABLED)
+
         # Category Labels
         self._category_labels = OrderedDict()
-        self.create_categories()
+        self.draw_categories()
+
         # Canvas widgets
         self._canvas_scroll = tk.Canvas(self, background=self._background, width=self._width, height=self._height)
         self._timeline = tk.Canvas(self._canvas_scroll, background=self._background, borderwidth=0)
         self._timeline_id = self._canvas_scroll.create_window(0, 0, window=self._timeline, anchor=tk.NW)
-        self._scrollbar_timeline = ttk.Scrollbar(self, command=self.set_scroll, orient=tk.HORIZONTAL)
-        self._scrollbar_vertical = ttk.Scrollbar(self, command=self.set_scroll_v, orient=tk.VERTICAL)
+        if self._autohidescrollbars:
+            self._scrollbar_timeline = AutoHideScrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+            self._scrollbar_vertical = AutoHideScrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
+        else:
+            self._scrollbar_timeline = ttk.Scrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+            self._scrollbar_vertical = ttk.Scrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
         self._canvas_scroll.config(xscrollcommand=self._scrollbar_timeline.set,
                                    yscrollcommand=self._scrollbar_vertical.set)
         self._canvas_categories.config(yscrollcommand=self._scrollbar_vertical.set)
 
         self._setup_bindings()
         self.zoom_reset()
-        self.generate_timeline_contents()
+        self.draw_timeline()
         self.grid_widgets()
-
-    """
-    Initialization
-    """
 
     def grid_widgets(self):
         """
-        Put all the child widgets of this super-widget in place
+        Configure all widgets using the grid geometry manager
+
+        Automatically called by the :meth:`__init__` method.
+        Does not have to be called by the user except in extraordinary
+        cases.
         """
         # Categories
         for index, label in enumerate(self._category_labels.values()):
@@ -235,52 +300,39 @@ class TimeLine(ttk.Frame):
             widget.bind("<MouseWheel>", self._mouse_scroll_v)
             widget.bind("<Shift-MouseWheel>", self._mouse_scroll_h)
         # Callback bindings
-        self._timeline.bind("<ButtonPress-1>", self.left_click)
-        self._timeline.bind("<B1-Motion>", self.left_motion)
-        self._timeline.bind("<ButtonPress-3>", self.right_click)
-        self._timeline.tag_bind("marker", "<Enter>", self.enter_handler)
-        self._timeline.tag_bind("marker", "<Leave>", self.leave_handler)
-        self._canvas_ticks.bind("<B1-Motion>", self.time_marker_move)
-        self._canvas_ticks.bind("<ButtonRelease-1>", self.time_marker_release)
+        self._timeline.bind("<ButtonPress-1>", self._left_click)
+        self._timeline.bind("<B1-Motion>", self._left_motion)
+        self._timeline.bind("<ButtonPress-3>", self._right_click)
+        self._timeline.tag_bind("marker", "<Enter>", self._enter_handler)
+        self._timeline.tag_bind("marker", "<Leave>", self._leave_handler)
+        self._canvas_ticks.bind("<B1-Motion>", self._time_marker_move)
+        self._canvas_ticks.bind("<ButtonRelease-1>", self._time_marker_release)
 
-    """
-    Generating TimeLine contents
-
-    These functions all play a role in creating items in the canvases
-    """
-
-    def generate_timeline_contents(self):
-        """
-        Generate all the contents of the Canvas, including time tick markers and all markers in the categories
-        """
+    def draw_timeline(self):
+        """Draw the contents of the whole TimeLine Canvas"""
         # Configure the canvas
         self.clear_timeline()
         self.create_scroll_region()
         self._timeline.config(width=self.pixel_width)
         self._canvas_scroll.config(width=self._width, height=self._height)
         # Generate the Y-coordinates for each of the rows and create the lines indicating the rows
-        self.create_separating_lines()
+        self.draw_separators()
         # Create the markers on the timeline
-        self.create_markers(self.markers)
+        self.draw_markers()
         # Create the ticks in the _canvas_ticks
-        self.create_ticks()
-        self.create_time_marker()
+        self.draw_ticks()
+        self.draw_time_marker()
 
-    def create_time_marker(self):
-        """
-        Create the time marker and the line in the appropriate canvases
-        """
+    def draw_time_marker(self):
+        """Draw the time marker on the TimeLine Canvas"""
         self._time_marker_image = self._canvas_ticks.create_image((2, 16), image=self._time_marker)
         self._time_marker_line = self._timeline.create_line(
-            (2, 0, 2, self._timeline.winfo_height()), fill="#016dc9", width=2
-        )
+            (2, 0, 2, self._timeline.winfo_height()), fill="#016dc9", width=2)
         self._timeline.lift(self._time_marker_line)
         self._timeline.tag_lower("marker")
 
-    def create_categories(self):
-        """
-        Create the appropriate category labels and update the size of the _canvas_categories
-        """
+    def draw_categories(self):
+        """Draw the category labels on the Canvas"""
         for label in self._category_labels.values():
             label.destroy()
         self._category_labels.clear()
@@ -299,9 +351,7 @@ class TimeLine(ttk.Frame):
         self._canvas_categories.config(width=canvas_width + 5, height=self._height)
 
     def create_scroll_region(self):
-        """
-        Set the correct scroll regions for the categories Canvas
-        """
+        """Setup the scroll region on the Canvas"""
         canvas_width = 0
         canvas_height = 0
         for label in self._category_labels.values():
@@ -312,15 +362,16 @@ class TimeLine(ttk.Frame):
 
     def clear_timeline(self):
         """
-        Delete all items in the Canvas, does not modify the categories
+        Clear the contents of the TimeLine Canvas
+
+        Does not modify the actual markers dictionary and thus after
+        redrawing all markers are visible again.
         """
         self._timeline.delete(tk.ALL)
         self._canvas_ticks.delete(tk.ALL)
 
-    def create_ticks(self):
-        """
-        Create the tick markers in the ticks canvas
-        """
+    def draw_ticks(self):
+        """Draw the time tick markers on the TimeLine Canvas"""
         self._canvas_ticks.create_line((0, 10, self.pixel_width, 10), fill="black")
         self._ticks = list(TimeLine.range(self._start, self._finish, self._tick_resolution / self._zoom_factor))
         for tick in self._ticks:
@@ -332,10 +383,8 @@ class TimeLine(ttk.Frame):
             self._canvas_ticks.create_line((x_tick, 5, x_tick, 15), fill="black")
         self._canvas_ticks.config(scrollregion="0 0 {0} {1}".format(self.pixel_width, 30))
 
-    def create_separating_lines(self):
-        """
-        Create the lines separating the different category rows in the TimeLine's Canvas
-        """
+    def draw_separators(self):
+        """Draw the lines separating the categories on the Canvas"""
         total = 1
         self._timeline.create_line((0, 1, self.pixel_width, 1))
         for index, (category, label) in enumerate(self._category_labels.items()):
@@ -346,58 +395,77 @@ class TimeLine(ttk.Frame):
         pixel_height = total
         self._timeline.config(height=pixel_height)
 
-    def create_markers(self, markers):
-        """
-        Create all the markers in a given category dictionary, as in the markers property
-        """
+    def draw_markers(self):
+        """Draw all created markers on the TimeLine Canvas"""
         self._canvas_markers.clear()
         for marker in self._markers.values():
             self.create_marker(marker["category"], marker["start"], marker["finish"], marker)
 
     def __configure_timeline(self, *args):
-        """
-        Function from ScrolledFrame, adapted for the _timeline
-        """
+        """Function from ScrolledFrame, adapted for the _timeline"""
         # Resize the canvas scrollregion to fit the entire frame
         (size_x, size_y) = (self._timeline.winfo_reqwidth(), self._timeline.winfo_reqheight())
         self._canvas_scroll.config(scrollregion="0 0 {0} {1}".format(size_x, size_y - 5))
 
-    """
-    Marker creation
-
-    Functions to add new markers to the TimeLine, as well as edit and remove them
-    """
-
     def create_marker(self, category, start, finish, marker=None, **kwargs):
         """
-        Create a new marker in the TimeLine with the specified properties
+        Create a new marker in the TimeLine with the specified options
 
-        For the *args, _v appendixes are used in order not to conflict with a marker dictionary as found in
-        self._markers
-
-        :param category: Category identifier (not text!)
+        :param category: Category identifier, key as given in categories
+            dictionary upon initialization
+        :type category: Any
         :param start: Start time for the marker
+        :type start: float
         :param finish: Finish time for the marker
+        :type finish: float
         :param marker: marker dictionary (replaces kwargs)
-        :return: marker iid
-        :raise ValueError: One of the specified arguments is invalid
+        :type marker: dict[str, Any]
 
-        Keyword Arguments:
-            Normal state options
-            * str text: a text label to show in the marker, may not be displayed fully if the zoom level does not allow
-                it. Updates when resizing.
-            * str background: Tkinter-compatible background color for the marker
-            * str foreground: Tkinter-compatible text color for the marker
-            * str outline: Tkinter-compatible outline color for the marker
-            * int border: The width of the border (with color outline)
-            * tuple font: Tkinter-compatible font tuple to set for the text of the marker
-            * str iid: unique marker identifier used by the internal code. If this is not a unique value, then weird
-                problems such as missing markers may occur. Please use something truly unique.
-            * tuple tags: set of tags to apply to this marker, allowing callbacks to be set and other properties
-            * bool move: whether the marker is allowed to be moved
-            Additionally, all options with the marker prefix from __init__, but without the prefix
-            Active state options: str active_background, str active_foreground, str active_outline, int active_border
-            Hover state options: str hover_background, str hover_foreground, str hover_outline, int hover_border
+        **Marker Options**
+        
+        Options can be given either in the marker dictionary argument,
+        or as keyword arguments. Given keyword arguments take precedence
+        over tag options, which take precedence over default options.
+
+        :param text: Text to show in the marker. Text may not be
+            displayed fully if the zoom level does not allow the marker
+            to be wide enough. Updates when resizing the marker.
+        :type text: str
+        :param background: Background color for the marker
+        :type background: str
+        :param foreground: Foreground (text) color for the marker
+        :type foreground: str
+        :param outline: Outline color for the marker
+        :type outline: str
+        :param border: The width of the border (for which outline is the
+            color)
+        :type border: int
+        :param font: Font tuple to set for the marker
+        :type font: tuple
+        :param iid: Unique marker identifier to use. A marker is
+            generated if not given, and its value is returned. Use this
+            option if keeping track of markers in a different manner
+            than with auto-generated iid's is necessary.
+        :type iid: str
+        :param tags: Set of tags to apply to this marker, allowing
+            callbacks to be set and other options to be configured. The
+            option precedence is from the first to the last item, so
+            the options of the last item overwrite those of the one
+            before, and those of the one before that, and so on.
+        :type tags: tuple[str]
+        :param move: Whether the marker is allowed to be moved
+        :type move: bool
+
+        Additionally, all the options with the ``marker_`` prefix from
+        :meth:`__init__`, but without the prefix, are supported. Active state
+        options are also available, with the ``active_`` prefix for
+        ``background``, ``foreground``, ``outline``, ``border``. These
+        options are also available for the hover state with the
+        ``hover_`` prefix.
+
+        :return: identifier of the created marker
+        :rtype: str
+        :raise ValueError: One of the specified arguments is invalid
         """
         kwargs = kwargs if marker is None else marker
         if category not in self._categories:
@@ -440,7 +508,7 @@ class TimeLine(ttk.Frame):
         )
         # Create the text
         text = kwargs.get("text", None)
-        text_id = self.create_text((x1, y1, x2, y2), text, foreground, font) if text is not None else None
+        text_id = self._draw_text((x1, y1, x2, y2), text, foreground, font) if text is not None else None
         # Save the marker
         locals_ = locals()
         self._markers[iid] = {
@@ -460,10 +528,8 @@ class TimeLine(ttk.Frame):
             self._iid += 1
         return iid
 
-    def create_text(self, coords, text, foreground, font):
-        """
-        Draw the text and shorten it if required
-        """
+    def _draw_text(self, coords, text, foreground, font):
+        """Draw the text and shorten it if required"""
         if text is None:
             return None
         x1_r, _, x2_r, _ = coords
@@ -486,10 +552,12 @@ class TimeLine(ttk.Frame):
     def update_marker(self, iid, **kwargs):
         """
         Change the options for a certain marker and redraw the marker
-        :param iid: iid for the marker to change
-        :param kwargs: options for create marker
-                       Note that `start` and `finish` are both *keyword arguments*
-        :return: result of create_marker
+
+        :param iid: identifier of the marker to change
+        :type iid: str
+        :param kwargs: Dictionary of options to update
+        :type kwargs: dict
+        :raises: ValueError
         """
         if iid not in self._markers:
             raise ValueError("Unknown iid passed as argument: {}".format(iid))
@@ -501,7 +569,10 @@ class TimeLine(ttk.Frame):
 
     def delete_marker(self, iid):
         """
-        Delete a marker from the timeline based on its iid
+        Delete a marker from the TimeLine
+
+        :param iid: marker identifier
+        :type iid: str
         """
         if iid == tk.ALL:
             for iid in list(self.markers.keys()):
@@ -514,14 +585,8 @@ class TimeLine(ttk.Frame):
         del self._markers[iid]
         self._timeline.delete(rectangle_id, text_id)
 
-    """
-    Zoom related functions
-    """
-
     def zoom_in(self):
-        """
-        Callback for the _button_zoom_in, to update the current zoom factor and then redraw the Canvas
-        """
+        """Increase zoom factor and redraw TimeLine"""
         index = self._zoom_factors.index(self._zoom_factor)
         if index + 1 == len(self._zoom_factors):
             # Already zoomed in all the way
@@ -530,12 +595,10 @@ class TimeLine(ttk.Frame):
         if self._zoom_factors.index(self.zoom_factor) + 1 == len(self._zoom_factors):
             self._button_zoom_in.config(state=tk.DISABLED)
         self._button_zoom_out.config(state=tk.NORMAL)
-        self.generate_timeline_contents()
+        self.draw_timeline()
 
     def zoom_out(self):
-        """
-        Callback for the _button_zoom_out, to update the current zoom factor and then redraw the Canvas
-        """
+        """Decrease zoom factor and redraw TimeLine"""
         index = self._zoom_factors.index(self._zoom_factor)
         if index == 0:
             # Already zoomed out all the way
@@ -544,12 +607,10 @@ class TimeLine(ttk.Frame):
         if self._zoom_factors.index(self._zoom_factor) == 0:
             self._button_zoom_out.config(state=tk.DISABLED)
         self._button_zoom_in.config(state=tk.NORMAL)
-        self.generate_timeline_contents()
+        self.draw_timeline()
 
     def zoom_reset(self):
-        """
-        Callback for the _button_zoom_reset, to reset the zoom level to its initial value, and then redraw the Canvas
-        """
+        """Reset the zoom factor to default and redraw TimeLine"""
         self._zoom_factor = self._zoom_factors[0] if self._zoom_default == 0 else self._zoom_default
         if self._zoom_factors.index(self._zoom_factor) == 0:
             self._button_zoom_out.config(state=tk.DISABLED)
@@ -557,47 +618,42 @@ class TimeLine(ttk.Frame):
         elif self._zoom_factors.index(self.zoom_factor) + 1 == len(self._zoom_factors):
             self._button_zoom_out.config(state=tk.NORMAL)
             self._button_zoom_in.config(state=tk.DISABLED)
-        self.generate_timeline_contents()
+        self.draw_timeline()
 
     def set_zoom_factor(self, factor):
         """
-        Function to manually set the zoom factor
+        Manually set a custom zoom factor
+
+        :param factor: Custom zoom factor
+        :type factor: float
         """
         self._zoom_factor = factor
-        self.generate_timeline_contents()
-
-    """
-    Time marker functions
-
-    Functions to show the small time frame
-    """
+        self.draw_timeline()
 
     def set_time(self, time):
         """
-        Allow the user to set the position of the time marker
+        Set the time marker to a specific time
+
+        :param time: Time to set for the time marker on the TimeLine
+        :type time: float
         """
         x = self.get_time_position(time)
         _, y = self._canvas_ticks.coords(self._time_marker_image)
         self._canvas_ticks.coords(self._time_marker_image, x, y)
         self._timeline.coords(self._time_marker_line, x, 0, x, self._timeline.winfo_height())
 
-    def time_marker_move(self, event):
-        """
-        Function bound to <B1-Motion> to allow the user to move the time marker
-        """
+    def _time_marker_move(self, event):
+        """Callback for <B1-Motion> Event: Move the selected marker"""
         limit = self.pixel_width
         x = self._canvas_ticks.canvasx(event.x)
         x = min(max(x, 0), limit)
         _, y = self._canvas_ticks.coords(self._time_marker_image)
         self._canvas_ticks.coords(self._time_marker_image, x, y)
         self._timeline.coords(self._time_marker_line, x, 0, x, self._timeline.winfo_height())
-        self.time_show(None)
+        self._time_show()
 
-    def time_marker_release(self, event):
-        """
-        Function bound to <B1-Release> to make the time marker window disappear when the movement of the time marker
-        is stopped.
-        """
+    def _time_marker_release(self, event):
+        """Callback for <B1-Release> Event: Hide time marker window"""
         if not self._time_visible:
             return
         self._time_label.destroy()
@@ -606,10 +662,8 @@ class TimeLine(ttk.Frame):
         self._time_window = None
         self._time_visible = False
 
-    def time_show(self, event):
-        """
-        This function makes the time marker window appear
-        """
+    def _time_show(self):
+        """Show the time marker window"""
         if not self._time_visible:
             self._time_visible = True
             self._time_window = tk.Toplevel(self)
@@ -623,39 +677,37 @@ class TimeLine(ttk.Frame):
             self._time_label.winfo_width(),
             self._time_label.winfo_height(),
             x - 15,
-            self._canvas_ticks.winfo_rooty() - 10
-        )
+            self._canvas_ticks.winfo_rooty() - 10)
         self._time_window.wm_geometry(geometry)
         self._time_label.config(text=TimeLine.get_time_string(self.time, self._unit))
 
-    """
-    Tag functions
-    """
-
     def tag_configure(self, tag_name, **kwargs):
         """
-        Configure a marker tag. Tags are processed in the order in which they are added to a marker
+        Create a marker tag
 
-        :param tag_name:
+        :param tag_name: Identifier for the tag
 
-        Keyword Arguments
-            Callbacks
-            * callable move_callback: Callback to be called upon moving             None
-                a marker. The callback is called with the following
-                arguments:
-                iid, (old_start, old_finish), new_start, new_finish)
-            * callable left_callback: Callback to be called upon left               None
-                clicking a marker. The callback is called with the
-                following arguments:
-                iid, x_coordinate, y_coordinate
-            * callable right_callback: Callback to be called upon right             None
-                clicking a marker. The callback is called with the
-                following arguments:
-                iid, x_coordinate, y_coordinate
-            Other options
-            * tk.Menu menu: a Menu widget to show upon right click, can             None
-                be used with the right_callback option simultaneously
-            All options for create_marker, except tuple tags
+        :param move_callback: Callback to be called upon moving a
+            marker. Arguments to callback:
+            ``(iid: str, (old_start: float, old_finish: float),
+            (new_start: float, new_finish: float))``
+        :type move_callback: callable
+        :param left_callback: Callback to be called upon left clicking
+            a marker. Arguments to callback:
+            ``(iid: str, x_coord: int, y_coord: int)``
+        :type left_callback: callable
+        :param right_callback: Callback to be called upon right clicking
+            a marker. Arguments to callback:
+            ``(iid: str, x_coord: int, y_coord: int)``
+        :type right_callback: callable
+        :param menu: A Menu widget to show upon right click. Can be
+            used with the right_callback option simultaneously.
+        :type menu: tk.Menu
+
+        In addition, supports all options supported by markers. Note
+        that tag options are applied to markers upon marker creation,
+        and thus is a tag is updated, the markers are not automatically
+        updated as well.
         """
         callbacks = [
             kwargs.get("move_callback", None),
@@ -668,54 +720,42 @@ class TimeLine(ttk.Frame):
         self._tags[tag_name] = kwargs
 
     def marker_tags(self, iid):
-        """
-        Generator for all the tags of a certain marker
-        """
+        """Generator for all the tags of a certain marker"""
         tags = self._markers[iid]["tags"]
         for tag in tags:
             yield tag
 
-    """
-    Scrolling functions
-    """
-
-    def set_scroll_v(self, *args):
-        """
-        Proxy for the two yview functions that should be called upon scrolling vertically
-        """
+    def _set_scroll_v(self, *args):
+        """Scroll both categories Canvas and scrolling container"""
         self._canvas_categories.yview(*args)
         self._canvas_scroll.yview(*args)
 
     def _mouse_scroll_h(self, event):
-        """
-        Callback for <Shift-MouseWheel> event for horizontal scrolling
-        """
+        """Callback <Shift-MouseWheel> event for horizontal scrolling"""
         args = (int(-1 * (event.delta / 120)), "units")
         self._canvas_scroll.xview_scroll(*args)
         self._canvas_ticks.xview_scroll(*args)
 
     def _mouse_scroll_v(self, event):
-        """
-        Callback for <MouseWheel> event for vertical scrolling
-        """
+        """Callback for <MouseWheel> event for vertical scrolling"""
         args = (int(-1 * (event.delta / 120)), "units")
         self._canvas_scroll.yview_scroll(*args)
         self._canvas_categories.yview_scroll(*args)
 
-    def set_scroll(self, *args):
-        """
-        Proxy for the xview function of the TimeLine Canvas, displays the value of the scroll in time units.
-        """
+    def _set_scroll(self, *args):
+        """Set horizontal scroll of scroll container and ticks Canvas"""
         self._canvas_scroll.xview(*args)
         self._canvas_ticks.xview(*args)
 
-    """
-    Time manipulation
-    """
-
     def get_time_position(self, time):
         """
-        Get the location as a pixel coordinate (only the x-coordinate) of a certain time value
+        Get x-coordinate for given time
+
+        :param time: Time to determine x-coordinate on Canvas for
+        :type time: float
+        :return: X-coordinate for the given time
+        :rtype: int
+        :raises: ValueError
         """
         if time < self._start or time > self._finish:
             raise ValueError("time argument out of bounds")
@@ -723,14 +763,27 @@ class TimeLine(ttk.Frame):
 
     def get_position_time(self, position):
         """
-        Get the time for a pixel coordinate
+        Get time for x-coordinate
+
+        :param position: X-coordinate position to determine time for
+        :type position: int
+        :return: Time for the given x-coordinate
+        :rtype: float
         """
         return self._start + position * (self._resolution / self._zoom_factor)
 
     @staticmethod
     def get_time_string(time, unit):
         """
-        Return a properly formatted string for a given time value and unit.
+        Create a properly formatted string given a time and unit
+
+        :param time: Time to format
+        :type time: float
+        :param unit: Unit to apply format of. Only supports hours ('h')
+            and minutes ('m').
+        :type unit: str
+        :return: A string in format '{whole}:{part}'
+        :rtype: str
         """
         supported_units = ["h", "m"]
         if unit not in supported_units:
@@ -740,16 +793,8 @@ class TimeLine(ttk.Frame):
         minutes = int(round(float("0.{}".format(minutes)) * 60))
         return "{:02d}:{:02d}".format(hours, minutes)
 
-    """
-    Marker manipulation
-
-    These functions are bound to Tkinter events and manipulate the markers in some form or another
-    """
-
-    def right_click(self, event):
-        """
-        Event bound function for a right click on the _timeline Canvas
-        """
+    def _right_click(self, event):
+        """Function bound to right click event for marker canvas"""
         iid = self.current_iid
         if iid is None:
             if self._menu is not None:
@@ -765,10 +810,8 @@ class TimeLine(ttk.Frame):
             return
         menu.post(event.x_root, event.y_root)
 
-    def left_click(self, event):
-        """
-        Event bound function for a left click on the _timeline Canvas
-        """
+    def _left_click(self, event):
+        """Function bound to left click event for marker canvas"""
         self.update_active()
         iid = self.current_iid
         if iid is None:
@@ -776,10 +819,8 @@ class TimeLine(ttk.Frame):
         args = (iid, event.x_root, event.y_root)
         self.call_callbacks(iid, "left_callback", args)
 
-    def left_motion(self, event):
-        """
-        Event bound function for a left click and movement on the _timeline Canvas
-        """
+    def _left_motion(self, event):
+        """Function bound to move event for marker canvas"""
         iid = self.current_iid
         if iid is None:
             return
@@ -850,23 +891,19 @@ class TimeLine(ttk.Frame):
         if self._after_id is not None:
             self.after_cancel(self._after_id)
         args = (iid, (marker["start"], marker["finish"]), (start, finish))
-        self._after_id = self.after(10, self.after_handler(iid, "move_callback", args))
+        self._after_id = self.after(10, self._after_handler(iid, "move_callback", args))
         marker["start"] = start
         marker["finish"] = finish
 
-    def enter_handler(self, event):
-        """
-        Callback for the <Enter> event on a marker, to set the hover options
-        """
+    def _enter_handler(self, event):
+        """Callback for :obj:`<Enter>` event on marker, to set hover options"""
         iid = self.current_iid
         if iid is None or iid == self.active:
             return
         self.update_state(iid, "hover")
 
-    def leave_handler(self, event):
-        """
-        Callback for the <Leave> event on a marker, to set the normal options
-        """
+    def _leave_handler(self, event):
+        """Callback for :obj:`<Leave>` event on marker, to set normal options"""
         iid = self.current_iid
         if iid is None or self.active == iid:
             return
@@ -874,7 +911,12 @@ class TimeLine(ttk.Frame):
 
     def update_state(self, iid, state):
         """
-        Update the state of a marker (normal, hover, active)
+        Set a custom state of the marker
+
+        :param iid: identifier of the marker to set the state of
+        :type iid: str
+        :param state: supports "active", "hover", "normal"
+        :type state: str
         """
         if state not in ["normal", "hover", "active"]:
             raise ValueError("Invalid state: {}".format(state))
@@ -891,9 +933,7 @@ class TimeLine(ttk.Frame):
         self._timeline.itemconfigure(text_id, fill=colors["foreground"])
 
     def update_active(self):
-        """
-        Update the state of the previously active item, and set the newly active item
-        """
+        """Update the active marker on the marker Canvas"""
         if self.active is not None:
             self.update_state(self.active, "normal")
         if self.current_iid == self.active:
@@ -903,10 +943,8 @@ class TimeLine(ttk.Frame):
         if self.active is not None:
             self.update_state(self.active, "active")
 
-    def after_handler(self, iid, callback, args):
-        """
-        Proxy function to call the function specified with the arguments and reset the after_id attribute
-        """
+    def _after_handler(self, iid, callback, args):
+        """Proxy to called by after() in mainloop"""
         self._after_id = None
         self.update_state(iid, "normal")
         self.call_callbacks(iid, callback, args)
@@ -914,10 +952,15 @@ class TimeLine(ttk.Frame):
     def call_callbacks(self, iid, type, args):
         """
         Call the available callbacks for a certain marker
-        :param iid: iid of the marker
+
+        :param iid: marker identifier
+        :type iid: str
         :param type: type of callback (key in tag dictionary)
+        :type type: str
         :param args: arguments for the callback
+        :type args: tuple
         :return: amount of callbacks called
+        :rtype: int
         """
         amount = 0
         for tag in self.marker_tags(iid):
@@ -927,16 +970,12 @@ class TimeLine(ttk.Frame):
                 callback(*args)
         return amount
 
-    """
-    Properties
-
-    These properties offer up-to-date information about the state of the TimeLine
-    """
-
     @property
     def time(self):
         """
         Current value the time marker is pointing to
+
+        :rtype: float
         """
         x, _, = self._canvas_ticks.coords(self._time_marker_image)
         return self.get_position_time(x)
@@ -945,6 +984,8 @@ class TimeLine(ttk.Frame):
     def active(self):
         """
         Currently selected marker
+
+        :rtype: str
         """
         return self._active
 
@@ -952,6 +993,8 @@ class TimeLine(ttk.Frame):
     def current(self):
         """
         Currently active item on the _timeline Canvas
+
+        :rtype: str
         """
         results = self._timeline.find_withtag(tk.CURRENT)
         return results[0] if len(results) != 0 else None
@@ -960,6 +1003,8 @@ class TimeLine(ttk.Frame):
     def current_iid(self):
         """
         Currently active item's iid
+
+        :rtype: str
         """
         current = self.current
         if current is None or current not in self._canvas_markers:
@@ -970,6 +1015,8 @@ class TimeLine(ttk.Frame):
     def markers(self):
         """
         Return a dictionary with categories as keys
+
+        :rtype: dict[str, dict[str, Any]]
         """
         return self._markers
 
@@ -977,22 +1024,27 @@ class TimeLine(ttk.Frame):
     def zoom_factor(self):
         """
         Return the current zoom factor
+
+        :rtype: float
         """
         return self._zoom_factor
 
     @property
     def pixel_width(self):
         """
-        The width of the whole TimeLine in pixels (so not just the visible part)
+        Width of the whole TimeLine in pixels
+
+        :rtype: int
         """
         return self.zoom_factor * ((self._finish - self._start) / self._resolution)
 
     @property
     def options(self):
+        """List of available options to :meth:`__init__`"""
         return [
             # TimeLine options
             "width", "height", "extend", "start", "finish", "resolution", "tick_resolution", "unit", "zoom_enabled",
-            "categories", "background", "style", "zoom_factors", "zoom_default", "extend", "menu", "snap_margin",
+            "categories", "background", "style", "zoom_factors", "zoom_default", "extend", "menu", "autohidescrollbars", "snap_margin",
             # Marker options
             "marker_font", "marker_background", "marker_foreground", "marker_outline", "marker_border", "marker_move",
             "marker_change_category", "marker_allow_overlap", "marker_snap_to_ticks"
@@ -1000,34 +1052,41 @@ class TimeLine(ttk.Frame):
 
     @property
     def marker_options(self):
+        """List of available options to create_marker"""
         return ["category", "start", "finish", "text", "font", "iid", "tags", "move", "rectangle_id", "text_id",
                 "allow_overlap", "change_category", "snap_to_ticks"] + \
                [prefix + item for prefix in ["hover_", "active_", ""]
                 for item in ["background", "foreground", "outline", "border"]]
 
-    """
-    Tkinter functions
-    """
-
     def configure(self, cnf={}, **kwargs):
-        """
-        Update an option of the TimeLine. New marker options are only applied to new markers.
-        """
+        """Update options of the TimeLine widget"""
         kwargs.update(cnf)
         TimeLine.check_kwargs(kwargs)
+        scrollbars = 'autohidescrollbars' in kwargs
         for option in self.options:
             attribute = "_" + option
             setattr(self, attribute, kwargs.pop(option, getattr(self, attribute)))
+        if scrollbars:
+            self._scrollbar_timeline.destroy()
+            self._scrollbar_vertical.destroy()
+            if self._autohidescrollbars:
+                self._scrollbar_timeline = AutoHideScrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+                self._scrollbar_vertical = AutoHideScrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
+            else:
+                self._scrollbar_timeline = ttk.Scrollbar(self, command=self._set_scroll, orient=tk.HORIZONTAL)
+                self._scrollbar_vertical = ttk.Scrollbar(self, command=self._set_scroll_v, orient=tk.VERTICAL)
+            self._canvas_scroll.config(xscrollcommand=self._scrollbar_timeline.set,
+                                       yscrollcommand=self._scrollbar_vertical.set)
+            self._canvas_categories.config(yscrollcommand=self._scrollbar_vertical.set)
+            self._scrollbar_timeline.grid(column=1, row=2, padx=(0, 5), pady=(0, 5), sticky="we")
+            self._scrollbar_vertical.grid(column=2, row=0, pady=5, padx=(0, 5), sticky="ns")
         ttk.Frame.configure(self, **kwargs)
-        self.generate_timeline_contents()
+        self.draw_timeline()
 
-    def config(self, cnf={}, **kwargs):
-        self.configure(cnf=cnf, **kwargs)
+    config = configure
 
     def cget(self, item):
-        """
-        Return the value of an option
-        """
+        """Return the value of an option"""
         return getattr(self, "_" + item) if item in self.options else ttk.Frame.cget(self, item)
 
     def __getitem__(self, item):
@@ -1038,9 +1097,11 @@ class TimeLine(ttk.Frame):
 
     def itemconfigure(self, iid, rectangle_options, text_options):
         """
-        Option to give full control to the user over the markers. Any option of a Canvas item can be used. Use at your
-        own risk. No error handling is provided. Please note that all changes done here are erased after redrawing
-        the TimeLine contents.
+        Configure options of items drawn on the Canvas
+
+        Low-level access to the individual elements of markers and other
+        items drawn on the timeline Canvas. All modifications are
+        overwritten when the TimeLine is redrawn.
         """
         rectangle_id, text_id = self._markers[iid]["rectangle_id"], self._markers[iid]["text_id"]
         if len(rectangle_options) != 0:
@@ -1048,23 +1109,15 @@ class TimeLine(ttk.Frame):
         if len(text_options) != 0:
             self._timeline.itemconfigure(text_id, **text_options)
 
-    """
-    Miscellaneous
-    """
-
     @staticmethod
     def calculate_text_coords(rectangle_coords):
-        """
-        Calculate the correct coordinates for text based on the rectangle coordinates
-        """
+        """Calculate Canvas text coordinates based on rectangle coords"""
         return (int(rectangle_coords[0] + (rectangle_coords[2] - rectangle_coords[0]) / 2),
                 int(rectangle_coords[1] + (rectangle_coords[3] - rectangle_coords[1]) / 2))
 
     @staticmethod
     def range(start, finish, step):
-        """
-        Like built-in range(), but with float support
-        """
+        """Like built-in :func:`~builtins.range`, but with float support"""
         value = start
         while value <= finish:
             yield value
@@ -1073,9 +1126,11 @@ class TimeLine(ttk.Frame):
     @staticmethod
     def check_kwargs(kwargs):
         """
-        Checks the type and values of the keyword arguments that have been set to attributes in __init__.
-        :return: None
-        :raise: ValueError or TypeError if an argument does not satisfy the conditions
+        Check the type and values of keyword arguments to :meth:`__init__`
+
+        :param kwargs: Dictionary of keyword arguments
+        :type kwargs: dict[str, Any]
+        :raises: TypeError, ValueError
         """
         # width, height
         width = kwargs.get("width", 400)
@@ -1138,6 +1193,9 @@ class TimeLine(ttk.Frame):
         menu = kwargs.get("menu", None)
         if menu is not None and not isinstance(menu, tk.Menu):
             raise TypeError("menu argument is not a tk.Menu widget")
+        autohidescrollbars = kwargs.get("autohidescrollbars", False)
+        if not isinstance(autohidescrollbars, bool):
+            raise TypeError("autohidescrollbars argument is not of bool type")
         # marker options
         marker_font = kwargs.get("marker_font", ("default", 10))
         marker_background = kwargs.get("marker_background", "lightblue")
@@ -1171,6 +1229,10 @@ class TimeLine(ttk.Frame):
     def check_marker_kwargs(self, kwargs):
         """
         Check the types of the keyword arguments for marker creation
+
+        :param kwargs: dictionary of options for marker creation
+        :type kwargs: dict
+        :raises: TypeError, ValueError
         """
         text = kwargs.get("text", "")
         if not isinstance(text, str) and text is not None:

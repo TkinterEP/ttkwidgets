@@ -38,12 +38,18 @@ class ColorSquare(tk.Canvas):
         """
         Create a ColorSquare.
 
-        Keyword arguments:
-            * parent: parent window
-            * hue: color square gradient for given hue (color in top right corner
-                   is (hue, 100, 100) in HSV
-            * color: initially selected color given in HSV
-            * width, height and any keyword option accepted by a tkinter Canvas
+        :param parent: parent widget
+        :type parent: widget
+        :param hue: hue (between 0 and 360) of the color square gradient
+                   (color in top right corner is (hue, 100, 100) in HSV)
+        :type hue: int
+        :param color: initially selected color given in HSV format
+        :type color: tuple[int]
+        :param height: height of the widget in pixels
+        :type height: int
+        :param width: width of the widget in pixels
+        :type width: int
+        :param kwargs: options to be passed on to the :class:`tk.Canvas` initializer
         """
         tk.Canvas.__init__(self, parent, height=height, width=width, **kwargs)
         self.bg = tk.PhotoImage(width=width, height=height, master=self)
@@ -96,11 +102,16 @@ class ColorSquare(tk.Canvas):
                          fill="#C2C2C2")
 
     def get_hue(self):
-        """Return hue."""
+        """Return current hue."""
         return self._hue
 
     def set_hue(self, value):
-        """Set hue."""
+        """
+        Change hue.
+
+        :param value: new hue value (between 0 and 360)
+        :type value: int
+        """
         old = self._hue
         self._hue = value
         if value != old:
@@ -126,7 +137,11 @@ class ColorSquare(tk.Canvas):
         self.event_generate("<<ColorChanged>>")
 
     def get(self):
-        """Return selected color with format (RGB, HSV, HEX)."""
+        """
+        Get selected color.
+
+        :return: color under cursor as a (RGB, HSV, HEX) tuple
+        """
         x = self.coords('cross_v')[0]
         y = self.coords('cross_h')[1]
         xp = min(x, self.bg.width() - 1)
@@ -143,7 +158,12 @@ class ColorSquare(tk.Canvas):
         return (r, g, b), (h, s, v), hexa
 
     def set_rgb(self, sel_color):
-        """Put cursor on sel_color given in RGB."""
+        """
+        Put cursor on sel_color given in RGB.
+
+        :param sel_color: color in RBG format
+        :type sel_color: sequence(int)
+        """
         width = self.winfo_width()
         height = self.winfo_height()
         h, s, v = rgb_to_hsv(*sel_color)
@@ -154,7 +174,12 @@ class ColorSquare(tk.Canvas):
         self.coords('cross_v', x * width, 0, x * width, height)
 
     def set_hsv(self, sel_color):
-        """Put cursor on sel_color given in HSV."""
+        """
+        Put cursor on sel_color given in HSV.
+
+        :param sel_color: color in HSV format
+        :type sel_color: sequence(int)
+        """
         width = self.winfo_width()
         height = self.winfo_height()
         h, s, v = sel_color

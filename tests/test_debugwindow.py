@@ -3,10 +3,7 @@
 from ttkwidgets import DebugWindow
 from tests import BaseWidgetTest
 import mock
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
+import tkinter as tk
 import os
 import sys
 
@@ -19,6 +16,11 @@ class TestDebugWindow(BaseWidgetTest):
     def test_debugwindow_init(self):
         debug = DebugWindow(self.window)
         self.window.update()
+        self.assertFalse(debug.scroll.winfo_ismapped())
+        debug.destroy()
+        debug = DebugWindow(self.window, autohidescrollbar=False)
+        self.window.update()
+        self.assertTrue(debug.scroll.winfo_ismapped())
 
     def test_debugwindow_print(self):
         debug = DebugWindow(self.window)

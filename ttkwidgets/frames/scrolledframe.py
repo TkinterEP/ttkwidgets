@@ -6,32 +6,44 @@ Source: This repository
 # The following sites were used for reference in the creation of this file:
 # http://code.activestate.com/recipes/578894-mousewheel-binding-to-scrolling-area-tkinter-multi/
 # http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
+import tkinter as tk
+from tkinter import ttk
+from ttkwidgets import AutoHideScrollbar
 
 
 class ScrolledFrame(ttk.Frame):
     """
-    A frame that sports a vertically oriented scrollbar for scrolling
+    A frame that sports a vertically oriented scrollbar for scrolling.
 
-    Widgets can be placed in instance.interior attribute Frame with any geometry manager
+    :ivar interior: :class:`ttk.Frame` in which to put the widgets to be scrolled with any geometry manager.
     """
 
-    def __init__(self, master=None, compound=tk.RIGHT, canvasheight=400, canvaswidth=400, canvasborder=0, **kwargs):
+    def __init__(self, master=None, compound=tk.RIGHT, canvasheight=400, 
+                 canvaswidth=400, canvasborder=0, autohidescrollbar=True, **kwargs):
         """
+        Create a ScrolledFrame.
+        
         :param master: master widget
-        :param compound: side the scrollbar should be on
-        :param canvasheight: hight of the internal canvas
+        :type master: widget
+        :param compound: "right" or "left": side the scrollbar should be on
+        :type compound: str
+        :param canvasheight: height of the internal canvas
+        :type canvasheight: int
         :param canvaswidth: width of the internal canvas
+        :type canvaswidth: int
         :param canvasborder: border width of the internal canvas
-        :param kwargs: passed on to Frame.__init__
+        :type canvasborder: int
+        :param autohidescrollbar: whether to use an :class:`~ttkwidgets.AutoHideScrollbar` or a :class:`ttk.Scrollbar`
+        :type autohidescrollbar: bool
+        :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
         ttk.Frame.__init__(self, master, **kwargs)
-        self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        if autohidescrollbar:
+            self._scrollbar = AutoHideScrollbar(self, orient=tk.VERTICAL)
+        else:
+            self._scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
         self._canvas = tk.Canvas(self, borderwidth=canvasborder, highlightthickness=0,
                                  yscrollcommand=self._scrollbar.set, width=canvaswidth, height=canvasheight)
         self.__compound = compound
@@ -44,20 +56,16 @@ class ScrolledFrame(ttk.Frame):
         self.__grid_widgets()
 
     def __grid_widgets(self):
-        """
-        Places all the child widgets in the appropriate positions
-        :return: None
-        """
+        """Places all the child widgets in the appropriate positions."""
         scrollbar_column = 0 if self.__compound is tk.LEFT else 2
         self._canvas.grid(row=0, column=1, sticky="nswe")
-        self.interior.grid(row=0, column=1, sticky="nswe")
         self._scrollbar.grid(row=0, column=scrollbar_column, sticky="ns")
 
     def __configure_interior(self, *args):
         """
-        Private function to configure the interior Frame
+        Private function to configure the interior Frame.
+        
         :param args: Tkinter event
-        :return: None
         """
         # Resize the canvas scrollregion to fit the entire frame
         (size_x, size_y) = (self.interior.winfo_reqwidth(), self.interior.winfo_reqheight())
@@ -68,27 +76,30 @@ class ScrolledFrame(ttk.Frame):
 
     def __configure_canvas(self, *args):
         """
-        Private function to configure the internal Canvas
+        Private function to configure the internal Canvas.
+        
         Changes the width of the canvas to fit the interior Frame
+        
         :param args: Tkinter event
-        :return: None
         """
         if self.interior.winfo_reqwidth() is not self._canvas.winfo_width():
             self._canvas.configure(width=self.interior.winfo_reqwidth())
 
     def __mouse_wheel(self, event):
         """
-        Private function to scroll the canvas view
+        Private function to scroll the canvas view.
+        
         :param event: Tkinter event
-        :return: None
         """
         self._canvas.yview_scroll(-1 * (event.delta // 100), "units")
 
     def resize_canvas(self, height=400, width=400):
         """
-        Function for the user to resize the internal Canvas widget if desired
+        Function for the user to resize the internal Canvas widget if desired.
+        
         :param height: new height in pixels
+        :type height: int
         :param width: new width in pixels
-        :return:
+        :type width: int
         """
         self._canvas.configure(width=width, height=height)

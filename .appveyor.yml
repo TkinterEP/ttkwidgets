@@ -1,14 +1,13 @@
 environment:
   matrix:
-    - PYTHON: "C:\\PYTHON27"
-    - PYTHON: "C:\\PYTHON34"
-    - PYTHON: "C:\\PYTHON35"
     - PYTHON: "C:\\PYTHON36"
+    - PYTHON: "C:\\PYTHON37"
+    - PYTHON: "C:\\PYTHON38"
 install:
-  - "%PYTHON%\\python.exe -m pip install codecov coverage nose mock pynput"
+  - "%PYTHON%\\python.exe -m pip install -U codecov coverage nose mock pynput setuptools pip"
 build: off
 test_script:
   - "%PYTHON%\\python.exe -m pip install ."
-  - "%PYTHON%\\python.exe -m nose --with-coverage"
+  - "%PYTHON%\\python.exe -m nose --with-coverage --cover-xml"
 after_test:
-  - "%PYTHON%\\Scripts\\codecov.exe"
+  - "%PYTHON%\\Scripts\\codecov.exe -f coverage.xml"

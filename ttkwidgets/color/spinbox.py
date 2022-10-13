@@ -5,9 +5,7 @@ License: GNU GPLv3
 Source: https://github.com/j4321/tkColorPicker
 
 Edited by RedFantom for Python 2/3 cross-compatibility and docstring formatting
-"""
 
-"""
 tkcolorpicker - Alternative to colorchooser for Tkinter.
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
 
@@ -45,19 +43,25 @@ class Spinbox(tk.Spinbox):
                                relief=kwargs.get("relief", "sunken"),
                                borderwidth=1)
         self.style.configure("%s.spinbox.TFrame" % self.frame,
-                             background="white")
+                             background=self.style.lookup("TSpinbox",
+                                                          "fieldbackground",
+                                                          default='white'))
         self.frame.configure(style="%s.spinbox.TFrame" % self.frame)
         kwargs["relief"] = "flat"
         kwargs["highlightthickness"] = 0
-        kwargs["selectbackground"] = self.style.lookup("TEntry",
+        kwargs["selectbackground"] = self.style.lookup("TSpinbox",
                                                        "selectbackground",
                                                        ("focus",))
-        kwargs["selectbackground"] = self.style.lookup("TEntry",
-                                                       "selectbackground",
-                                                       ("focus",))
-        kwargs["selectforeground"] = self.style.lookup("TEntry",
+        kwargs["selectforeground"] = self.style.lookup("TSpinbox",
                                                        "selectforeground",
                                                        ("focus",))
+        kwargs["background"] = self.style.lookup("TSpinbox",
+                                                 "fieldbackground",
+                                                 default='white')
+        kwargs["foreground"] = self.style.lookup("TSpinbox",
+                                                 "foreground")
+        kwargs["buttonbackground"] = self.style.lookup("TSpinbox",
+                                                       "background")
         tk.Spinbox.__init__(self, self.frame, **kwargs)
         tk.Spinbox.pack(self, padx=1, pady=1)
         self.frame.spinbox = self
@@ -93,26 +97,23 @@ class Spinbox(tk.Spinbox):
         self.place_info = self.frame.place_info
         self.place_slaves = self.frame.place_slaves
 
-        self.bind_class("ttkSpinbox", "<FocusIn>", self.focusin, True)
-        self.bind_class("ttkSpinbox", "<FocusOut>", self.focusout, True)
+        self.bind('<1>', lambda e: self.focus_set())
+        self.frame.bind("<FocusIn>", self.focusin)
+        self.frame.bind("<FocusOut>", self.focusout)
 
-    @staticmethod
-    def focusout(event):
+    def focusout(self, event):
         """Change style on focus out events."""
-        w = event.widget.spinbox
-        bc = w.style.lookup("TEntry", "bordercolor", ("!focus",))
-        dc = w.style.lookup("TEntry", "darkcolor", ("!focus",))
-        lc = w.style.lookup("TEntry", "lightcolor", ("!focus",))
-        w.style.configure("%s.spinbox.TFrame" % event.widget, bordercolor=bc,
-                          darkcolor=dc, lightcolor=lc)
+        bc = self.style.lookup("TEntry", "bordercolor", ("!focus",))
+        dc = self.style.lookup("TEntry", "darkcolor", ("!focus",))
+        lc = self.style.lookup("TEntry", "lightcolor", ("!focus",))
+        self.style.configure("%s.spinbox.TFrame" % self.frame, bordercolor=bc,
+                             darkcolor=dc, lightcolor=lc)
 
-    @staticmethod
-    def focusin(event):
+    def focusin(self, event):
         """Change style on focus in events."""
-        w = event.widget.spinbox
-        w.old_value = w.get()
-        bc = w.style.lookup("TEntry", "bordercolor", ("focus",))
-        dc = w.style.lookup("TEntry", "darkcolor", ("focus",))
-        lc = w.style.lookup("TEntry", "lightcolor", ("focus",))
-        w.style.configure("%s.spinbox.TFrame" % event.widget, bordercolor=bc,
-                          darkcolor=dc, lightcolor=lc)
+        self.old_value = self.get()
+        bc = self.style.lookup("TEntry", "bordercolor", ("focus",))
+        dc = self.style.lookup("TEntry", "darkcolor", ("focus",))
+        lc = self.style.lookup("TEntry", "lightcolor", ("focus",))
+        self.style.configure("%s.spinbox.TFrame" % self.frame, bordercolor=bc,
+                             darkcolor=dc, lightcolor=lc)
