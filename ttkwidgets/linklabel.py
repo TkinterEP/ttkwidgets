@@ -38,11 +38,10 @@ class LinkLabel(ttk.Label):
         self._hover_color = kwargs.pop("hover_color", "#000fff")
         self._clicked_color = kwargs.pop("clicked_color", "#6600a6")
 
-        parent = master or tk._default_root
-        is_mac = parent.tk.call("tk", "windowingsystem") == "aqua"
+        is_mac = (master or tk._default_root).tk.call("tk", "windowingsystem") == "aqua"
         kwargs.setdefault("cursor", "pointinghand" if is_mac else "hand2")
 
-        ttk.Label.__init__(self, parent, **kwargs)
+        ttk.Label.__init__(self, master, **kwargs)
 
         if "disabled" not in self.state():
             self.configure(foreground=self._normal_color)
