@@ -22,7 +22,7 @@ class ToggledFrame(ttk.Frame):
     :ivar interior: :class:`ttk.Frame` in which to put the widgets to be toggled with any geometry manager.
     """
 
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, *, text=None, cursor="arrow", width=20, **kwargs):
         """
         Create a ToggledFrame.
 
@@ -36,10 +36,6 @@ class ToggledFrame(ttk.Frame):
         :type cursor: str
         :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
-        cursor = kwargs.pop("cursor", "arrow")
-        text = kwargs.pop("text", None)
-        width = kwargs.pop("width", 20)
-
         self._open = tk.BooleanVar(value=False)
 
         ttk.Frame.__init__(self, master, **kwargs)
