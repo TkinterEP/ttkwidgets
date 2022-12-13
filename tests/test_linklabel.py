@@ -36,6 +36,9 @@ class TestLinkLabel(BaseWidgetTest):
         self.window.update()
         label["clicked_color"] = "purple"
         self.window.update()
+        label.config(cursor="hand1")
+        self.window.update()
+        self.assertEquals(str(label.cget("cursor")), "hand1")
 
     def test_linklabel_cget(self):
         label = LinkLabel(self.window, link="www.google.com", text="Visit Google")

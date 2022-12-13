@@ -6,7 +6,7 @@ Source: This repository
 Edited by rdbende: default, native cursors, virtual event, colors
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbrol/tkinter-kit)
-# Unfortunately this link is invalid. I can't find any nbrol, or Nelson Brochado on GitHub :(
+# Available from fork: https://www.github.com/RedFantom/tkinter-kit
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
@@ -16,7 +16,7 @@ class LinkLabel(ttk.Label):
     """
     A :class:`ttk.Label` that can be clicked to open a link with a default blue color, a purple color when clicked and a bright
     blue color when hovering over the Label.
-    """    
+    """
     def __init__(self, master=None, **kwargs):
         """
         Create a LinkLabel.
@@ -30,6 +30,8 @@ class LinkLabel(ttk.Label):
         :type hover_color: str
         :param clicked_color: text color when link is clicked
         :type clicked_color: str
+        :param cursor: string name for cursor to display on hover
+        :type cursor: str
         :param kwargs: options to be passed on to the :class:`ttk.Label` initializer
         """
         self._link = kwargs.pop("link", "")
@@ -37,13 +39,12 @@ class LinkLabel(ttk.Label):
         self._hover_color = kwargs.pop("hover_color", "#000fff")
         self._clicked_color = kwargs.pop("clicked_color", "#6600a6")
         self._master = master or tk._default_root
-        if self._master.tk.call("tk", "windowingsystem") == "aqua":
-            self._cursor = kwargs.pop("cursor", "pointinghand")
-        else:
-            self._cursor = kwargs.pop("cursor", "hand2")
+        ismac = self._master.tk.call("tk", "windowingsystem") == "aqua"
+        if "cursor" not in kwargs:
+            kwargs["cursor"] = "pointinghand" if ismac else "hand2"
         ttk.Label.__init__(self, master, **kwargs)
         if "disabled" not in self.state():
-            self.configure(foreground=self._normal_color, cursor=self._cursor)
+            self.configure(foreground=self._normal_color)
         self.__clicked = False
         self.bind("<Button-1>", self.open_link)
         self.bind("<Enter>", self._on_enter)
@@ -93,7 +94,6 @@ class LinkLabel(ttk.Label):
         self._hover_color = kwargs.pop("hover_color", self._hover_color)
         self._normal_color = kwargs.pop("normal_color", self._normal_color)
         self._clicked_color = kwargs.pop("clicked_color", self._clicked_color)
-        self._cursor = kwargs.pop("cursor", self._cursor)
         ttk.Label.configure(self, **kwargs)
 
     config = configure
