@@ -15,7 +15,7 @@ setup(
     packages=["ttkwidgets", "ttkwidgets.frames", "ttkwidgets.font", "ttkwidgets.autocomplete", "ttkwidgets.color", "ttkwidgets.validated_entries"],
     py_modules=["ttkwidgets"],
     package_data={"ttkwidgets": ["assets/*"]},
-    version="0.12.1",
+    version="0.13.0",
     description=" A collection of widgets for Tkinter's ttk extensions by various authors ",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
