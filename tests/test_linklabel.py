@@ -39,7 +39,7 @@ class TestLinkLabel(BaseWidgetTest):
         self.window.update()
         label.config(cursor="hand1")
         self.window.update()
-        assert label.cget("cursor") == "hand1"
+        assert str(label.cget("cursor")) == "hand1"
 
     def test_linklabel_cget(self):
         label = LinkLabel(self.window, link="www.google.com", text="Visit Google")
