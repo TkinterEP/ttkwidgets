@@ -3,7 +3,7 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 
-Edited by rdbende: default, native cursors, virtual event, colors
+Edited by rdbende: change default widget colors, use native cursors by default, add virtual event
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbrol/tkinter-kit)
 # Available from fork: https://www.github.com/RedFantom/tkinter-kit
