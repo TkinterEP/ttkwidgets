@@ -25,7 +25,16 @@ This file contains a list of all the authors of widgets in this repository. Plea
   * `AutoHideScrollbar` based on an idea by [Fredrik Lundh](effbot.org/zone/tkinter-autoscrollbar.htm)
   * All color widgets: `askcolor`, `ColorPicker`, `GradientBar` and `ColorSquare`, `LimitVar`, `Spinbox`, `AlphaBar` and supporting functions in `functions.py`.
   * `AutocompleteEntryListbox`
-- [Dogeek](https://github.com/Dogeek)
+- [Simon Bordeyne](https://github.com/Dogeek)
   * `validated_entries` submodule
 - Multiple authors:
   * `ScaleEntry` (RedFantom and Juliette Monsel)
+- [rdbende](https://github.com/rdbende)
+- [Bart Broere](https://github.com/bartbroere)
+  * PR #86
+- [Ryan Baker](https://github.com/ryanbaekr)
+  * PR #96: `check_all` and `uncheck_all` for `CheckboxTreeview`
+- [Fredy Ramirez](https://github.com/formateli)
+  * PR #59: Example runner (`examples/run.py`) 
+- [jnhyperion](https://github.com/jnhyperion)
+  * PR #31

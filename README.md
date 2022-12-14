@@ -10,11 +10,8 @@ A collection of widgets for Tkinter's ttk extensions by various authors.
 
 ## License
     ttkwidgets: A collection of widgets for Tkinter's ttk extensions by various authors 
-    Copyright (C) RedFantom 2017
-    Copyright (C) The Python Team
-    Copyright (C) Mitja Martini 2008
-    Copyright (C) Russell Adams 2011
-    Copyright (C) Juliette Monsel 2017
+    Copyright (c) 2008-2022 The ttkwidgets authors
+    See AUTHORS.md for more details
     
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
