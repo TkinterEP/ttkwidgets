@@ -2,12 +2,17 @@
 Author: RedFantom
 License: GNU GPLv3
 Source: This repository
+
+Improved by rdbende
 """
+
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
-import os
-from PIL import Image, ImageTk
+
 from ttkwidgets.utilities import get_assets_directory
+
+assets_dir = Path(get_assets_directory())
 
 
 class ToggledFrame(ttk.Frame):
@@ -17,44 +22,98 @@ class ToggledFrame(ttk.Frame):
     :ivar interior: :class:`ttk.Frame` in which to put the widgets to be toggled with any geometry manager.
     """
 
-    def __init__(self, master=None, text="", width=20, compound=tk.LEFT, **kwargs):
+    def __init__(self, master=None, *, text=None, cursor="arrow", width=20, **kwargs):
         """
         Create a ToggledFrame.
 
         :param master: master widget
         :type master: widget
-        :param text: text to display next to the toggle arrow
+        :param text: text to in the header of the ToggledFrame
         :type text: str
         :param width: width of the closed ToggledFrame (in characters)
         :type width: int
-        :param compound: "center", "none", "top", "bottom", "right" or "left":
-                         position of the toggle arrow compared to the text
-        :type compound: str
+        :param cursor: cursor that appears on the ToggledFrame's button
+        :type cursor: str
         :param kwargs: keyword arguments passed on to the :class:`ttk.Frame` initializer
         """
-        ttk.Frame.__init__(self, master, **kwargs)
-        self._open = False
-        self.__checkbutton_var = tk.BooleanVar()
-        self._open_image = ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), "open.png")))
-        self._closed_image = ImageTk.PhotoImage(Image.open(os.path.join(get_assets_directory(), "closed.png")))
-        self._checkbutton = ttk.Checkbutton(self, style="Toolbutton", command=self.toggle,
-                                            variable=self.__checkbutton_var, text=text, compound=compound,
-                                            image=self._closed_image, width=width)
-        self.interior = ttk.Frame(self, relief=tk.SUNKEN)
-        self._grid_widgets()
+        self._open = tk.BooleanVar(value=False)
 
-    def _grid_widgets(self):
-        self._checkbutton.grid(row=0, column=0, sticky="we")
+        ttk.Frame.__init__(self, master, **kwargs)
+
+        self.interior = ttk.Frame(self)
+
+        self._open_image = tk.PhotoImage(file=assets_dir / "open.png")
+        self._closed_image = tk.PhotoImage(file=assets_dir / "closed.png")
+
+        self._button = ttk.Checkbutton(
+            self,
+            style="Toolbutton",
+            compound="right",
+            cursor=cursor,
+            image=self._closed_image,
+            text=text,
+            variable=self._open,
+            command=self._toggle_when_clicked,
+            width=width,
+        )
+        self._button.grid(row=0, column=0, sticky="ew")
+
+    def __getitem__(self, key):
+        return self.cget(key)
+
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
+
+    def _toggle_when_clicked(self):
+        # when clicking the checkbutton it inverts its variable, so we can't simply use self.toggle
+        if self._open.get():
+            self.interior.grid(row=1, column=0, sticky="nswe")
+            self._button.config(image=self._open_image)
+            self.event_generate("<<ToggledFrameOpened>>")
+        else:
+            self.interior.grid_forget()
+            self._button.config(image=self._closed_image)
+            self.event_generate("<<ToggledFrameClosed>>")
+
+    def open(self):
+        self.interior.grid(row=1, column=0, sticky="nswe")
+        self._open.set(True)
+        self._button.config(image=self._open_image)
+        self.event_generate("<<ToggledFrameOpened>>")
+
+    def close(self):
+        self.interior.grid_forget()
+        self._open.set(False)
+        self._button.config(image=self._closed_image)
+        self.event_generate("<<ToggledFrameClosed>>")
 
     def toggle(self):
-        """Toggle :obj:`ToggledFrame.interior` opened or closed."""
-        if self._open:
-            self._open = False
-            self.__checkbutton_var.set(False)
-            self.interior.grid_forget()
-            self._checkbutton.config(image=self._closed_image)
+        if self._open.get():
+            self.close()
         else:
-            self._open = True
-            self.__checkbutton_var.set(True)
-            self.interior.grid(row=1, column=0, sticky="nswe")
-            self._checkbutton.config(image=self._open_image)
+            self.open()
+
+    @property
+    def opened(self):
+        return self._open.get()
+
+    def configure(self, **kwargs):
+        """Configure resources of the widget"""
+        button_options = {
+            key: kwargs.pop(key) for key in ("cursor", "text", "width") if key in kwargs
+        }
+        self._button.configure(**button_options)
+        ttk.Frame.configure(self, **kwargs)
+
+    config = configure
+
+    def cget(self, key):
+        """Return the resource value for a KEY given as string"""
+        if key in {"cursor", "text", "width"}:
+            return self._button.cget(key)
+        else:
+            return ttk.Frame.cget(self, key)
+
+    def keys(self):
+        """Return a list of all resource names of this widget"""
+        return sorted(ttk.Frame.keys(self) + ["text"])

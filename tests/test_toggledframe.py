@@ -1,26 +1,36 @@
 # Copyright (c) RedFantom 2017
 # For license see LICENSE
-from ttkwidgets.frames import ToggledFrame
-from tests import BaseWidgetTest
 import tkinter as tk
+
+from tests import BaseWidgetTest
+from ttkwidgets.frames import ToggledFrame
 
 
 class TestToggledFrame(BaseWidgetTest):
     def test_toggledframe_init(self):
         frame = ToggledFrame(self.window)
         frame.pack()
-        self.window.update()
 
     def test_toggledframe_open(self):
         frame = ToggledFrame(self.window)
         frame.pack()
+        self.window.update()
         frame.toggle()
-        self.assertTrue(frame._open)
+        assert frame.opened
 
     def test_toggledframe_open_close(self):
         frame = ToggledFrame(self.window)
         frame.pack()
+        self.window.update()
         frame.toggle()
-        self.assertTrue(frame._open)
-        frame.toggle()
-        self.assertFalse(frame._open)
+        self.window.update()
+        assert frame.opened
+        frame.close()
+        self.window.update()
+        assert not frame.opened
+        frame.open()
+        self.window.update()
+        assert frame.opened
+        frame._button.invoke()
+        self.window.update()
+        assert not frame.opened
