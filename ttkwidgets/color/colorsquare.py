@@ -5,9 +5,9 @@ License: GNU GPLv3
 Source: https://github.com/j4321/tkColorPicker
 
 Edited by RedFantom for Python 2/3 cross-compatibility and docstring formatting
-"""
 
-"""
+
+
 tkcolorpicker - Alternative to colorchooser for Tkinter.
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
 
@@ -56,9 +56,9 @@ class ColorSquare(tk.Canvas):
         self._hue = hue
         if not color:
             color = hue2col(self._hue)
-        self.bind('<Configure>', lambda e: self._draw(color))
-        self.bind('<ButtonPress-1>', self._on_click)
-        self.bind('<B1-Motion>', self._on_move)
+        self.bind("<Configure>", lambda e: self._draw(color))
+        self.bind("<ButtonPress-1>", self._on_click)
+        self.bind("<B1-Motion>", self._on_move)
 
     def _fill(self):
         """Create the gradient."""
@@ -122,8 +122,8 @@ class ColorSquare(tk.Canvas):
         """Move cross on click."""
         x = event.x
         y = event.y
-        self.coords('cross_h', 0, y, self.winfo_width(), y)
-        self.coords('cross_v', x, 0, x, self.winfo_height())
+        self.coords("cross_h", 0, y, self.winfo_width(), y)
+        self.coords("cross_v", x, 0, x, self.winfo_height())
         self.event_generate("<<ColorChanged>>")
 
     def _on_move(self, event):
@@ -132,8 +132,8 @@ class ColorSquare(tk.Canvas):
         h = self.winfo_height()
         x = min(max(event.x, 0), w)
         y = min(max(event.y, 0), h)
-        self.coords('cross_h', 0, y, w, y)
-        self.coords('cross_v', x, 0, x, h)
+        self.coords("cross_h", 0, y, w, y)
+        self.coords("cross_v", x, 0, x, h)
         self.event_generate("<<ColorChanged>>")
 
     def get(self):
@@ -142,8 +142,8 @@ class ColorSquare(tk.Canvas):
 
         :return: color under cursor as a (RGB, HSV, HEX) tuple
         """
-        x = self.coords('cross_v')[0]
-        y = self.coords('cross_h')[1]
+        x = self.coords("cross_v")[0]
+        y = self.coords("cross_h")[1]
         xp = min(x, self.bg.width() - 1)
         yp = min(y, self.bg.height() - 1)
         try:
@@ -170,8 +170,8 @@ class ColorSquare(tk.Canvas):
         self.set_hue(h)
         x = v / 100.
         y = (1 - s / 100.)
-        self.coords('cross_h', 0, y * height, width, y * height)
-        self.coords('cross_v', x * width, 0, x * width, height)
+        self.coords("cross_h", 0, y * height, width, y * height)
+        self.coords("cross_v", x * width, 0, x * width, height)
 
     def set_hsv(self, sel_color):
         """
@@ -186,5 +186,5 @@ class ColorSquare(tk.Canvas):
         self.set_hue(h)
         x = v / 100.
         y = (1 - s / 100.)
-        self.coords('cross_h', 0, y * height, width, y * height)
-        self.coords('cross_v', x * width, 0, x * width, height)
+        self.coords("cross_h", 0, y * height, width, y * height)
+        self.coords("cross_v", x * width, 0, x * width, height)

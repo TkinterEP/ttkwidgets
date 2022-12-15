@@ -76,9 +76,9 @@ class AlphaBar(tk.Canvas):
         except Exception:
             self._variable.trace("w", self._update_alpha)
 
-        self.bind('<Configure>', lambda e: self._draw_gradient(alpha, color))
-        self.bind('<ButtonPress-1>', self._on_click)
-        self.bind('<B1-Motion>', self._on_move)
+        self.bind("<Configure>", lambda e: self._draw_gradient(alpha, color))
+        self.bind("<ButtonPress-1>", self._on_click)
+        self.bind("<B1-Motion>", self._on_move)
 
     def _draw_gradient(self, alpha, color):
         """Draw the gradient and put the cursor on alpha."""
@@ -107,20 +107,20 @@ class AlphaBar(tk.Canvas):
         if v < 50:
             fill = "gray80"
         else:
-            fill = 'black'
-        self.create_line(x, 0, x, height, width=2, tags='cursor', fill=fill)
+            fill = "black"
+        self.create_line(x, 0, x, height, width=2, tags="cursor", fill=fill)
 
     def _on_click(self, event):
         """Move selection cursor on click."""
         x = event.x
-        self.coords('cursor', x, 0, x, self.winfo_height())
+        self.coords("cursor", x, 0, x, self.winfo_height())
         self._variable.set(round2((255. * x) / self.winfo_width()))
 
     def _on_move(self, event):
         """Make selection cursor follow the cursor."""
         w = self.winfo_width()
         x = min(max(event.x, 0), w)
-        self.coords('cursor', x, 0, x, self.winfo_height())
+        self.coords("cursor", x, 0, x, self.winfo_height())
         self._variable.set(round2((255. * x) / w))
 
     def _update_alpha(self, *args):
@@ -134,7 +134,7 @@ class AlphaBar(tk.Canvas):
 
     def get(self):
         """Return alpha value of color under cursor."""
-        coords = self.coords('cursor')
+        coords = self.coords("cursor")
         return round2((255. * coords[0]) / self.winfo_width())
 
     def set(self, alpha):
@@ -149,7 +149,7 @@ class AlphaBar(tk.Canvas):
         elif alpha < 0:
             alpha = 0
         x = alpha / 255. * self.winfo_width()
-        self.coords('cursor', x, 0, x, self.winfo_height())
+        self.coords("cursor", x, 0, x, self.winfo_height())
         self._variable.set(alpha)
 
     def set_color(self, color):
@@ -164,3 +164,4 @@ class AlphaBar(tk.Canvas):
         else:
             alpha = color[3]
         self._draw_gradient(alpha, color[:3])
+
