@@ -575,7 +575,7 @@ class TimeLine(ttk.Frame):
         :type iid: str
         """
         if iid == tk.ALL:
-            for iid in self.markers.keys():
+            for iid in list(self.markers.keys()):
                 self.delete_marker(iid)
             return
         options = self._markers[iid]
