@@ -2,20 +2,23 @@
 Author: RedFantom
 License: GNU GPLv3
 Source: This repository
+
+Edited by rdbende to use AutocompleteEntryListbox to improve font search,
+and for allow default font family option
 """
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
 import tkinter as tk
-from tkinter import font
-from ttkwidgets import ScrolledListbox
+from tkinter import font as tkfont
+from ttkwidgets.autocomplete.autocomplete_entrylistbox import AutocompleteEntryListbox
 
 
-class FontFamilyListbox(ScrolledListbox):
+class FontFamilyListbox(AutocompleteEntryListbox):
     """
-    :class:`~ttkwidgets.ScrolledListbox` listing all font families available on the system with a Scrollbar on the right with the option
-    of a callback when double clicked and a property to get the font family name.
+    :class:`~ttkwidgets.AutocompleteEntryListbox` listing all font families available
+    on the system
     """
 
-    def __init__(self, master=None, callback=None, **kwargs):
+    def __init__(self, master=None, callback=None, font=None, **kwargs):
         """
         Create a FontFamilyListbox.
 
@@ -23,17 +26,16 @@ class FontFamilyListbox(ScrolledListbox):
         :type master: widget
         :param callback: callable object with one argument: the font family name
         :type callback: function
+        :param font: set the default font family, family and size must be specified
+        :type font: tuple
         :param kwargs: keyword arguments passed to :class:`~ttkwidgets.ScrolledListbox`, in turn passed to :class:`tk.Listbox`
         """
-        ScrolledListbox.__init__(self, master, compound=tk.RIGHT, **kwargs)
         self._callback = callback
-        font_names = sorted(set(font.families()))
-        index = 0
-        self.font_indexes = {}
-        for name in font_names:
-            self.listbox.insert(index, name)
-            self.font_indexes[index] = name
-            index += 1
+        self._font_families = sorted(set(tkfont.families()))
+        AutocompleteEntryListbox.__init__(self, master, completevalues=self._font_families, **kwargs)
+        if font:
+            self.listbox.selection_set(self._font_families.index(font[0]))
+            self.listbox.yview_scroll(self._font_families.index(font[0]), "units")
         self.listbox.bind("<<ListboxSelect>>", self._on_click)
 
     def _on_click(self, *args):
@@ -48,12 +50,12 @@ class FontFamilyListbox(ScrolledListbox):
     @property
     def selection(self):
         """
-                Selection property.
+        Selection property.
 
         :return: None if no font is selected and font family name if one is selected.
         :rtype: None or str
         """
         selection = self.listbox.curselection()
-        if len(selection) is 0:
+        if len(selection) == 0:
             return None
-        return self.font_indexes[self.listbox.curselection()[0]]
+        return self._font_families[selection[0]]
