@@ -179,7 +179,7 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         widget.entry.delete(0, "end")
         widget.entry.insert(0, "Hello")
         self.window.update()
-        assert widget.entry.get() == "Hello"
+        self.assertEqual(widget.entry.get(), "Hello")
         widget.clear()
         self.window.update()
-        assert not widget.entry.get()
+        self.assertFalse(widget.entry.get())
