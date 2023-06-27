@@ -174,3 +174,12 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         widget.entry.event_generate('<Right>')
         self.window.update()
         self.assertEqual(widget.entry.index('insert'), widget.entry.index('end') - 2)
+
+        # test clear method
+        widget.entry.delete(0, "end")
+        widget.entry.insert(0, "Hello")
+        self.window.update()
+        self.assertEqual(widget.entry.get(), "Hello")
+        widget.clear()
+        self.window.update()
+        self.assertFalse(widget.entry.get())

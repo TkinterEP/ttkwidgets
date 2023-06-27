@@ -213,6 +213,10 @@ class AutocompleteEntryListbox(ttk.Frame):
             return self.entry.cget(key)
         else:
             return ttk.Frame.cget(self, key)
+        
+    def clear(self):
+        self.entry.delete(0, "end")
+        self.listbox.selection_clear(0, "end")
 
     def configure(self, cnf={}, **kw):
         kwargs = {}
