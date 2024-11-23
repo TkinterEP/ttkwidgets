@@ -3,9 +3,11 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
+
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
 import tkinter as tk
 from tkinter import font
+
 from ttkwidgets import ScrolledListbox
 
 
@@ -54,6 +56,6 @@ class FontFamilyListbox(ScrolledListbox):
         :rtype: None or str
         """
         selection = self.listbox.curselection()
-        if len(selection) is 0:
+        if not len(selection):
             return None
         return self.font_indexes[self.listbox.curselection()[0]]

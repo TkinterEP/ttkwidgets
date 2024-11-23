@@ -3,9 +3,11 @@ Author: RedFantom
 License: GNU GPLv3
 Source: This repository
 """
+
 # Based on an idea by Nelson Brochado (https://www.github.com/nbro/tkinter-kit)
 import tkinter as tk
 from tkinter import font
+
 from ttkwidgets.autocomplete import AutocompleteCombobox
 
 
@@ -28,7 +30,13 @@ class FontFamilyDropdown(AutocompleteCombobox):
         self._fonts = font_families
         self._font = tk.StringVar(master)
         self.__callback = callback
-        AutocompleteCombobox.__init__(self, master, textvariable=self._font, completevalues=font_families, **kwargs)
+        AutocompleteCombobox.__init__(
+            self,
+            master,
+            textvariable=self._font,
+            completevalues=font_families,
+            **kwargs,
+        )
         self.bind("<<ComboboxSelected>>", self._on_select)
         self.bind("<Return>", self._on_select)
 
@@ -49,7 +57,7 @@ class FontFamilyDropdown(AutocompleteCombobox):
         :return: None if no font is selected and font family name if one is selected.
         :rtype: None or str
         """
-        if self._font.get() is "" or self._font.get() not in self._fonts:
+        if self._font.get() == "" or self._font.get() not in self._fonts:
             return None
         else:
             return self._font.get()
