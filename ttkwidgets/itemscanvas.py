@@ -203,7 +203,9 @@ class ItemsCanvas(ttk.Frame):
         elif path is not None:
             img = Image.open(path)
             if resize:
-                img = img.resize((self._canvaswidth, self._canvasheight), Image.ANTIALIAS)
+                # Pillow 10 removes Image.ANTIALIAS (Use LANCZOS or BICUBIC):
+                resize_mode = Image.Resampling.LANCZOS if hasattr(Image, "Resampling") else Image.ANTIALIAS
+                img = img.resize((self._canvaswidth, self._canvasheight), resize_mode)
             self._image = ImageTk.PhotoImage(img)
         self._background = self.canvas.create_image(0, 0, image=self._image, anchor=tk.NW, tag="background")
         self.canvas.tag_lower("background")
