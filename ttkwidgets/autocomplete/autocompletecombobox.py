@@ -15,7 +15,7 @@ tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresi
 
 class AutocompleteCombobox(ttk.Combobox):
     """:class:`ttk.Combobox` widget that features autocompletion."""
-    def __init__(self, master=None, completevalues=None, **kwargs):
+    def __init__(self, master=None, completevalues=None, sort=True, **kwargs):
         """
         Create an AutocompleteCombobox.
 
@@ -23,9 +23,12 @@ class AutocompleteCombobox(ttk.Combobox):
         :type master: widget
         :param completevalues: autocompletion values
         :type completevalues: list
+        :param sort: sort autocompletion values, default is True for backwards compatibility with older versions
+        :type sort: boolean (default: True)
         :param kwargs: keyword arguments passed to the :class:`ttk.Combobox` initializer
         """
         ttk.Combobox.__init__(self, master, values=completevalues, **kwargs)
+        self._sort = sort
         self._completion_list = completevalues
         if isinstance(completevalues, list):
             self.set_completion_list(completevalues)
@@ -74,7 +77,12 @@ bind $popdown.f.l <KeyPress> [list ComboListKeyPressed %%W %%K]
         :param completion_list: completion values
         :type completion_list: list
         """
-        self._completion_list = sorted(completion_list, key=str.lower)  # Work with a sorted list
+        
+        # Clone the list to avoid unintentional modifications to the input list
+        self._completion_list = completion_list[:]
+        if self._sort:
+            # Work with a sorted list if sorting is enabled
+            self._completion_list.sort(key=str.lower)
         self.configure(values=completion_list)
         self._hits = []
         self._hit_index = 0

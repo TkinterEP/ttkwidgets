@@ -29,6 +29,14 @@ class TestAutocompleteWidgets(BaseWidgetTest):
         box['completevalues'] = ["Test"]
         self.assertEqual(box['completevalues'], ["Test"])
 
+    def test_autocompletecombobox_unsorted(self):
+        box = AutocompleteCombobox(self.window, completevalues=["Apple", "Pear", "Banana"], sort=False)
+        box.pack()
+        self.window.update()
+
+        self.assertIn('completevalues', box.keys())
+        self.assertEqual(box['completevalues'], ["Apple", "Pear", "Banana"])
+
     def test_autocompleteentry(self):
         entry = AutocompleteEntry(self.window, completevalues=["Apple", "Pear", "Banana"])
         entry.pack()
