@@ -92,3 +92,43 @@ class TestTooltip(BaseWidgetTest):
         balloon = Tooltip(self.window)
         balloon._on_enter(None)
         balloon._on_leave(None)
+
+    def test_leave_during_show(self):
+        button = tk.Button(self.window)
+        button.pack()
+        balloon = Tooltip(button)
+        self.window.update()
+        self.window.after(0, lambda: button.event_generate("<Leave>"))
+        balloon.show()
+        self.assertIsNone(balloon._toplevel)
+        balloon.show()
+        self.assertTrue(balloon._toplevel.winfo_exists())
+        button.event_generate("<Leave>")
+        self.assertIsNone(balloon._toplevel)
+
+    def test_reconfigure_during_show(self):
+        balloon = Tooltip(self.window, offset=(0, 0))
+        self.window.after(0, lambda: balloon.configure(text="Updated", offset=(100, 100), static=True))
+        balloon.show()
+        self.window.update()
+        x = self.window.winfo_rootx() + self.window.winfo_width()
+        y = self.window.winfo_rooty() + self.window.winfo_height()
+        self.assertEqual(balloon._toplevel.winfo_x(), x + 100)
+        self.assertEqual(balloon._toplevel.winfo_y(), y + 100)
+        self.assertEqual(balloon.text_label.cget("text"), "Updated")
+        balloon._on_leave(None)
+
+    def test_master_destroyed_during_show(self):
+        button = tk.Button(self.window)
+        button.pack()
+        balloon = Tooltip(button)
+        self.window.update()
+        self.window.after(0, button.destroy)
+        balloon.show()
+        self.assertFalse(button.winfo_exists())
+
+    def test_application_destroyed_during_show(self):
+        root = tk.Tk()
+        balloon = Tooltip(root)
+        root.after(0, root.destroy)
+        balloon.show()

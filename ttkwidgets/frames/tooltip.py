@@ -120,7 +120,17 @@ class Tooltip(ttk.Frame):
             x, y = x + w, y + h
         else:
             x, y = self.master.winfo_pointerxy()
+        # Processing events may hide this tooltip or replace it via configure().
+        toplevel = self._toplevel
         self._canvas.update()
+        if self._toplevel is not toplevel:
+            return
+        try:
+            if not toplevel.winfo_exists():
+                return
+        except tk.TclError:
+            # The entire Tk application may have been destroyed by a callback.
+            return
         # Update the Geometry of the Toplevel to update its position and size
         self._toplevel.geometry("{0}x{1}+{2}+{3}".format(
             self._canvas.winfo_width(), self._canvas.winfo_height(),
